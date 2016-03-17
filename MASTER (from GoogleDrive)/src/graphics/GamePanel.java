@@ -8,6 +8,7 @@ import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
@@ -37,9 +38,9 @@ public class GamePanel extends GenericPanel{
 	public GamePanel(MasterGamePanel masterGamePanel){
 		this.masterGamePanel = masterGamePanel;
 		ballImage = Toolkit.getDefaultToolkit().createImage("res\\Textures\\disc.png");
-		aiming = null;
 		hitPoint = new Point3D(0, 0, 0);
 		hitVector = new Vector(0, 0, 0);
+		aiming = new Line3D(0, 0, 0, 0, 0, 0);
 
 		addMouseListener(new MouseAdapter(){
 			boolean clicked = false;
@@ -65,11 +66,16 @@ public class GamePanel extends GenericPanel{
 				}
 			}
 
-			public void mouseDragged(MouseEvent e){
-					hitPoint.setLocation(e.getX(), e.getY(), 0);
-					hitVector = new Vector(game.getBall1().getX() - e.getX(), game.getBall1().getY() - e.getY(), 0.0);
-					aiming = new Line3D(hitPoint, new Point3D(hitPoint.getX() + hitVector.getX() * 100000, hitPoint.getY() + hitVector.getY() * 100000, 0));
+		});
+
+		addMouseMotionListener(new MouseMotionListener() {
+			public void mouseDragged(MouseEvent e) {
+				hitPoint.setLocation(e.getX(), e.getY(), 0);
+				hitVector.setValues(game.getBall1().getX() - e.getX(), game.getBall1().getY() - e.getY(), 0.0);
+				aiming.setLine(hitPoint, new Point3D(hitPoint.getX() + hitVector.getX() * 100000, hitPoint.getY() + hitVector.getY() * 100000, 0));
+				//System.out.println("Mouse dragged, line is " + aiming + ", point 1 is " + aiming.getP1() + ", point 2 is " + aiming.getP2());
 			}
+			public void mouseMoved(MouseEvent e) {}
 		});
 	}
 
@@ -92,17 +98,16 @@ public class GamePanel extends GenericPanel{
 		Graphics2D g2 = (Graphics2D) g;
 		if (game != null) {
 			drawCourse(g);
+			drawAiming(g2);
 			drawBall(g);
-			drawAiming(g);
 		}
 	}
 
-	public void drawAiming(Graphics g){
-		if(aiming != null){
-			Graphics2D g2d = (Graphics2D) g;
+	public void drawAiming(Graphics2D g2d){
+		if (aiming != null) {
 			g2d.setColor(Color.RED);
-			System.out.println("Hi");
-			g2d.draw(new Line2D.Double(aiming.getX1(), aiming.getY1(), aiming.getX2(), aiming.getY2()));
+			Line2D.Double line = new Line2D.Double(aiming.getX1(), aiming.getY1(), aiming.getX2(), aiming.getY2());
+			g2d.draw(line);
 		}
 	}
 

@@ -14,7 +14,7 @@ public class Vector {
 		this.y = p2.getY()-p1.getY();
 		this.z = p2.getZ()-p1.getZ();
 	}
-	
+
 	public Vector(Line3D line){
 		this.x = line.getX2()-line.getX1();
 		this.y = line.getY2()-line.getY1();
@@ -48,7 +48,13 @@ public class Vector {
 	public void setZ(double z) {
 		this.z = z;
 	}
-	
+
+	public void setValues(double x, double y, double z) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+
 	public double getLength() {
         double length = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2));
         return length;
@@ -96,16 +102,16 @@ public class Vector {
     public Vector clone() {
         return new Vector(x, y, z);
     }
-    
+
     public void add(Vector v){
     	x += v.getX();
     	y += v.getY();
     	z += v.getZ();
     }
-    
+
     public String toString(){
     	return "[" + x + "|" + y + "|" + z + "]";
     }
-	
-	
+
+
 }

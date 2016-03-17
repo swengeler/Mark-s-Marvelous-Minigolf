@@ -145,11 +145,9 @@ public class Course {
 	}
 
 	public void combineEdges() {
-	    Edge currentEdge;
 	    //ArrayList<Edge> edges = this.getEdges();
 		System.out.println("Size of edges arraylist before combining: " + edges.size());
 	    for (int i = 0; i < edges.size(); i++) {
-	        currentEdge = edges.get(i);
 	        for (int j = i + 1; j < edges.size(); j++) {
 	            int counter = 0;
 	            for (int l = 0; l < edges.get(j).xpoints().length; l++) {
