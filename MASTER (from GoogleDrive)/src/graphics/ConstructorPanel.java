@@ -107,6 +107,7 @@ public class ConstructorPanel extends GenericPanel{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// first check all the edges
+				course.combineEdges();
 				frame.openGame(course);
 			}
 		});

@@ -1,4 +1,4 @@
-package course_designer_GUI;
+package graphics;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -7,12 +7,12 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
-import course_designer.Course;
-import course_designer.Edge;
-import course_designer.GameTile;
-import course_designer.Hole;
-import course_designer.Obstacle;
-import course_designer.StartPoint;
+import entities.Course;
+import entities.Edge;
+import entities.GameTile;
+import entities.Hole;
+import physicsengine.Obstacle;
+import entities.StartPoint;
 
 public class DrawPanel extends JPanel{
 
@@ -20,6 +20,7 @@ public class DrawPanel extends JPanel{
 	Course course;
 	private GameTile[][] grid;
 	private ArrayList<Obstacle> obstacles = new ArrayList<Obstacle>();
+	private int counter;
 
 
 	private final int SIZE = 50;
@@ -33,6 +34,8 @@ public class DrawPanel extends JPanel{
 		course.resetEdges();
 		grid = course.getGrid();
 		super.paintComponent(g);
+		System.out.print("Number of edges during one repaint: ");
+		counter = 0;
 		for (int x = 0; x < grid.length; x++) {
 			for (int y = 0; y < grid[0].length; y++) {
 				if (grid[x][y] == null) {
@@ -50,7 +53,7 @@ public class DrawPanel extends JPanel{
 				if (grid[x][y] != null && grid[x][y].getEnd()) {
 					Obstacle hole = new Hole(100 + (x * SIZE) + 25, 20 + (y * SIZE) + 25, false);
 					Graphics2D g2d = (Graphics2D) g;
-					hole.draw(g2d);
+					hole.draw(g2d, false);
 				}
 				if (grid[x][y] != null && grid[x][y].getStart()) {
 					StartPoint start = new StartPoint(100 + (x * SIZE) + (SIZE/2), 20 + (y * SIZE) + (SIZE/2));
@@ -59,6 +62,7 @@ public class DrawPanel extends JPanel{
 				}
 			}
 		}
+		System.out.println(course.getEdges().size() + "/" + counter + "\n");
 		drawObstacles(g);
 		drawOverLay(g);
 	}
@@ -72,6 +76,7 @@ public class DrawPanel extends JPanel{
 			g.setColor(Color.BLACK);
 			g.drawPolygon(right.getShape());
 			course.addEdge(right);
+			counter++;
 		}
 		if (grid[x][y].hasLeftEdge()) {
 			Edge left = new Edge(100 + (x * SIZE), 20 + (y * SIZE), edgeSize, SIZE);
@@ -80,6 +85,7 @@ public class DrawPanel extends JPanel{
 			g.setColor(Color.BLACK);
 			g.drawPolygon(left.getShape());
 			course.addEdge(left);
+			counter++;
 		}
 		if (grid[x][y].hasTopEdge()) {
 			Edge top = new Edge(100 + (x * SIZE), 20 + (y * SIZE), SIZE, edgeSize);
@@ -88,6 +94,7 @@ public class DrawPanel extends JPanel{
 			g.setColor(Color.BLACK);
 			g.drawPolygon(top.getShape());
 			course.addEdge(top);
+			counter++;
 		}
 		if (grid[x][y].hasBottomEdge()) {
 			Edge bottom = new Edge(100 + (x * SIZE), 20 + (y * SIZE) + (SIZE - edgeSize), SIZE, edgeSize);
@@ -96,6 +103,7 @@ public class DrawPanel extends JPanel{
 			g.setColor(Color.BLACK);
 			g.drawPolygon(bottom.getShape());
 			course.addEdge(bottom);
+			counter++;
 		}
 	}
 
@@ -107,7 +115,8 @@ public class DrawPanel extends JPanel{
 			g.fillPolygon(topLeft.getShape());
 			g.setColor(Color.BLACK);
 			g.drawPolygon(topLeft.getShape());
-			course.addEdge(topLeft);
+			//course.addEdge(topLeft);
+			counter++;
 		}
 		if (grid[x][y].hasTopRight()) {
 			Edge topRight = new Edge(100 + (x * SIZE) + (SIZE - cornerSize), 20 + (y * SIZE), cornerSize, cornerSize);
@@ -115,7 +124,8 @@ public class DrawPanel extends JPanel{
 			g.fillPolygon(topRight.getShape());
 			g.setColor(Color.BLACK);
 			g.drawPolygon(topRight.getShape());
-			course.addEdge(topRight);
+			//course.addEdge(topRight);
+			counter++;
 		}
 		if (grid[x][y].hasBottomLeft()) {
 			Edge bottomLeft = new Edge(100 + (x * SIZE), 20 + (y * SIZE) + (SIZE - cornerSize), cornerSize, cornerSize);
@@ -123,7 +133,8 @@ public class DrawPanel extends JPanel{
 			g.fillPolygon(bottomLeft.getShape());
 			g.setColor(Color.BLACK);
 			g.drawPolygon(bottomLeft.getShape());
-			course.addEdge(bottomLeft);
+			//course.addEdge(bottomLeft);
+			counter++;
 		}
 		if (grid[x][y].hasBottomRight()) {
 			Edge bottomRight = new Edge(100 + (x * SIZE) + (SIZE - cornerSize), 20 + (y * SIZE) + (SIZE - cornerSize), cornerSize, cornerSize);
@@ -131,7 +142,8 @@ public class DrawPanel extends JPanel{
 			g.fillPolygon(bottomRight.getShape());
 			g.setColor(Color.BLACK);
 			g.drawPolygon(bottomRight.getShape());
-			course.addEdge(bottomRight);
+			//course.addEdge(bottomRight);
+			counter++;
 		}
 	}
 
@@ -139,7 +151,7 @@ public class DrawPanel extends JPanel{
 		obstacles = course.getObstacles();
 		Graphics2D g2 = (Graphics2D) g;
 		for (Obstacle o: obstacles) {
-			o.draw(g2);
+			o.draw(g2, false);
 		}
 	}
 
@@ -147,7 +159,7 @@ public class DrawPanel extends JPanel{
 		Graphics2D g2d = (Graphics2D) g;
 		Obstacle overLay = course.getOverLay();
 		if (overLay != null) {
-			overLay.draw(g2d);
+			overLay.draw(g2d, false);
 		}
 	}
 

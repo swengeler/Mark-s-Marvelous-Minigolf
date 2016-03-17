@@ -23,7 +23,7 @@ import utils.Point3D;
 import utils.Vector;
 
 public class GamePanel extends GenericPanel{
-	
+
 	private Game game;
 	private MasterGamePanel masterGamePanel;
 	boolean inGame;
@@ -33,14 +33,14 @@ public class GamePanel extends GenericPanel{
 	private Point3D hitPoint;
 	private Vector hitVector;
 	private int score=0;
-	
+
 	public GamePanel(MasterGamePanel masterGamePanel){
 		this.masterGamePanel = masterGamePanel;
 		ballImage = Toolkit.getDefaultToolkit().createImage("res\\Textures\\disc.png");
 		aiming = null;
 		hitPoint = new Point3D(0, 0, 0);
 		hitVector = new Vector(0, 0, 0);
-		
+
 		addMouseListener(new MouseAdapter(){
 			boolean clicked = false;
 			int x,y;
@@ -64,27 +64,30 @@ public class GamePanel extends GenericPanel{
 					game.addScore();
 				}
 			}
-			
+
 			public void mouseDragged(MouseEvent e){
 					hitPoint.setLocation(e.getX(), e.getY(), 0);
 					hitVector = new Vector(game.getBall1().getX() - e.getX(), game.getBall1().getY() - e.getY(), 0.0);
-					aiming = new Line3D(hitPoint, new Point3D(hitPoint.getX() + hitVector.getX() * 100000, hitPoint.getY() + hitVector.getY() * 100000, 0)); 
+					aiming = new Line3D(hitPoint, new Point3D(hitPoint.getX() + hitVector.getX() * 100000, hitPoint.getY() + hitVector.getY() * 100000, 0));
 			}
 		});
 	}
-	
-	public void setCourse(Course course){
+
+	public void setCourse(Course course) {
+		for (Edge e : course.getEdges()) {
+			System.out.println(e.getInfo());
+		}
 		game = new Game(multiplayer, course, frame, masterGamePanel);
 	}
-	
+
 	public Image getBallImage(){
 		return ballImage;
 	}
-	
+
 	public int getScore(){
 		return score;
 	}
-	
+
 	public void paintComponent(Graphics g){
 		Graphics2D g2 = (Graphics2D) g;
 		if (game != null) {
@@ -93,7 +96,7 @@ public class GamePanel extends GenericPanel{
 			drawAiming(g);
 		}
 	}
-	
+
 	public void drawAiming(Graphics g){
 		if(aiming != null){
 			Graphics2D g2d = (Graphics2D) g;
@@ -102,7 +105,7 @@ public class GamePanel extends GenericPanel{
 			g2d.draw(new Line2D.Double(aiming.getX1(), aiming.getY1(), aiming.getX2(), aiming.getY2()));
 		}
 	}
-	
+
 	private void drawBall(Graphics g) {
 		Point3D p = game.getBall1().getCenter();
 		int r = (int) game.getBall1().getRadius();
@@ -118,13 +121,13 @@ public class GamePanel extends GenericPanel{
 					g.fillRect((int)(x*TILE_SIZE*PX_SCALE), (int)(y*TILE_SIZE*PX_SCALE), (int)(TILE_SIZE*PX_SCALE), (int)(TILE_SIZE*PX_SCALE));
 				}
 			}
-		
+
 		ArrayList<Obstacle> obstacles = game.getObstacles();
 		for(Obstacle o:obstacles){
 			o.draw((Graphics2D) g, true);
 		}
-		
+
 	}
 
-	
+
 }

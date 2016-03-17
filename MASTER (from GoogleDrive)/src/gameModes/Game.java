@@ -28,7 +28,7 @@ import utils.Vector;
 import physicsengine.Obstacle;;
 
 public class Game {
-	
+
 	private Ball ball1;
 	private Ball ball2;
 	private boolean multiplayer;
@@ -39,8 +39,8 @@ public class Game {
 	private int score;
 	public ArrayList<Obstacle> obstacles;
 	private MasterGamePanel masterGamePanel;
-	
-	public Game(boolean multiplayer, Course course, MainFrame frame, MasterGamePanel masterGamePanel){
+
+	public Game(boolean multiplayer, Course course, MainFrame frame, MasterGamePanel masterGamePanel) {
 		this.masterGamePanel = masterGamePanel;
 		ball1 = new Ball();
 		this.frame = frame;
@@ -54,9 +54,9 @@ public class Game {
 		ph.setBallSpeed(new Vector(0,0,0));
 		ph.start();
 	}
-	
-	
-	
+
+
+
 	public PhysicsHandler getPh() {
 		return ph;
 	}
@@ -76,10 +76,10 @@ public class Game {
 
         RoundObstacle o3 = new RoundObstacle(200, 200, 50);
         obstacles.add(o3);
-        
+
         ph.addObstacles(obstacles);
     }
-	
+
 	public Ball getBall1() {
 		return ball1;
 	}
@@ -107,19 +107,19 @@ public class Game {
 		int edgeSize = 10;
 		for(int x=0; x<grid.length; x++)
 			for(int y=0; y<grid[0].length; y++){
-			
+
 				if(course.checkTile(x, y)){
 				if (grid[x][y].hasRightEdge()) {
 					int[] xpoints = {(x * GenericPanel.TILE_SIZE) + (GenericPanel.TILE_SIZE - edgeSize), (x * GenericPanel.TILE_SIZE) + (GenericPanel.TILE_SIZE), (x * GenericPanel.TILE_SIZE) + (GenericPanel.TILE_SIZE), (x * GenericPanel.TILE_SIZE) + (GenericPanel.TILE_SIZE - edgeSize)};
 					int[] ypoints = {(y * GenericPanel.TILE_SIZE), (y * GenericPanel.TILE_SIZE), ((y+1) * GenericPanel.TILE_SIZE), ((y+1) * GenericPanel.TILE_SIZE)};
 					obstacles.add(new PolygonObstacle(new Polygon(xpoints,ypoints,4),true, Color.GRAY));
-					
+
 				}
 				if (grid[x][y].hasLeftEdge()) {
 					int[] xpoints = {(x * GenericPanel.TILE_SIZE), (x * GenericPanel.TILE_SIZE) + edgeSize, (x * GenericPanel.TILE_SIZE) + edgeSize, (x * GenericPanel.TILE_SIZE)};
 					int[] ypoints = {(y * GenericPanel.TILE_SIZE), (y * GenericPanel.TILE_SIZE), ((y+1) * GenericPanel.TILE_SIZE), ((y+1) * GenericPanel.TILE_SIZE)};
 					obstacles.add(new PolygonObstacle(new Polygon(xpoints,ypoints,4),true, Color.GRAY));
-					
+
 				}
 				if (grid[x][y].hasTopEdge()) {
 					int[] xpoints = {(x * GenericPanel.TILE_SIZE), ((x+1) * GenericPanel.TILE_SIZE), ((x+1) * GenericPanel.TILE_SIZE), x * GenericPanel.TILE_SIZE};
@@ -136,24 +136,21 @@ public class Game {
 				}
 			}
 			}
-		
-		
+
+
 	}
-	
+
 	public ArrayList<Obstacle> getObstacles(){
 		return obstacles;
 	}
-	
+
 	public void over(){
 		ball1.multiplyVWith(0);
 		course.setBallToStart(ball1);
 		System.out.println("shot = "  + this.getScore());
 		score=0;
 	}
-	
 
-    
-    
     public void addScore(){
     	this.score++;
     	masterGamePanel.UpdateScore(score);
@@ -161,7 +158,7 @@ public class Game {
     public int getScore(){
     	return this.score;
     }
-    
-    
-	
+
+
+
 }
