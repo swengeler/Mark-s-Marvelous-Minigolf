@@ -29,7 +29,7 @@ public class ConstructorPanel extends GenericPanel{
 	private DrawPanel contentPanel;
 	private String currentObstacleString = "Green";
 	private MainFrame frame;
-	
+
 	public ConstructorPanel(MainFrame frame) {
 		this.setPreferredSize(new Dimension(1000, 1000));
 		this.setLayout(new BorderLayout());
@@ -41,14 +41,14 @@ public class ConstructorPanel extends GenericPanel{
 		this.add(botPanel, BorderLayout.SOUTH);
 		this.frame = frame;
 	}
-	
+
 	public JPanel getTitlePanel() {
 		JPanel titlePanel = new JPanel();
 		JLabel title = new JLabel("Course Constructor");
 		titlePanel.add(title);
 		return titlePanel;
 	}
-	
+
 	public JPanel getMidPanel() {
 		JPanel midPanel = new JPanel();
 		midPanel.setLayout(new BorderLayout());
@@ -58,7 +58,7 @@ public class ConstructorPanel extends GenericPanel{
 		midPanel.add(drawPanel, BorderLayout.CENTER);
 		return midPanel;
 	}
-	
+
 	public JPanel getLeftPanel() {
 		String[] Obstacles = {"Green", "Start", "Hole", "Square", "Circle", "Triangle"};
 		JComboBox<String> obstacleList = new JComboBox<>(Obstacles);
@@ -72,7 +72,7 @@ public class ConstructorPanel extends GenericPanel{
 		leftPanel.add(obstacleList);
 		return leftPanel;
 	}
-	
+
 	public JPanel getContentPanel() {
 		DrawPanel drawPanel = new DrawPanel(course);
 		contentPanel = new DrawPanel(course);
@@ -81,7 +81,7 @@ public class ConstructorPanel extends GenericPanel{
 		drawPanel.addMouseMotionListener(new mouseMovement());
 		return drawPanel;
 	}
-	
+
 	public JPanel getBottomPanel() {
 		JPanel botPanel = new JPanel();
 		JButton undoButton = new JButton("Undo");
@@ -106,10 +106,11 @@ public class ConstructorPanel extends GenericPanel{
 		playButton.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				// first check all the edges
 				frame.openGame(course);
 			}
 		});
-		
+
 		botPanel.add(undoButton);
 		botPanel.add(resetButton);
 		botPanel.add(saveButton);
@@ -117,9 +118,9 @@ public class ConstructorPanel extends GenericPanel{
 		botPanel.add(playButton);
 		return botPanel;
 	}
-	
+
 	public class MouseEvents implements MouseListener {
-		
+
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			//nothing
@@ -227,11 +228,11 @@ public class ConstructorPanel extends GenericPanel{
 		public void mouseReleased(MouseEvent e) {
 			// nothing
 		}
-		
+
 	}
-	
+
 	public class mouseMovement implements MouseMotionListener {
-		
+
 		boolean inGrid = false;
 
 		@Override
