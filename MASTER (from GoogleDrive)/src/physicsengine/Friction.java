@@ -35,7 +35,7 @@ public class Friction extends Acceleration {
         y = - ay * factor;
         z = - az * factor;
     }
-    
+
     public double getFactor(){
     	return factor;
     }

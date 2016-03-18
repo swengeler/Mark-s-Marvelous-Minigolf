@@ -6,18 +6,19 @@ import java.awt.geom.Ellipse2D;
 
 import graphics.GenericPanel;
 import utils.Point3D;
+import utils.Calculator;
 
 import physicsengine.Obstacle;
 import physicsengine.RoundObstacle;
 
 public class Hole extends RoundObstacle {
 
-	private final int radius = 20;
+	private final int radius = 11;
 	private double centerX;
 	private double centerY;
 	private Ellipse2D.Double shape;
     private Color color;
-    public static final double HOLE_NUMBER = 10;
+    public static final double HOLE_NUMBER = 1;
 
 	public Hole(double centerX, double centerY, boolean overLay){
 		super(centerX, centerY, 0, overLay);
@@ -40,20 +41,17 @@ public class Hole extends RoundObstacle {
 	}
 
 	public boolean contains(Ball ball) {
-		if(ball.getX() <= 230 && ball.getX() >= 190 && ball.getY() <= 90 && ball.getY() >= 50) {
+		if (Calculator.distancePointPoint(ball.getCenter(), super.getCenter()) <= ball.getRadius() + this.radius) {
 			return true;
 		}
 		return false;
 	}
 
 	public boolean isBallIn(Ball ball) {
-		//if (super.contains(ball.getX(), ball.getY())) {
-		//System.out.println("Location of hole: " + centerX + "/" + centerY);
-		//if(ball.getX() <= centerX + radius && ball.getX() >= centerX - radius && ball.getY() <= centerY + radius && ball.getY() >= centerY + radius) {
-		if(ball.getX() <= 230 && ball.getX() >= 190 && ball.getY() <= 90 && ball.getY() >= 50) {
-			System.out.println("Hole is hit");
+		if (Calculator.distancePointPoint(ball.getCenter(), super.getCenter()) < this.radius) {
+			//System.out.println("Hole is hit");
 			if(ball.getVelocity().getLength() < HOLE_NUMBER) {
-				System.out.println("Ball is slow enough");
+				//System.out.println("Ball is slow enough");
 				return true;
 			}
 		}
