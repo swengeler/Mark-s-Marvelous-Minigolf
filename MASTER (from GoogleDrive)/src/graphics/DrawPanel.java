@@ -15,7 +15,7 @@ import physicsengine.Obstacle;
 import entities.StartPoint;
 
 public class DrawPanel extends JPanel{
-
+	
 	private static final long serialVersionUID = 1L;
 	Course course;
 	private GameTile[][] grid;
@@ -34,7 +34,7 @@ public class DrawPanel extends JPanel{
 		course.resetEdges();
 		grid = course.getGrid();
 		super.paintComponent(g);
-		System.out.print("Number of edges during one repaint: ");
+		if (Course.PRINT_EDGE_DEBUG) {System.out.print("Number of edges during one repaint: ");}
 		counter = 0;
 		for (int x = 0; x < grid.length; x++) {
 			for (int y = 0; y < grid[0].length; y++) {
@@ -62,7 +62,7 @@ public class DrawPanel extends JPanel{
 				}
 			}
 		}
-		System.out.println(course.getEdges().size() + "/" + counter + "\n");
+		if (Course.PRINT_EDGE_DEBUG) {System.out.println(course.getEdges().size() + "/" + counter + "\n");}
 		drawObstacles(g);
 		drawOverLay(g);
 	}

@@ -11,14 +11,18 @@ import physicsengine.Obstacle;
 import physicsengine.RoundObstacle;
 
 public class Hole extends RoundObstacle {
-	
-	private final int radius = 11;
+
+	private final int radius = 20;
+	private double centerX;
+	private double centerY;
 	private Ellipse2D.Double shape;
     private Color color;
-    public static final double HOLE_NUMBER = 1;
-	
+    public static final double HOLE_NUMBER = 10;
+
 	public Hole(double centerX, double centerY, boolean overLay){
 		super(centerX, centerY, 0, overLay);
+		this.centerX = centerX;
+		this.centerY = centerY;
         shape = new Ellipse2D.Double(centerX - radius, centerY - radius, 2 * radius, 2 * radius);
         color = Color.BLACK;
 	}
@@ -35,14 +39,27 @@ public class Hole extends RoundObstacle {
         g2d.draw(Nshape);
 	}
 
-	public boolean isBallIn(Ball ball) {
-		if(shape.contains(ball.getX(), ball.getY())){
-			if(ball.getVelocity().getLength() < HOLE_NUMBER)
-				return true;
+	public boolean contains(Ball ball) {
+		if(ball.getX() <= 230 && ball.getX() >= 190 && ball.getY() <= 90 && ball.getY() >= 50) {
+			return true;
 		}
 		return false;
 	}
-	
-	
+
+	public boolean isBallIn(Ball ball) {
+		//if (super.contains(ball.getX(), ball.getY())) {
+		//System.out.println("Location of hole: " + centerX + "/" + centerY);
+		//if(ball.getX() <= centerX + radius && ball.getX() >= centerX - radius && ball.getY() <= centerY + radius && ball.getY() >= centerY + radius) {
+		if(ball.getX() <= 230 && ball.getX() >= 190 && ball.getY() <= 90 && ball.getY() >= 50) {
+			System.out.println("Hole is hit");
+			if(ball.getVelocity().getLength() < HOLE_NUMBER) {
+				System.out.println("Ball is slow enough");
+				return true;
+			}
+		}
+		return false;
+	}
+
+
 
 }

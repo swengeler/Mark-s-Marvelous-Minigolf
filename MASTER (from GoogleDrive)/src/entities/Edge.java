@@ -29,7 +29,7 @@ public class Edge {
 		for (double i = x - 1; i <= x + 1; i += 1) {
 			for (double j = y - 1; j <= y + 1; j += 1) {
 				if (edge.contains(i, j)) {
-					System.out.println(this.getInfo() + " contains " + i + "/" + j);
+					if (Course.PRINT_EDGE_DEBUG) {System.out.println(this.getInfo() + " contains " + i + "/" + j);}
 					return true;
 				}
 			}

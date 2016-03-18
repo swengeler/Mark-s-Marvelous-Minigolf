@@ -34,6 +34,7 @@ public class GamePanel extends GenericPanel{
 	private Point3D hitPoint;
 	private Vector hitVector;
 	private int score=0;
+	private boolean aimingEnabled;
 
 	public GamePanel(MasterGamePanel masterGamePanel){
 		this.masterGamePanel = masterGamePanel;
@@ -41,6 +42,7 @@ public class GamePanel extends GenericPanel{
 		hitPoint = new Point3D(0, 0, 0);
 		hitVector = new Vector(0, 0, 0);
 		aiming = new Line3D(0, 0, 0, 0, 0, 0);
+		aimingEnabled = true;
 
 		addMouseListener(new MouseAdapter(){
 			boolean clicked = false;
@@ -61,7 +63,7 @@ public class GamePanel extends GenericPanel{
 					double yVel = e.getY() - y;
 					game.getPh().setBallSpeed(new Vector(-xVel*0.01, -yVel*0.01, 0));
 					clicked = false;
-					aiming = null;
+					aimingEnabled = false;
 					game.addScore();
 				}
 			}
@@ -70,6 +72,9 @@ public class GamePanel extends GenericPanel{
 
 		addMouseMotionListener(new MouseMotionListener() {
 			public void mouseDragged(MouseEvent e) {
+				if (game.getPh().isStopped()) {
+					aimingEnabled = true;
+				}
 				hitPoint.setLocation(e.getX(), e.getY(), 0);
 				hitVector.setValues(game.getBall1().getX() - e.getX(), game.getBall1().getY() - e.getY(), 0.0);
 				aiming.setLine(hitPoint, new Point3D(hitPoint.getX() + hitVector.getX() * 100000, hitPoint.getY() + hitVector.getY() * 100000, 0));
@@ -80,8 +85,10 @@ public class GamePanel extends GenericPanel{
 	}
 
 	public void setCourse(Course course) {
-		for (Edge e : course.getEdges()) {
-			System.out.println(e.getInfo());
+		if (Course.PRINT_EDGE_DEBUG) {
+			for (Edge e : course.getEdges()) {
+				System.out.println(e.getInfo());
+			}
 		}
 		game = new Game(multiplayer, course, frame, masterGamePanel);
 	}
@@ -104,7 +111,7 @@ public class GamePanel extends GenericPanel{
 	}
 
 	public void drawAiming(Graphics2D g2d){
-		if (aiming != null) {
+		if (aiming != null && aimingEnabled) {
 			g2d.setColor(Color.RED);
 			Line2D.Double line = new Line2D.Double(aiming.getX1(), aiming.getY1(), aiming.getX2(), aiming.getY2());
 			g2d.draw(line);

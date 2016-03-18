@@ -8,6 +8,8 @@ import utils.Point3D;
 
 public class Course {
 
+	public static final boolean PRINT_EDGE_DEBUG = false;
+
 	private final int X = 10;
 	private final int Y = 10;
 	private int[] s_e_tile = new int[4];  //{xStart,yStart,xEnd,yEnd}
@@ -54,6 +56,7 @@ public class Course {
 	}
 
 	public void addObstacle(Obstacle obstacle) {
+		System.out.println("Adding " + obstacle);
 		obstacles.add(obstacle);
 	}
 
@@ -146,7 +149,7 @@ public class Course {
 
 	public void combineEdges() {
 	    //ArrayList<Edge> edges = this.getEdges();
-		System.out.println("Size of edges arraylist before combining: " + edges.size());
+		if (PRINT_EDGE_DEBUG) {System.out.println("Size of edges arraylist before combining: " + edges.size());}
 	    for (int i = 0; i < edges.size(); i++) {
 	        for (int j = i + 1; j < edges.size(); j++) {
 	            int counter = 0;
@@ -157,21 +160,23 @@ public class Course {
 	                }
 	            }
 	            if (counter == 2) {
-					System.out.println("Combining edges: ");
-					System.out.println(edges.get(i).getInfo());
-					System.out.println(edges.get(j).getInfo());
-					System.out.print("Points added to first edge: ");
+					if (PRINT_EDGE_DEBUG) {
+						System.out.println("Combining edges: ");
+						System.out.println(edges.get(i).getInfo());
+						System.out.println(edges.get(j).getInfo());
+						System.out.print("Points added to first edge: ");
+					}
 	                for (int l = 0; l < edges.get(j).xpoints().length; l++) {
-						System.out.print(edges.get(j).xpoints()[l] + "/" + edges.get(j).ypoints()[l] + " ");
+						if (PRINT_EDGE_DEBUG) {System.out.print(edges.get(j).xpoints()[l] + "/" + edges.get(j).ypoints()[l] + " ");}
 	                    edges.get(i).addPoint(edges.get(j).xpoints()[l], edges.get(j).ypoints()[l]);
 	                }
-					System.out.println("\n");
+					if (PRINT_EDGE_DEBUG) {System.out.println("\n");}
 	                edges.remove(edges.get(j));
 	                j--;
 	            }
 	        }
 	    }
-		System.out.println("Size of edges arraylist after combining: " + edges.size());
+		if (PRINT_EDGE_DEBUG) {System.out.println("Size of edges arraylist after combining: " + edges.size());}
 	}
 
 	public GameTile[][] getGrid() {

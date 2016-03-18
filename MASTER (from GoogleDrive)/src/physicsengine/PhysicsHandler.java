@@ -32,9 +32,9 @@ public class PhysicsHandler {
     private boolean ballStopped = true;
 
     private Timer t;
-    
+
     private Game game;
-    
+
     public PhysicsHandler(Ball ball, Game game) {
         this.ball = ball;
         addObstacles();
@@ -48,15 +48,15 @@ public class PhysicsHandler {
 			}
 		});
     }
-    
+
     public void addObstacles(ArrayList<Obstacle> obstacles){
     	this.obstacles.addAll(obstacles);
     }
-    
+
     public void start(){
     	t.start();
     }
-    
+
     public void pause(){
     	t.stop();
     }
@@ -99,17 +99,16 @@ public class PhysicsHandler {
                 		Hole tempH = (Hole) o;
                 		if(tempH.isBallIn(ball)){
                 			System.out.println("game over");
-                			
                 			game.over();
                 		}
-                			
+
                 	/*
                 	if(o instanceof Hole && firstWall){
                     	System.out.println("hit hole");
                     	location1= ball.getCenter();
                     	firstWall=false;
                     } else if(o instanceof Hole && !firstWall ){
-                    	Hole temp = (Hole) o;                    	
+                    	Hole temp = (Hole) o;
                     	//Point3D location2= ball.getCenter();
                     	double vx= ball.getVelocity().getX()*0.000001;
                     	double vy=ball.getVelocity().getY()*0.0000001;
@@ -143,7 +142,7 @@ public class PhysicsHandler {
                     ball.move();
                     }
                 }
-                
+
                 break;
             }
         }
@@ -154,12 +153,12 @@ public class PhysicsHandler {
     		for (Acceleration a : accelerations) {
     			if(a instanceof Friction)
     				((Friction) a).update(ball.getVelocity());
-    			
+
     			ball.applyAcceleration(a);
     			//System.out.println("Applying Acceleration -> " + " with value " + a.toString() + " has factor " + ((Friction)a).getFactor());
     		}
     }
-    
+
     public boolean isStopped(){
     	return ballStopped;
     }
@@ -179,7 +178,7 @@ public class PhysicsHandler {
 
         RoundObstacle o2 = new RoundObstacle(200, 200, 50);
         //obstacles.add(o2);
-        
+
     }
 
     public void addAccelerations() {
@@ -188,7 +187,7 @@ public class PhysicsHandler {
         Acceleration friction = new Friction(0, 0, 0, Friction.GRASS);
         accelerations.add(friction);
     }
-    
+
     public void setBallSpeed(Vector v){
     	ball.setVelocity(v);
     	ballStopped = false;
