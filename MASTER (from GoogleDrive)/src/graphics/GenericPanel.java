@@ -16,11 +16,11 @@ import main.MainFrame;
 
 public class GenericPanel extends JPanel {
 	MainFrame frame;
-	public static final double PX_SCALE = 1.2;
+	public static final double PX_SCALE = 1;
 	public static final int TILE_SIZE = 140;
-	
+
 	public static final int SIZE = 50;
-	
+
 	public Font addCustomFont(String name, float size){
 		Font customFont = null;
 		 try {
@@ -40,7 +40,7 @@ public class GenericPanel extends JPanel {
        }
 		 return customFont;
 	}
-	
+
 	public static void addEnlighter(MainFrame frame, JLabel label){
 		label.addMouseListener(new MouseAdapter() {
             @Override

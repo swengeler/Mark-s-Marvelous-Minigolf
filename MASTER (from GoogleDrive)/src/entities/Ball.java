@@ -107,6 +107,7 @@ public class Ball {
     public Point3D pushBallOut(Obstacle o) {
         Vector reversedUnitV = velocity.getUnitVector();
         reversedUnitV.reverse();
+		reversedUnitV.multiplyWith(5);
         while (this.collides(o)) {
             this.translate(reversedUnitV);
         }

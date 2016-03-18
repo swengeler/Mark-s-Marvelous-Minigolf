@@ -18,7 +18,7 @@ public class Hole extends RoundObstacle {
 	private double centerY;
 	private Ellipse2D.Double shape;
     private Color color;
-    public static final double HOLE_NUMBER = 1;
+    public static final double HOLE_CAPTURE_VEL = 0.5;
 
 	public Hole(double centerX, double centerY, boolean overLay){
 		super(centerX, centerY, 0, overLay);
@@ -50,7 +50,7 @@ public class Hole extends RoundObstacle {
 	public boolean isBallIn(Ball ball) {
 		if (Calculator.distancePointPoint(ball.getCenter(), super.getCenter()) < this.radius) {
 			//System.out.println("Hole is hit");
-			if(ball.getVelocity().getLength() < HOLE_NUMBER) {
+			if(ball.getVelocity().getLength() < HOLE_CAPTURE_VEL) {
 				//System.out.println("Ball is slow enough");
 				return true;
 			}
