@@ -15,7 +15,7 @@ import physicsengine.Obstacle;
 import entities.StartPoint;
 
 public class DrawPanel extends JPanel{
-	
+
 	private static final long serialVersionUID = 1L;
 	Course course;
 	private GameTile[][] grid;
@@ -115,7 +115,7 @@ public class DrawPanel extends JPanel{
 			g.fillPolygon(topLeft.getShape());
 			g.setColor(Color.BLACK);
 			g.drawPolygon(topLeft.getShape());
-			//course.addEdge(topLeft);
+			course.addEdge(topLeft);
 			counter++;
 		}
 		if (grid[x][y].hasTopRight()) {
@@ -124,7 +124,7 @@ public class DrawPanel extends JPanel{
 			g.fillPolygon(topRight.getShape());
 			g.setColor(Color.BLACK);
 			g.drawPolygon(topRight.getShape());
-			//course.addEdge(topRight);
+			course.addEdge(topRight);
 			counter++;
 		}
 		if (grid[x][y].hasBottomLeft()) {
@@ -133,7 +133,7 @@ public class DrawPanel extends JPanel{
 			g.fillPolygon(bottomLeft.getShape());
 			g.setColor(Color.BLACK);
 			g.drawPolygon(bottomLeft.getShape());
-			//course.addEdge(bottomLeft);
+			course.addEdge(bottomLeft);
 			counter++;
 		}
 		if (grid[x][y].hasBottomRight()) {
@@ -142,7 +142,7 @@ public class DrawPanel extends JPanel{
 			g.fillPolygon(bottomRight.getShape());
 			g.setColor(Color.BLACK);
 			g.drawPolygon(bottomRight.getShape());
-			//course.addEdge(bottomRight);
+			course.addEdge(bottomRight);
 			counter++;
 		}
 	}

@@ -32,7 +32,7 @@ public class PolygonObstacle implements Obstacle {
     public PolygonObstacle(Polygon p, boolean overlay, Color c) {
     	this(p,overlay);
     	color = c;
-    	
+
     }
     public PolygonObstacle(Polygon p) {
         shape = p;
@@ -42,7 +42,7 @@ public class PolygonObstacle implements Obstacle {
             corners.add(new RoundObstacle(p.xpoints[i], p.ypoints[i], 1));
         }
     }
-    
+
     public boolean isOverlay() {
 		return overlay;
 	}
@@ -143,12 +143,14 @@ public class PolygonObstacle implements Obstacle {
 	@Override
 	public void translate(int x, int y) {
 		shape.translate(x, y);
-		
+
 	}
 	@Override
 	public void scale(double s) {
-		// TODO Auto-generated method stub
-		
+        for (int i = 0; i < shape.npoints; i++) {
+            shape.xpoints[i] *= s;
+            shape.ypoints[i] *= s;
+        }
 	}
 
 }

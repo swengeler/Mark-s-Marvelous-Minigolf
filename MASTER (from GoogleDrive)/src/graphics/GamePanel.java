@@ -75,8 +75,8 @@ public class GamePanel extends GenericPanel{
 				if (game.getPh().isStopped()) {
 					aimingEnabled = true;
 				}
-				hitPoint.setLocation(e.getX(), e.getY(), 0);
-				hitVector.setValues(game.getBall1().getX() - e.getX(), game.getBall1().getY() - e.getY(), 0.0);
+				hitPoint.setLocation(e.getX() / GenericPanel.PX_SCALE, e.getY() / GenericPanel.PX_SCALE, 0);
+				hitVector.setValues((game.getBall1().getX() - e.getX()) / GenericPanel.PX_SCALE, (game.getBall1().getY() - e.getY()) / GenericPanel.PX_SCALE, 0.0);
 				aiming.setLine(hitPoint, new Point3D(hitPoint.getX() + hitVector.getX() * 100000, hitPoint.getY() + hitVector.getY() * 100000, 0));
 				//System.out.println("Mouse dragged, line is " + aiming + ", point 1 is " + aiming.getP1() + ", point 2 is " + aiming.getP2());
 			}
@@ -90,6 +90,7 @@ public class GamePanel extends GenericPanel{
 				System.out.println(e.getInfo());
 			}
 		}
+		System.out.println("setCourse length of obstacle list " + course.getObstacles().size());
 		game = new Game(multiplayer, course, frame, masterGamePanel);
 	}
 
@@ -105,7 +106,7 @@ public class GamePanel extends GenericPanel{
 		Graphics2D g2 = (Graphics2D) g;
 		if (game != null) {
 			drawCourse(g);
-			drawAiming(g2);
+			//drawAiming(g2);
 			drawBall(g);
 		}
 	}
@@ -113,7 +114,7 @@ public class GamePanel extends GenericPanel{
 	public void drawAiming(Graphics2D g2d){
 		if (aiming != null && aimingEnabled) {
 			g2d.setColor(Color.RED);
-			Line2D.Double line = new Line2D.Double(aiming.getX1(), aiming.getY1(), aiming.getX2(), aiming.getY2());
+			Line2D.Double line = new Line2D.Double(aiming.getX1() * GenericPanel.PX_SCALE, aiming.getY1() * GenericPanel.PX_SCALE, aiming.getX2() * GenericPanel.PX_SCALE, aiming.getY2() * GenericPanel.PX_SCALE);
 			g2d.draw(line);
 		}
 	}

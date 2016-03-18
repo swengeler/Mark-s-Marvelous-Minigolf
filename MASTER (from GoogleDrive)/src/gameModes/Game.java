@@ -50,6 +50,7 @@ public class Game {
 		course.setBallToStart(ball1);
 		ph = new PhysicsHandler(ball1,this);
 		setObstacles();
+		System.out.println("setCourse length of obstacle list " + obstacles);
 		ph.addObstacles(obstacles);
 		ph.setBallSpeed(new Vector(0,0,0));
 		ph.start();
@@ -101,7 +102,8 @@ public class Game {
 		obstacles = new ArrayList<Obstacle>();
 		for(Obstacle o:course.getObstacles()){
 			o.translate(-100, -20);
-			//o.scale(140.0/50.0);
+			o.scale(140.0/50.0);
+			obstacles.add(o);
 		}
 		GameTile[][] grid = course.getGrid();
 		int edgeSize = 10;
