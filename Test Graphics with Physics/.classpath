@@ -9,6 +9,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/jars/slick-util.jar"/>
-	<classpathentry kind="lib" path="C:/Users/maggi/Java/Test2/lib/jars/PNGDecoder.jar"/>
+	<classpathentry kind="lib" path="lib/jars/PNGDecoder.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
