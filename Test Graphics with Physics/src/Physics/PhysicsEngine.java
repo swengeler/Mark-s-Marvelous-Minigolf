@@ -21,7 +21,7 @@ public class PhysicsEngine {
 		for(Ball b:balls){
 			b.move(world);
 			b.checkGroundCollision(world);
-			b.checkMinSpeed(world);
+			//b.checkMinSpeed(world);
 		}
 		
 	}

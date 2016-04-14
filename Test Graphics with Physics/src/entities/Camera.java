@@ -6,11 +6,11 @@ import org.lwjgl.util.vector.Vector3f;
 
 public class Camera {
 
-	private float distanceFromBall = 50;
+	private float distanceFromBall = 100;
 	private float angleAroundBall = 0;
 	
 	private Vector3f position = new Vector3f(0,0,0);
-	private float pitch;			//How high or low the camera is aimed
+	private float pitch = 20;			//How high or low the camera is aimed
 	private float yaw;				//How much left or right the camera is aiming
 	private float roll;				//How much the camera is tilted
 	

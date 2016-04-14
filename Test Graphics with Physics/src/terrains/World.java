@@ -65,12 +65,19 @@ public class World {
 		return lights;
 	}
 	
-	public float getHeightOfTerrain(float x, float z){
+	public Terrain getTerrain(float x, float z){
 		float gX = (float) Math.floor(x/Terrain.getSize());
 		float gZ = (float) Math.floor(z/Terrain.getSize());
 		for(Terrain t:terrains)
 			if(gX == t.getGridX() && gZ == t.getGridZ())
-				return getHeightTerrain(x,z,t);
+				return t;
+		return null;
+	}
+	
+	public float getHeightOfTerrain(float x, float z){
+		Terrain t = getTerrain(x,z);
+		if(t != null)
+			return getHeightTerrain(x,z,t);
 		return 0;
 	}
 	
@@ -99,11 +106,9 @@ public class World {
 	}
 	
 	public Vector3f getNormalOfTerrain(float x, float z){
-		float gX = (float) Math.floor(x/Terrain.getSize());
-		float gZ = (float) Math.floor(z/Terrain.getSize());
-		for(Terrain t:terrains)
-			if(gX == t.getGridX() && gZ == t.getGridZ())
-				return getNormalTerrain(x,z,t);
+		Terrain t = getTerrain(x,z);
+		if(t != null)
+			return getNormalTerrain(x,z,t);
 		return new Vector3f(0, 1, 0);
 	}
 	

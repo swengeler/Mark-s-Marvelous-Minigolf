@@ -8,6 +8,7 @@ import java.util.Map;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector4f;
 
 import entities.Camera;
 import entities.Entity;
@@ -47,7 +48,7 @@ public class MasterRenderer {
 		createProjectionMatrix();
 		renderer = new EntityRenderer(shader,projectionMatrix);
 		terrainRenderer = new TerrainRenderer(terrainShader, projectionMatrix);
-		skyboxRenderer = new SkyboxRenderer(loader, projectionMatrix);
+		skyboxRenderer = new SkyboxRenderer(loader, projectionMatrix, "sky1");
 	}
 	
 	public static void enableCulling(){
@@ -59,20 +60,22 @@ public class MasterRenderer {
 		GL11.glDisable(GL11.GL_CULL_FACE);
 	}
 	
-	public void render(List<Light> lights, Camera camera){
+	public void render(List<Light> lights, Camera camera, Vector4f clipPlane){
 		prepare();
 		shader.start();
+		shader.loadClipPlane(clipPlane);
 		shader.loadSkyColor(RED, GREEN, BLUE);
 		shader.loadLights(lights);
 		shader.loadviewMatrix(camera);
-		renderer.render(entities);;
+		renderer.render(entities);
 		shader.stop();
 		terrainShader.start();
+		terrainShader.loadClipPlane(clipPlane);
 		terrainShader.loadLights(lights);
 		terrainShader.loadViewMatrix(camera);
 		terrainRenderer.render(terrains);
 		terrainShader.stop();
-		skyboxRenderer.render(camera);
+		skyboxRenderer.render(camera, RED, GREEN, BLUE);
 		terrains.clear();
 		entities.clear();
 	}
@@ -116,12 +119,18 @@ public class MasterRenderer {
 		projectionMatrix.m33 = 0; 
 	}
 
-	public void processWorld(World world) {
+	
+	
+	public Matrix4f getProjectionMatrix() {
+		return projectionMatrix;
+	}
+
+	public void processWorld(World world, Vector4f clipPlane) {
 		for(Terrain t:world.getTerrains())
 			terrains.add(t);
 		for(Entity e:world.getEntities())
 			processEntity(e);
-		render(world.getLights(), world.getCamera());
+		render(world.getLights(), world.getCamera(), clipPlane);
 		
 	}
 	

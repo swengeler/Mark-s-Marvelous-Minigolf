@@ -80,7 +80,7 @@ public class Ball extends Entity{
 
 	public void checkGroundCollision(World world) {
 		float terrainHeight = world.getHeightOfTerrain(this.getPosition().x, this.getPosition().z);
-		if(this.getPosition().y < terrainHeight && currentVel.y != 0){
+		if(this.getPosition().y < terrainHeight ){
 			super.getPosition().y = terrainHeight;
 			Vector3f normal = world.getNormalOfTerrain(getPosition().x, getPosition().z);
 			System.out.println("Normal: x=" + normal.x + " y=" + normal.y + " z=" + normal.z);

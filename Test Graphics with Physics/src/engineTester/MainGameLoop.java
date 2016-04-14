@@ -5,8 +5,11 @@ import java.util.List;
 import java.util.Random;
 
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 import Physics.PhysicsEngine;
 import entities.Ball;
@@ -27,6 +30,11 @@ import shaders.StaticShader;
 import terrains.Terrain;
 import terrains.World;
 import textures.ModelTexture;
+import toolbox.MousePicker;
+import water.WaterFrameBuffers;
+import water.WaterRenderer;
+import water.WaterShader;
+import water.WaterTile;
 
 public class MainGameLoop {
 
@@ -80,14 +88,14 @@ public class MainGameLoop {
 		lights.add(new Light(new Vector3f(35,17,35),new Vector3f(0,2,2), new Vector3f(1,0.01f,0.002f)));
 		lights.add(new Light(new Vector3f(0,7,70),new Vector3f(2,2,0), new Vector3f(1,0.01f,0.002f)));
 		
-		Ball player1 = new Ball(ballTModel, new Vector3f(50, 200, 100), 0, 0, 0, 1);
+		Ball player1 = new Ball(ballTModel, new Vector3f(50, 3, 0), 0, 0, 0, 1);
 		List<Ball> balls = new ArrayList<Ball>();
 		balls.add(player1);
 		
 		
 		Camera camera = new Camera(player1);
 		World world = new World(camera);
-		world.add(new Terrain(0, 0, loader,new ModelTexture(loader.loadTexture("grass")), "heightmap"));
+		world.add(new Terrain(0, 0, loader,new ModelTexture(loader.loadTexture("grass"))));
 		
 		List<Entity> nature = new ArrayList<Entity>();
 		Random r = new Random();
@@ -157,15 +165,51 @@ public class MainGameLoop {
 		
 		PhysicsEngine mainEngine = new PhysicsEngine(balls, world);
 		
+		MousePicker picker = new MousePicker(camera, renderer.getProjectionMatrix(), world);
+		
+		WaterShader waterShader = new WaterShader();
+		WaterRenderer waterRenderer = new WaterRenderer(loader, waterShader, renderer.getProjectionMatrix());
+		List<WaterTile> waters = new ArrayList<WaterTile>();
+		waters.add(new WaterTile(75, 120, 13));
+		
+		WaterFrameBuffers fbos = new WaterFrameBuffers();
+		GuiTexture refraction = new GuiTexture(fbos.getRefractionTexture(), new Vector2f(0.5f, 0.5f), new Vector2f(0.25f, 0.25f));
+		GuiTexture reflection = new GuiTexture(fbos.getReflectionTexture(), new Vector2f(-0.5f, 0.5f), new Vector2f(0.25f, 0.25f));
+		guis.add(refraction);
+		guis.add(reflection);
+		
 		while(!Display.isCloseRequested()){
-			world.start();
-			mainEngine.tick();
 			player1.move(world);
+			world.start();
+			picker.update();
+			mainEngine.tick();
+			
+			Vector3f terrainPoint = picker.getCurrentTerrainPoint();
+			if(terrainPoint != null){
+				nature.get(0).setPosition(terrainPoint);
+			}
+			
+			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
+			
+			fbos.bindReflectionFrameBuffer();
 			renderer.processEntity(player1);
-			renderer.processWorld(world);
+			renderer.processWorld(world, new Vector4f(0, 1, 0, -waters.get(0).getHeight()));
+			
+			fbos.bindRefractionFrameBuffer();
+			renderer.processEntity(player1);
+			renderer.processWorld(world, new Vector4f(0, -1, 0, 15));
+			
+			
+			fbos.unbindCurrentFrameBuffer();
+			renderer.processEntity(player1);
+			renderer.processWorld(world, new Vector4f(0, 1, 0, 0));
+			waterRenderer.render(waters,  camera);
 			guiRenderer.render(guis);
+			
 			DisplayManager.updateDisplay();
 		}
+		fbos.cleanUp();
+		waterShader.cleanUp();
 		guiRenderer.cleanUp();
 		renderer.cleanUp();
 		loader.cleanUp();

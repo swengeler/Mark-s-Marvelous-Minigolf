@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 import entities.Camera;
 import entities.Light;
@@ -25,6 +26,7 @@ public class TerrainShader extends ShaderProgram{
 	private int location_shineDamper;
 	private int location_reflectivity;
 	private int location_skyColor;
+	private int location_plane;
 	
 	
 	public TerrainShader() {
@@ -46,7 +48,8 @@ public class TerrainShader extends ShaderProgram{
 		location_shineDamper = super.getUniformLocation("shineDamper");
 		location_reflectivity = super.getUniformLocation("reflectivity");
 		location_skyColor = super.getUniformLocation("skyColor");
-	
+		location_plane = super.getUniformLocation("plane");
+		
 		location_lightPosition = new int[MAX_LIGHTS];
 		location_lightColour = new int[MAX_LIGHTS];
 		location_attenuation = new int[MAX_LIGHTS];
@@ -55,6 +58,10 @@ public class TerrainShader extends ShaderProgram{
 			location_lightColour[i] = super.getUniformLocation("lightColour[" + i + "]");
 			location_attenuation[i] = super.getUniformLocation("attenuation[" + i + "]");
 		}
+	}
+	
+	public void loadClipPlane(Vector4f plane){
+		super.loadVector(location_plane, plane);
 	}
 	
 	public void loadSkyColor(float r, float g, float b){
