@@ -1,6 +1,5 @@
 package Physics;
 
-// Raffa scemo
 
 import java.util.List;
 

@@ -16,7 +16,7 @@ import org.lwjgl.util.vector.Vector2f;
 
 public class Terrain {
 
-	private static final float SIZE = 2400;
+	private static final float SIZE = 800;
 	private static final int VERTEX_COUNT = 512;
 	private static final float MAX_HEIGHT = 40;
 	private static final float MAX_PIXEL_COLOR = 256 * 256 * 256;

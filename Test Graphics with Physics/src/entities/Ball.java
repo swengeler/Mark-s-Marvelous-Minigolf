@@ -19,6 +19,7 @@ public class Ball extends Entity{
 	private static final float COEFF_RESTITUTION = 0.83f;
 	
 	private Vector3f currentVel = new Vector3f();
+	private Vector3f rotVel = new Vector3f();
 	private Vector3f currentAcc = new Vector3f();
 	private float currentTurnSpeed = 0;
 	
@@ -83,7 +84,6 @@ public class Ball extends Entity{
 		if(this.getPosition().y < terrainHeight ){
 			super.getPosition().y = terrainHeight;
 			Vector3f normal = world.getNormalOfTerrain(getPosition().x, getPosition().z);
-			System.out.println("Normal: x=" + normal.x + " y=" + normal.y + " z=" + normal.z);
 			Vector3f newPartialVel = (Vector3f) normal.scale(2*Vector3f.dot(currentVel, normal));
 			Vector3f.sub(newPartialVel, currentVel, currentVel);
 			currentVel.negate();
