@@ -80,6 +80,25 @@ public class MasterRenderer {
 		entities.clear();
 	}
 	
+	public void render(List<Light> lights, Camera camera){
+		prepare();
+		shader.start();
+		shader.loadClipPlane(new Vector4f(0, -1, 0, 40));
+		shader.loadSkyColor(RED, GREEN, BLUE);
+		shader.loadLights(lights);
+		shader.loadviewMatrix(camera);
+		renderer.render(entities);
+		shader.stop();
+		terrainShader.start();
+		terrainShader.loadLights(lights);
+		terrainShader.loadViewMatrix(camera);
+		terrainRenderer.render(terrains);
+		terrainShader.stop();
+		skyboxRenderer.render(camera, RED, GREEN, BLUE);
+		terrains.clear();
+		entities.clear();
+	}
+	
 	public void processEntity(Entity entity){
 		TexturedModel entityModel = entity.getModel();
 		List<Entity> batch = entities.get(entityModel);
@@ -131,6 +150,15 @@ public class MasterRenderer {
 		for(Entity e:world.getEntities())
 			processEntity(e);
 		render(world.getLights(), world.getCamera(), clipPlane);
+		
+	}
+	
+	public void processWorld(World world) {
+		for(Terrain t:world.getTerrains())
+			terrains.add(t);
+		for(Entity e:world.getEntities())
+			processEntity(e);
+		render(world.getLights(), world.getCamera());
 		
 	}
 	

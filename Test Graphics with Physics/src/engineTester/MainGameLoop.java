@@ -95,7 +95,7 @@ public class MainGameLoop {
 		
 		Camera camera = new Camera(player1);
 		World world = new World(camera);
-		world.add(new Terrain(0, 0, loader,new ModelTexture(loader.loadTexture("grass"))));
+		world.add(new Terrain(0, 0, loader,new ModelTexture(loader.loadTexture("grass")), "heightmap"));
 		
 		List<Entity> nature = new ArrayList<Entity>();
 		Random r = new Random();
@@ -167,16 +167,13 @@ public class MainGameLoop {
 		
 		MousePicker picker = new MousePicker(camera, renderer.getProjectionMatrix(), world);
 		
-		WaterShader waterShader = new WaterShader();
-		WaterRenderer waterRenderer = new WaterRenderer(loader, waterShader, renderer.getProjectionMatrix());
-		List<WaterTile> waters = new ArrayList<WaterTile>();
-		waters.add(new WaterTile(75, 120, 13));
-		
 		WaterFrameBuffers fbos = new WaterFrameBuffers();
-		GuiTexture refraction = new GuiTexture(fbos.getRefractionTexture(), new Vector2f(0.5f, 0.5f), new Vector2f(0.25f, 0.25f));
-		GuiTexture reflection = new GuiTexture(fbos.getReflectionTexture(), new Vector2f(-0.5f, 0.5f), new Vector2f(0.25f, 0.25f));
-		guis.add(refraction);
-		guis.add(reflection);
+		
+		WaterShader waterShader = new WaterShader();
+		WaterRenderer waterRenderer = new WaterRenderer(loader, waterShader, renderer.getProjectionMatrix(), fbos);
+		List<WaterTile> waters = new ArrayList<WaterTile>();
+		waters.add(new WaterTile(75, 120, 0));
+		
 		
 		while(!Display.isCloseRequested()){
 			player1.move(world);
@@ -192,18 +189,24 @@ public class MainGameLoop {
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 			
 			fbos.bindReflectionFrameBuffer();
+			float distance = 2 * (camera.getPosition().y - waters.get(0).getHeight());
+			camera.getPosition().y -= distance;
+			camera.invertPitch();
 			renderer.processEntity(player1);
 			renderer.processWorld(world, new Vector4f(0, 1, 0, -waters.get(0).getHeight()));
+			camera.getPosition().y += distance;
+			camera.invertPitch();
+			
 			
 			fbos.bindRefractionFrameBuffer();
 			renderer.processEntity(player1);
-			renderer.processWorld(world, new Vector4f(0, -1, 0, 15));
+			renderer.processWorld(world, new Vector4f(0, -1, 0, waters.get(0).getHeight()));
 			
 			
 			fbos.unbindCurrentFrameBuffer();
 			renderer.processEntity(player1);
-			renderer.processWorld(world, new Vector4f(0, 1, 0, 0));
-			waterRenderer.render(waters,  camera);
+			renderer.processWorld(world, new Vector4f(0, -1, 0, 100));
+			waterRenderer.render(waters, camera);
 			guiRenderer.render(guis);
 			
 			DisplayManager.updateDisplay();
