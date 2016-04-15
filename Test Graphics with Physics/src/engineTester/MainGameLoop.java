@@ -95,7 +95,7 @@ public class MainGameLoop {
 		
 		Camera camera = new Camera(player1);
 		World world = new World(camera);
-		world.add(new Terrain(0, 0, loader,new ModelTexture(loader.loadTexture("grass"))));
+		world.add(new Terrain(0, 0, loader,new ModelTexture(loader.loadTexture("grass")), "heightmap"));
 		
 		List<Entity> nature = new ArrayList<Entity>();
 		Random r = new Random();
