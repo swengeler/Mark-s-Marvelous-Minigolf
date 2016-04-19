@@ -1,11 +1,2 @@
-/entities/
-/terrains/
-/engineTester/
-/water/
-/renderEngine/
-/skybox/
-/shaders/
-/normalMappingObjConverter/
-/normalMappingRenderer/
-/textures/
-/particles/
+*.class
+/Test Graphics with Physics/bin/
