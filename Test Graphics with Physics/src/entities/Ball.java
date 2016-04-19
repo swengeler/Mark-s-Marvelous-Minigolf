@@ -10,7 +10,7 @@ import terrains.World;
 import Physics.PhysicsEngine;
 
 public class Ball extends Entity{
-	private static final float RUN_SPEED = 2;
+	private static final float RUN_SPEED = 20f;
 	private static final float TURN_SPEED = 100;
 	private static final float JUMP_POWER = 40;
 	private static final float MIN_XVEL = 0;
@@ -30,9 +30,9 @@ public class Ball extends Entity{
 	public void move(World world){
 		checkInputs(world);
 		super.increaseRotation(0, currentTurnSpeed * DisplayManager.getFrameTimeSeconds(), 0);
-		
-		currentAcc = new Vector3f(PhysicsEngine.GRAVITY.x, PhysicsEngine.GRAVITY.y, PhysicsEngine.GRAVITY.z);
 		/*
+		currentAcc = new Vector3f(PhysicsEngine.GRAVITY.x, PhysicsEngine.GRAVITY.y, PhysicsEngine.GRAVITY.z);
+		
 		if(getPosition().y <= world.getHeightOfTerrain(getPosition().x, getPosition().z)){
 			Vector3f antinorm = (Vector3f) world.getNormalOfTerrain(getPosition().x, getPosition().z).negate();
 			antinorm.normalise(antinorm);
@@ -40,15 +40,15 @@ public class Ball extends Entity{
 			normComponent.negate();
 			Vector3f.add(currentAcc, normComponent, currentAcc);
 			System.out.println("Acceleration: x=" + currentAcc.x + " y=" + currentAcc.y + " z=" + currentAcc.z);
-		}*/
+		}
 		currentAcc.scale(DisplayManager.getFrameTimeSeconds());
 		
 		Vector3f.add(currentVel, currentAcc, currentVel);
 		
 		Vector3f delta = new Vector3f(currentVel.x, currentVel.y, currentVel.z);
 		delta.scale(DisplayManager.getFrameTimeSeconds());
-		
-		super.increasePosition(delta);
+		*/
+		super.increasePosition((Vector3f) currentVel.scale(DisplayManager.getFrameTimeSeconds()));
 		
 		float terrainHeight = world.getHeightOfTerrain(super.getPosition().x, super.getPosition().z);
 	}
@@ -60,13 +60,17 @@ public class Ball extends Entity{
 	
 	private void checkInputs(World world){
 		if(Keyboard.isKeyDown(Keyboard.KEY_W)){
-			this.currentVel.x += (float) (RUN_SPEED * Math.sin(Math.toRadians(super.getRotY())));
-			this.currentVel.z += (float) (RUN_SPEED * Math.cos(Math.toRadians(super.getRotY())));
+			this.currentVel.x = (float) (RUN_SPEED * Math.sin(Math.toRadians(super.getRotY())));
+			this.currentVel.z = (float) (RUN_SPEED * Math.cos(Math.toRadians(super.getRotY())));
 			
 		} else if (Keyboard.isKeyDown(Keyboard.KEY_S)){
-			this.currentVel.x += (float) -(RUN_SPEED * Math.sin(Math.toRadians(super.getRotY())));
-			this.currentVel.z += (float) -(RUN_SPEED * Math.cos(Math.toRadians(super.getRotY())));
+			this.currentVel.x = (float) -(RUN_SPEED * Math.sin(Math.toRadians(super.getRotY())));
+			this.currentVel.z = (float) -(RUN_SPEED * Math.cos(Math.toRadians(super.getRotY())));
+		} else {
+			this.currentVel.x = 0;
+			this.currentVel.z = 0;
 		}
+			
 		
 		if(Keyboard.isKeyDown(Keyboard.KEY_D))
 			this.currentTurnSpeed = -TURN_SPEED;
@@ -76,7 +80,11 @@ public class Ball extends Entity{
 			this.currentTurnSpeed = 0;
 		
 		if(Keyboard.isKeyDown(Keyboard.KEY_SPACE))
-			jump(world);
+			this.currentVel.y = 5;
+		else if(Keyboard.isKeyDown(Keyboard.KEY_LCONTROL))
+			this.currentVel.y = -5;
+		else
+			this.currentVel.y = 0;
 	}
 
 	public void checkGroundCollision(World world) {

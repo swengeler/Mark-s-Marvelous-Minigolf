@@ -50,7 +50,7 @@ public class EntityRenderer {
 		ModelTexture texture = model.getTexture();
 		if(texture.isHasTransparency())
 			MasterRenderer.disableCulling();
-		shader.loadFakeLightingVariable(texture.isUseFakeLighing());
+		shader.loadFakeLightingVariable(texture.isUseFakeLighting());
 		shader.loadShineVariables(texture.getShineDamper(), texture.getReflectivity());
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, model.getTexture().getID());

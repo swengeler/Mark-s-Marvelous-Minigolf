@@ -1,5 +1,7 @@
 package water;
 
+import org.lwjgl.util.vector.Vector3f;
+
 public class WaterTile {
 	
 	public static final float TILE_SIZE = 60;
@@ -23,6 +25,11 @@ public class WaterTile {
 
 	public float getZ() {
 		return z;
+	}
+
+	public void setPosition(Vector3f terrainPoint) {
+		this.x = terrainPoint.x;
+		this.z = terrainPoint.z;
 	}
 
 

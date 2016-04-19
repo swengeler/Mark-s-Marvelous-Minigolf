@@ -4,3 +4,8 @@
 /water/
 /renderEngine/
 /skybox/
+/shaders/
+/normalMappingObjConverter/
+/normalMappingRenderer/
+/textures/
+/particles/

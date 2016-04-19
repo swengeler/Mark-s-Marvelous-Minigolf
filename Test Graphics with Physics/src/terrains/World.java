@@ -14,6 +14,7 @@ import entities.Camera;
 public class World {
 	private List<Terrain> terrains = new ArrayList<Terrain>();
 	private List<Entity> entities = new ArrayList<Entity>();
+	private List<Entity> normalEntities = new ArrayList<Entity>();
 	private List<Light> lights = new ArrayList<Light>();
 	private Camera camera;
 	
@@ -59,6 +60,10 @@ public class World {
 	
 	public List<Entity> getEntities(){
 		return entities;
+	}
+	
+	public void addNormE(List<Entity> normEnt){
+		getNormalEntities().addAll(normEnt);
 	}
 	
 	public List<Light> getLights(){
@@ -137,6 +142,14 @@ public class World {
 		}
 		answer.normalise();
 		return answer;
+	}
+
+	public List<Entity> getNormalEntities() {
+		return normalEntities;
+	}
+
+	public void setNormalEntities(List<Entity> normalEntities) {
+		this.normalEntities = normalEntities;
 	}
 	
 }
