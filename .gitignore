@@ -1,7 +1,7 @@
 *.class
 bin/
 res/
-*.classpath
+.classpath
 *.project
 .settings/
 lib/
