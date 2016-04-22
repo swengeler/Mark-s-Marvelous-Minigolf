@@ -19,7 +19,6 @@ public class Ball extends Entity{
 	private static final float COEFF_RESTITUTION = 0.83f;
 	
 	private Vector3f currentVel = new Vector3f();
-	private Vector3f rotVel = new Vector3f();
 	private Vector3f currentAcc = new Vector3f();
 	private float currentTurnSpeed = 0;
 	

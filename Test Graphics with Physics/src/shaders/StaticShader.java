@@ -3,6 +3,7 @@ package shaders;
 import java.util.List;
 
 import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
@@ -28,6 +29,8 @@ public class StaticShader extends ShaderProgram{
 	private int location_useFakeLighting;
 	private int location_skyColor;
 	private int location_plane;
+	private int location_numberOfRows;
+	private int location_offset;
 	
 	
 	public StaticShader() {
@@ -51,6 +54,8 @@ public class StaticShader extends ShaderProgram{
 		location_useFakeLighting = super.getUniformLocation("useFakeLighting");
 		location_skyColor = super.getUniformLocation("skyColor");
 		location_plane = super.getUniformLocation("plane");
+		location_numberOfRows = super.getUniformLocation("numberOfRows");
+		location_offset = super.getUniformLocation("offset");
 		
 		location_lightPosition = new int[MAX_LIGHTS];
 		location_lightColour = new int[MAX_LIGHTS];
@@ -60,6 +65,14 @@ public class StaticShader extends ShaderProgram{
 			location_lightColour[i] = super.getUniformLocation("lightColour[" + i + "]");
 			location_attenuation[i] = super.getUniformLocation("attenuation[" + i + "]");
 		}
+	}
+	
+	public void loadNumberOfRows(int numberOfRows){
+		super.loadFloat(location_numberOfRows, numberOfRows);
+	}
+	
+	public void loadOffset(float x, float y){
+		super.loadVector(location_offset, new Vector2f(x,y));
 	}
 	
 	public void loadClipPlane(Vector4f plane){

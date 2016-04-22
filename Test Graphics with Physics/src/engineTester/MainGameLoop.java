@@ -64,14 +64,14 @@ public class MainGameLoop {
 		TexturedModel humanTModel = new TexturedModel(humanModel,new ModelTexture(loader.loadTexture("playerTexture")));
 		TexturedModel ballTModel = new TexturedModel(ballModel,new ModelTexture(loader.loadTexture("white")));
 		TexturedModel treeTModel = new TexturedModel(treeModel,new ModelTexture(loader.loadTexture("tree")));
-		TexturedModel fernTModel = new TexturedModel(fernModel,new ModelTexture(loader.loadTexture("fern")));
+		TexturedModel fernTModel = new TexturedModel(fernModel,new ModelTexture(loader.loadTexture("fernAtlas")));
 		TexturedModel grassTModel = new TexturedModel(grassModel,new ModelTexture(loader.loadTexture("grassTexture")));
 		TexturedModel pineTModel = new TexturedModel(pineModel,new ModelTexture(loader.loadTexture("pine")));
 		TexturedModel boxTModel = new TexturedModel(boxModel,new ModelTexture(loader.loadTexture("box")));
 		TexturedModel flowerTModel = new TexturedModel(flowerModel,new ModelTexture(loader.loadTexture("flower")));
 		
 		
-		
+		fernTModel.getTexture().setNumberOfRows(2);
 		fernTModel.getTexture().setHasTransparency(true);
 		grassTModel.getTexture().setUseFakeLighting(true);
 		grassTModel.getTexture().setHasTransparency(true);
@@ -118,7 +118,7 @@ public class MainGameLoop {
 			if(i<120){
 				float x = r.nextFloat()*Terrain.getSize();
 				float z = r.nextFloat()*Terrain.getSize();
-				nature.add(new Entity(fernTModel, new Vector3f(x, world.getHeightOfTerrain(x, z), z), 0, r.nextFloat()*180, 0, 1));
+				nature.add(new Entity(fernTModel, r.nextInt(4),new Vector3f(x, world.getHeightOfTerrain(x, z), z), 0, r.nextFloat()*180, 0, 1));
 			}
 			if(i<120){
 				float x = r.nextFloat()*Terrain.getSize();
@@ -205,7 +205,7 @@ public class MainGameLoop {
 			
 			fbos.unbindCurrentFrameBuffer();
 			renderer.processEntity(player1);
-			renderer.processWorld(world, new Vector4f(0, -1, 0, 100));
+			renderer.processWorld(world, new Vector4f(0, -1, 0, 10000));
 			waterRenderer.render(waters, camera);
 			guiRenderer.render(guis);
 			
