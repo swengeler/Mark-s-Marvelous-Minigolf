@@ -88,15 +88,15 @@ public class MainGameLoop {
 		lights.add(new Light(new Vector3f(35,17,35),new Vector3f(0,2,2), new Vector3f(1,0.01f,0.002f)));
 		lights.add(new Light(new Vector3f(0,7,70),new Vector3f(2,2,0), new Vector3f(1,0.01f,0.002f)));
 		
-		Ball player1 = new Ball(ballTModel, new Vector3f(50, 3, 0), 0, 0, 0, 1);
+		Ball player1 = new Ball(ballTModel, new Vector3f(200, 0, 200), 0, 0, 0, 1);
 		List<Ball> balls = new ArrayList<Ball>();
 		balls.add(player1);
 		
 		
 		Camera camera = new Camera(player1);
 		World world = new World(camera);
-		world.add(new Terrain(0, 0, loader,new ModelTexture(loader.loadTexture("grass")), "heightmap"));
-		
+		world.add(new Terrain(0, 0, loader,new ModelTexture(loader.loadTexture("grass")), "arena"/*, "heightmap"*/));
+		/*
 		List<Entity> nature = new ArrayList<Entity>();
 		Random r = new Random();
 		for(int i=0; i<200; i++){
@@ -150,7 +150,7 @@ public class MainGameLoop {
 			//dragons.add(new Entity(staticModel, new Vector3f(x, y, z), 0f, (float) (Math.random() * 180f), 0f, 1f ));
 		}
 		Entity big_Human = new Entity(humanTModel, new Vector3f(0,0,50), 0f, 0f, 0f, 10);
-		
+		*/
 		MasterRenderer renderer = new MasterRenderer(loader);
 		
 		List<GuiTexture> guis = new ArrayList<GuiTexture>();
@@ -159,8 +159,8 @@ public class MainGameLoop {
 		
 		GuiRenderer guiRenderer = new GuiRenderer(loader);
 		
-		world.addEntities(nature);
-		world.add(big_Human);
+		//world.addEntities(nature);
+		//world.add(big_Human);
 		world.addLights(lights);
 		
 		PhysicsEngine mainEngine = new PhysicsEngine(balls, world);
@@ -183,7 +183,7 @@ public class MainGameLoop {
 			
 			Vector3f terrainPoint = picker.getCurrentTerrainPoint();
 			if(terrainPoint != null){
-				nature.get(0).setPosition(terrainPoint);
+				//nature.get(0).setPosition(terrainPoint);
 			}
 			
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
