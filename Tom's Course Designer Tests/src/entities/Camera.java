@@ -16,6 +16,9 @@ public class Camera {
 	
 	public Camera(Ball ball){
 		this.ball = ball;
+		if (ball instanceof Empty){
+			((Empty) ball).setCamera(this);
+		}
 	}
 
 	public void move(){

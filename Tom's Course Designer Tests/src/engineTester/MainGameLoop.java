@@ -14,6 +14,7 @@ import org.lwjgl.util.vector.Vector4f;
 import Physics.PhysicsEngine;
 import entities.Ball;
 import entities.Camera;
+import entities.Empty;
 import entities.Entity;
 import entities.Light;
 import guis.GuiRenderer;
@@ -51,6 +52,7 @@ public class MainGameLoop {
 		ModelData pine = OBJFileLoader.loadOBJ("pine");
 		ModelData flower = OBJFileLoader.loadOBJ("grassModel");
 		ModelData box = OBJFileLoader.loadOBJ("box");
+		ModelData empty = OBJFileLoader.loadOBJ("empty");
 		
 		RawModel humanModel = loader.loadToVAO(human.getVertices(), human.getTextureCoords(), human.getNormals(), human.getIndices());
 		RawModel ballModel = loader.loadToVAO(ball.getVertices(), ball.getTextureCoords(), ball.getNormals(), ball.getIndices());
@@ -60,6 +62,7 @@ public class MainGameLoop {
 		RawModel pineModel = loader.loadToVAO(pine.getVertices(), pine.getTextureCoords(), pine.getNormals(), pine.getIndices());
 		RawModel boxModel = loader.loadToVAO(box.getVertices(), box.getTextureCoords(), box.getNormals(), box.getIndices());
 		RawModel flowerModel = loader.loadToVAO(flower.getVertices(), flower.getTextureCoords(), flower.getNormals(), flower.getIndices());
+		RawModel emptyModel = loader.loadToVAO(empty.getVertices(), empty.getTextureCoords(), empty.getNormals(), empty.getIndices());
 		
 		TexturedModel humanTModel = new TexturedModel(humanModel,new ModelTexture(loader.loadTexture("playerTexture")));
 		TexturedModel ballTModel = new TexturedModel(ballModel,new ModelTexture(loader.loadTexture("white")));
@@ -69,6 +72,7 @@ public class MainGameLoop {
 		TexturedModel pineTModel = new TexturedModel(pineModel,new ModelTexture(loader.loadTexture("pine")));
 		TexturedModel boxTModel = new TexturedModel(boxModel,new ModelTexture(loader.loadTexture("box")));
 		TexturedModel flowerTModel = new TexturedModel(flowerModel,new ModelTexture(loader.loadTexture("flower")));
+		TexturedModel emptyTModel = new TexturedModel(emptyModel, new ModelTexture(loader.loadTexture("flower")));
 		
 		
 		fernTModel.getTexture().setNumberOfRows(2);
@@ -84,7 +88,7 @@ public class MainGameLoop {
 		List<Light> lights = new ArrayList<Light>();
 		lights.add(new Light(new Vector3f(0,1000,400),new Vector3f(1,1,1)));
 		
-		Ball player1 = new Ball(ballTModel, new Vector3f(50, 3, 0), 0, 0, 0, 1);
+		Ball player1 = new Empty(emptyTModel, new Vector3f(400, 0, 400), 0, 0, 0, 1);
 		List<Ball> balls = new ArrayList<Ball>();
 		balls.add(player1);
 		Camera camera = new Camera(player1);
