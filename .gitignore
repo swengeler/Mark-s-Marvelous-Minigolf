@@ -1,6 +1,5 @@
 *.class
 bin/
-res/
 .settings/
 lib/
 .project
