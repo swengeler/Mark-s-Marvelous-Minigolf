@@ -18,11 +18,13 @@ public class Ball extends Entity{
 	private static final float MIN_ZVEL = 0;
 	private static final float COEFF_RESTITUTION = 0.56f;
 	
-	private static final float BR_DECIDER = (float) Math.PI/18;
+	private static final float BR_DECIDER = (float) (Math.PI * 0.1);
 	
 	private Vector3f currentVel = new Vector3f();
 	private Vector3f currentAcc = new Vector3f();
 	private float currentTurnSpeed = 0;
+	
+	private boolean bouncingEnabled = true;
 	
 	public Ball(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
 		super(model, position, rotX, rotY, rotZ, scale);
@@ -93,14 +95,15 @@ public class Ball extends Entity{
 			System.out.println("Position after: ( " + getPosition().x + " | " + getPosition().y + " | " + getPosition().z + " )");
 			Vector3f normal = world.getNormalOfTerrain(getPosition().x, getPosition().z);
 			System.out.println("Normal: ( " + normal.x + " | " + normal.y + " | " + normal.z + " )");
+			float angleme = (float) Math.acos((Vector3f.dot(normal, currentVel))/(normal.length() * currentVel.length()));
 			float angle = (float)Math.PI - Vector3f.angle(normal, currentVel);
-			System.out.println("Angle: " + angle);
+			System.out.println("Angle: " + angle + " Angleme: " + angleme);
 			
 			Vector3f newPartialVel = (Vector3f) normal.scale(2*Vector3f.dot(currentVel, normal));
 			Vector3f.sub(newPartialVel, currentVel, currentVel);
 			currentVel.negate();
 			
-			if ((angle < ((float)Math.PI/2 - BR_DECIDER))) {
+			if (bouncingEnabled && (angle < (float)(Math.PI/2 - BR_DECIDER))) {
 				System.out.println("Bouncing");
 				// implement more complex mechanism for rolling/sliding behaviour on the ground
 				currentVel.scale(COEFF_RESTITUTION);
@@ -110,21 +113,28 @@ public class Ball extends Entity{
 				Vector3f projection = (Vector3f) normal.scale(Vector3f.dot(currentVel, normal)/normal.lengthSquared());
 				System.out.println("Normal part: ( " + projection.x + " | " + projection.y + " | " + projection.z + " )");
 				Vector3f.sub(currentVel, projection, projectionOnPlane);
+				projection.set(projectionOnPlane.x, projectionOnPlane.y, projectionOnPlane.z);
 				System.out.println("Projection: ( " + projectionOnPlane.x + " | " + projectionOnPlane.y + " | " + projectionOnPlane.z + " )");
 				Vector3f frictionDir = (Vector3f) projectionOnPlane.scale(-1/projectionOnPlane.length()); // reverse the direction of movement and scale to be a unit vector
 				System.out.println("Friction1: ( " + frictionDir.x + " | " + frictionDir.y + " | " + frictionDir.z + " )");
-				float angleSN = 90 - Vector3f.angle(normal, frictionDir);
-				float frictionAcc = PhysicsEngine.COEFF_FRICTION * (PhysicsEngine.GRAVITY.length() * (float)(Math.cos(angleSN)));
+				float angleSN = Vector3f.angle(new Vector3f(frictionDir.x,0,frictionDir.z), frictionDir);
+				System.out.println("Gravity scaling: " + Math.cos(angleSN) + " Angle: " + angleSN);
+				float frictionAcc = PhysicsEngine.COEFF_FRICTION * (PhysicsEngine.GRAVITY.length() * DisplayManager.getFrameTimeSeconds() * (float)(Math.cos(angleSN)));
 				System.out.println("Friction accleration: " + frictionAcc);
 				frictionDir = (Vector3f) frictionDir.scale(frictionAcc); // should now be the correctly scaled vector of the frictional ACCELERATION
 				System.out.println("Friction2: ( " + frictionDir.x + " | " + frictionDir.y + " | " + frictionDir.z + " )");
-				currentVel.set(projectionOnPlane.x, projectionOnPlane.y, projectionOnPlane.z);
-				Vector3f.add(currentVel, (Vector3f)frictionDir.scale(DisplayManager.getFrameTimeSeconds()), currentVel);
+				currentVel.set(projection.x, projection.y, projection.z);
+				System.out.println("Velocity as projection: ( " + currentVel.x + " | " + currentVel.y + " | " + currentVel.z + " )");
+				if (currentVel.length() > frictionDir.length())
+					Vector3f.add(currentVel, frictionDir, currentVel);
+				bouncingEnabled = false;
 			}
 			
 			System.out.println("Velocity after: ( " + currentVel.x + " | " + currentVel.y + " | " + currentVel.z + " )\n");
 			
 			
+		} else if (!bouncingEnabled) {
+			bouncingEnabled = true;
 		}
 		
 		/*
