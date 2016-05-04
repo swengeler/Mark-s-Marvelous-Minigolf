@@ -163,4 +163,8 @@ public class Ball extends Entity{
 			currentVel.z = 0;
 	}
 	
+	public float getRadius() {
+		return 5;
+	}
+	
 }

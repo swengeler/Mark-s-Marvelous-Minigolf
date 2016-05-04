@@ -2,11 +2,13 @@ package entities;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import Physics.CollisionData;
 import models.TexturedModel;
 
 public class Entity {
 
 	private TexturedModel model;
+	private CollisionData cdata;
 	private Vector3f position;
 	protected Vector3f rotVel = new Vector3f();
 	private float scale;
@@ -20,6 +22,7 @@ public class Entity {
 		this.rotVel.y = rotY;
 		this.rotVel.z = rotZ;
 		this.scale = scale;
+		createCollisionData();
 	}
 	
 	public Entity(TexturedModel model, int index, Vector3f position, float rotX, float rotY, float rotZ,
@@ -31,17 +34,22 @@ public class Entity {
         this.rotVel.y = rotY;
         this.rotVel.z = rotZ;
         this.scale = scale;
+        createCollisionData();
     }
 	
-	  public float getTextureXOffset(){
-	        int column = textureIndex%model.getTexture().getNumberOfRows();
-	        return (float)column/(float)model.getTexture().getNumberOfRows();
-	    }
+	private void createCollisionData() {
+		//somethingsomething
+	}
+	
+	public float getTextureXOffset(){
+		int column = textureIndex%model.getTexture().getNumberOfRows();
+	    return (float)column/(float)model.getTexture().getNumberOfRows();
+	}
 	     
-	    public float getTextureYOffset(){
-	        int row = textureIndex/model.getTexture().getNumberOfRows();
-	        return (float)row/(float)model.getTexture().getNumberOfRows();
-	    }
+	public float getTextureYOffset(){
+		int row = textureIndex/model.getTexture().getNumberOfRows();
+		return (float)row/(float)model.getTexture().getNumberOfRows();
+	}
 	 
 	
 	public void increasePosition(float dx, float dy, float dz){
