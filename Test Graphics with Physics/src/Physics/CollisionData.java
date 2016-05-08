@@ -35,7 +35,7 @@ public class CollisionData {
 		bbox = new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
 	}
 
-	public ArrayList<PhysicalFace> collidingFaces(Ball b) {
+	public ArrayList<PhysicalFace> getCollidingFaces(Ball b) {
 		collisionList.clear();
 		for (PhysicalFace f : faces) {
 			if (f.collidesWithBall(b))

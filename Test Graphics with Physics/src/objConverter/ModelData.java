@@ -3,6 +3,9 @@ package objConverter;
 import java.io.PrintWriter;
 
 public class ModelData {
+	
+	public static final int PRINT_DATA_FILE = 0;
+	public static final int PRINT_NRFACES = 1;
 
 	private float[] vertices;
 	private float[] textureCoords;
@@ -39,19 +42,22 @@ public class ModelData {
 		return furthestPoint;
 	}
 	
-	public void print() {
+	public void print(int id) {
 		try {
-			PrintWriter writer = new PrintWriter("printed_vertices_and_shit.txt","UTF-8");
-			System.out.println("\nvertices.length = " + vertices.length + ", normals.length = " + normals.length + ", indices.length = " + indices.length + "\n");
-			writer.println("VERTICES AND NORMALS");
-			for (int i = 0; i < (vertices.length / 3); i++) {
-				writer.println(i + ") Vertex: ( " + vertices[i] + " | " + vertices[i + 1] + " | " + vertices[i + 2] + " ) --- Normal: ( " + normals[i] + " | " + normals[i + 1] + " | " + normals[i + 2] + " )");
+			if (id == ModelData.PRINT_DATA_FILE) {
+				PrintWriter writer = new PrintWriter("printed_vertices_and_shit.txt","UTF-8");
+				writer.println("VERTICES AND NORMALS");
+				for (int i = 0; i < (vertices.length / 3); i++) {
+					writer.println(i + ") Vertex: ( " + vertices[i] + " | " + vertices[i + 1] + " | " + vertices[i + 2] + " ) --- Normal: ( " + normals[i] + " | " + normals[i + 1] + " | " + normals[i + 2] + " )");
+				}
+				writer.println("\nINDICES");
+				for (int i = 0; i < (indices.length / 3); i++) {
+					writer.println(i + ") Vertices: ( " + indices[i] + " | " + indices[i + 1] + " | " + indices[i + 2] + ")");
+				}
+				writer.close();
+			} else if (id == ModelData.PRINT_NRFACES) {
+				System.out.println("\nNumber of faces: " + (indices.length / 3) + "\n");
 			}
-			writer.println("\nINDICES");
-			for (int i = 0; i < (indices.length / 3); i++) {
-				writer.println(i + ") Vertices: ( " + indices[i] + " | " + indices[i + 1] + " | " + indices[i + 2] + ")");
-			}
-			writer.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

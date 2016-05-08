@@ -6,7 +6,8 @@ import entities.Ball;
 
 public class PhysicalFace {
 	
-	private Vector3f normal, point1, point2, point3, dist, smallest, largest;
+	private Vector3f normal, point1, point2, point3, dist;
+	private BoundingBox bbox;
 
 	public PhysicalFace(Vector3f normal, Vector3f point1, Vector3f point2, Vector3f point3) {
 		this.normal = new Vector3f(normal.x, normal.y, normal.z);
@@ -21,10 +22,7 @@ public class PhysicalFace {
 		dist.set((point1.x - b.getPosition().x), (point1.y - b.getPosition().y), (point1.z - b.getPosition().z));
 		double distance = Vector3f.dot(normal, dist)/normal.length();
 		double r = b.getRadius();
-		if (distance <= b.getRadius() &&
-			((b.getPosition().x - r) <= largest.x && (b.getPosition().x + r) >= smallest.x) &&
-			((b.getPosition().y - r) <= largest.y && (b.getPosition().y + r) >= smallest.y) &&
-			((b.getPosition().z - r) <= largest.z && (b.getPosition().z + r) >= smallest.z))
+		if (distance <= b.getRadius() && bbox.inBoundingBox(b))
 			return true;
 		return false;
 	}
@@ -36,9 +34,7 @@ public class PhysicalFace {
 		float maxX = Math.max(point1.x, Math.max(point2.x, point3.x));
 		float maxY = Math.max(point1.y, Math.max(point2.y, point3.y));
 		float maxZ = Math.max(point1.z, Math.max(point2.z, point3.z));
-		smallest = new Vector3f(minX, minY, minZ);
-		largest = new Vector3f(maxX, maxY, maxZ);
-	
+		bbox = new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
 	}
 	
 }

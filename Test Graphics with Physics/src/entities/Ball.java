@@ -1,5 +1,7 @@
 package entities;
 
+import java.util.ArrayList;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector3f;
 
@@ -7,6 +9,7 @@ import models.TexturedModel;
 import renderEngine.DisplayManager;
 import terrains.Terrain;
 import terrains.World;
+import Physics.PhysicalFace;
 import Physics.PhysicsEngine;
 
 public class Ball extends Entity{
@@ -30,24 +33,11 @@ public class Ball extends Entity{
 		super(model, position, rotX, rotY, rotZ, scale);
 	}
 
-	public void move(World world){
+	public void move(World world){ // world really necessary?
 		checkInputs(world);
-		//System.out.println("FrameTimeSeconds: " + DisplayManager.getFrameTimeSeconds());
 		super.increaseRotation(0, currentTurnSpeed * DisplayManager.getFrameTimeSeconds(), 0);
-		
-		//currentAcc = new Vector3f(PhysicsEngine.GRAVITY.x, PhysicsEngine.GRAVITY.y, PhysicsEngine.GRAVITY.z);
-		/*
-		if(getPosition().y <= world.getHeightOfTerrain(getPosition().x, getPosition().z)){
-			Vector3f antinorm = (Vector3f) world.getNormalOfTerrain(getPosition().x, getPosition().z).negate();
-			antinorm.normalise(antinorm);
-			Vector3f normComponent = (Vector3f) antinorm.scale(Vector3f.dot(currentAcc, antinorm));
-			normComponent.negate();
-			Vector3f.add(currentAcc, normComponent, currentAcc);
-			System.out.println("Acceleration: x=" + currentAcc.x + " y=" + currentAcc.y + " z=" + currentAcc.z);
-		}*/
 		Vector3f gravity = new Vector3f(PhysicsEngine.GRAVITY.x, PhysicsEngine.GRAVITY.y, PhysicsEngine.GRAVITY.z);
 		gravity = (Vector3f) gravity.scale(DisplayManager.getFrameTimeSeconds());
-		//System.out.println("Gravity: " + gravity.y);
 		
 		Vector3f.add(currentVel, gravity, currentVel);
 		
@@ -84,8 +74,16 @@ public class Ball extends Entity{
 		if(Keyboard.isKeyDown(Keyboard.KEY_SPACE))
 			jump(world);
 	}
+	
+	public boolean collidesWith(ArrayList<PhysicalFace> faces) {
+		for (PhysicalFace f : faces) {
+			if (f.collidesWithBall(this))
+				return true;
+		}
+		return false;
+	}
 
-	public void checkGroundCollision(World world) {
+	public void checkGroundCollision(World world) { // should be obsolete once PhysicsEngine is working properly
 		
 		// get list of possible "ground-tiles"
 		// get list of possible faces of obstacles
@@ -174,6 +172,10 @@ public class Ball extends Entity{
 	
 	public float getRadius() {
 		return 5;
+	}
+	
+	public Vector3f getVelocity() {
+		return currentVel;
 	}
 	
 }

@@ -6,9 +6,11 @@ import java.util.List;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
+import Physics.PhysicalFace;
 import entities.Entity;
 import entities.Light;
 import toolbox.Maths;
+import entities.Ball;
 import entities.Camera;
 
 public class World {
@@ -68,6 +70,11 @@ public class World {
 	
 	public List<Light> getLights(){
 		return lights;
+	}
+	
+	public ArrayList<PhysicalFace> getCollidingFaces(Ball b) {
+		// delegate the work further down to a specific terrain
+		return null;
 	}
 	
 	public Terrain getTerrain(float x, float z){

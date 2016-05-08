@@ -1,5 +1,7 @@
 package entities;
 
+import java.util.ArrayList;
+
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
@@ -51,6 +53,7 @@ public class Entity {
 	}
 
 	private void createCollisionData(ModelData data) {
+		long before = System.currentTimeMillis();
 		cdata = new CollisionData();
 		Matrix4f transformationMatrix = Maths.createTransformationMatrix(this.position,this.rotVel.x,this.rotVel.y,this.rotVel.z,this.scale);
 		Vector4f tfVector = new Vector4f(0,0,0,1f);
@@ -105,6 +108,13 @@ public class Entity {
 			cdata.addFace(face);
 		}
 		cdata.setBoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+		long after = System.currentTimeMillis();
+		long difference = after - before;
+		System.out.println("Time to construct faces (for entity): " + difference + "\n");
+	}
+	
+	public ArrayList<PhysicalFace> getCollidingFaces(Ball b) {
+		return this.cdata.getCollidingFaces(b);
 	}
 
 	public float getTextureXOffset(){
