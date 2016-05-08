@@ -72,7 +72,7 @@ public class Entity {
 
 		PhysicalFace face;
 		int[] currInd = new int[3];
-		for (int i = 0; i < (ind.length / 3); i += 3) {
+		for (int i = 0; i < ind.length; i += 3) {
 			currInd[0] = ind[i] * 3;
 			currInd[1] = ind[i + 1] * 3;
 			currInd[2] = ind[i + 2] * 3;

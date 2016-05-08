@@ -47,11 +47,11 @@ public class ModelData {
 			if (id == ModelData.PRINT_DATA_FILE) {
 				PrintWriter writer = new PrintWriter("printed_vertices_and_shit.txt","UTF-8");
 				writer.println("VERTICES AND NORMALS");
-				for (int i = 0; i < (vertices.length / 3); i++) {
-					writer.println(i + ") Vertex: ( " + vertices[i] + " | " + vertices[i + 1] + " | " + vertices[i + 2] + " ) --- Normal: ( " + normals[i] + " | " + normals[i + 1] + " | " + normals[i + 2] + " )");
+				for (int i = 0; i < vertices.length; i += 3) {
+					writer.println((i/3) + ") Vertex: ( " + vertices[i] + " | " + vertices[i + 1] + " | " + vertices[i + 2] + " ) --- Normal: ( " + normals[i] + " | " + normals[i + 1] + " | " + normals[i + 2] + " )");
 				}
 				writer.println("\nINDICES");
-				for (int i = 0; i < (indices.length / 3); i++) {
+				for (int i = 0; i < indices.length; i += 3) {
 					writer.println(i + ") Vertices: ( " + indices[i] + " | " + indices[i + 1] + " | " + indices[i + 2] + ")");
 				}
 				writer.close();
