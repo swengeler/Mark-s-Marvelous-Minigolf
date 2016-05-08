@@ -35,7 +35,24 @@ public class PhysicsEngine {
 			b.checkGroundCollision(world);
 			//b.checkMinSpeed(world);
 		}
-		
+	}
+	
+	public void checkGroundCollision(Ball b) {
+		// based on position (also take into account height >> highest terrain point) of the ball, check whether collision occurs
+		// height of terrain in radius distance around ball
+		// possibly combine with object collision so that they arent resolved separately if the ball hits both the ground and an obstacle
+	}
+	
+	public void checkObstacleCollision(Ball b) {
+		// also include collision with a ball!!!
+	}
+	
+	public void checkBallCollision(Ball b1) {
+		for (Ball b2:this.balls) {
+			if (!b1.equals(b2)) {
+				// do something
+			}
+		}
 	}
 	
 }

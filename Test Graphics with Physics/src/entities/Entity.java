@@ -1,9 +1,14 @@
 package entities;
 
+import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
+import org.lwjgl.util.vector.Vector4f;
 
 import Physics.CollisionData;
+import Physics.PhysicalFace;
 import models.TexturedModel;
+import objConverter.ModelData;
+import toolbox.Maths;
 
 public class Entity {
 
@@ -12,9 +17,9 @@ public class Entity {
 	private Vector3f position;
 	protected Vector3f rotVel = new Vector3f();
 	private float scale;
-	
+
 	private int textureIndex = 0;
-	
+
 	public Entity(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
 		this.model = model;
 		this.position = position;
@@ -22,9 +27,8 @@ public class Entity {
 		this.rotVel.y = rotY;
 		this.rotVel.z = rotZ;
 		this.scale = scale;
-		createCollisionData();
 	}
-	
+
 	public Entity(TexturedModel model, int index, Vector3f position, float rotX, float rotY, float rotZ,
             float scale) {
         this.textureIndex = index;
@@ -34,41 +38,103 @@ public class Entity {
         this.rotVel.y = rotY;
         this.rotVel.z = rotZ;
         this.scale = scale;
-        createCollisionData();
     }
-	
-	private void createCollisionData() {
-		//somethingsomething
+
+	public Entity(TexturedModel model, ModelData data, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
+		this.model = model;
+		this.position = position;
+		this.rotVel.x = rotX;
+		this.rotVel.y = rotY;
+		this.rotVel.z = rotZ;
+		this.scale = scale;
+		createCollisionData(data);
 	}
-	
+
+	private void createCollisionData(ModelData data) {
+		cdata = new CollisionData();
+		Matrix4f transformationMatrix = Maths.createTransformationMatrix(this.position,this.rotVel.x,this.rotVel.y,this.rotVel.z,this.scale);
+		Vector4f tfVector = new Vector4f(0,0,0,1f);
+		Vector3f p1 = new Vector3f(0,0,0), p2 = new Vector3f(0,0,0), p3 = new Vector3f(0,0,0);
+		Vector3f normal = new Vector3f(0,0,0), v1 = new Vector3f(0,0,0), v2 = new Vector3f(0,0,0);
+
+		float[] ver = data.getVertices();
+		int[] ind = data.getIndices();
+
+		float minX = Float.MAX_VALUE;
+		float minY = minX;
+		float minZ = minX;
+		float maxX = Float.MIN_VALUE;
+		float maxY = maxX;
+		float maxZ = maxX;
+
+		PhysicalFace face;
+		int[] currInd = new int[3];
+		for (int i = 0; i < (ind.length / 3); i += 3) {
+			currInd[0] = ind[i] * 3;
+			currInd[1] = ind[i + 1] * 3;
+			currInd[2] = ind[i + 2] * 3;
+
+			// first vertex
+			tfVector.set(ver[currInd[0]], ver[currInd[0] + 1], ver[currInd[0] + 2]);
+			Matrix4f.transform(transformationMatrix, tfVector, tfVector);
+			p1.set(tfVector.x, tfVector.y, tfVector.z);
+			// second vertex
+			tfVector.set(ver[currInd[1]], ver[currInd[1] + 1], ver[currInd[1] + 2]);
+			Matrix4f.transform(transformationMatrix, tfVector, tfVector);
+			p2.set(tfVector.x, tfVector.y, tfVector.z);
+			// third vertex
+			tfVector.set(ver[currInd[2]], ver[currInd[2] + 1], ver[currInd[2] + 2]);
+			Matrix4f.transform(transformationMatrix, tfVector, tfVector);
+			p3.set(tfVector.x, tfVector.y, tfVector.z);
+			
+			// adjusting max/min values
+			minX = Math.min(minX, Math.min(p1.x, Math.min(p2.x, p3.x)));
+			minY = Math.min(minY, Math.min(p1.y, Math.min(p2.y, p3.y)));
+			minZ = Math.min(minZ, Math.min(p1.z, Math.min(p2.z, p3.z)));
+			maxX = Math.max(maxX, Math.max(p1.x, Math.max(p2.x, p3.x)));
+			maxY = Math.max(maxY, Math.max(p1.y, Math.max(p2.y, p3.y)));
+			maxZ = Math.max(maxZ, Math.max(p1.z, Math.max(p2.z, p3.z)));
+			
+			// constructing a face from the three points p1, p2 and p3 and their resulting normal
+			Vector3f.sub(p2, p1, v1);
+			Vector3f.sub(p3, p1, v2);
+			Vector3f.cross(v1, v2, normal);
+			normal.normalise();
+			face = new PhysicalFace(normal, p1, p2, p3);
+
+			cdata.addFace(face);
+		}
+		cdata.setBoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+	}
+
 	public float getTextureXOffset(){
 		int column = textureIndex%model.getTexture().getNumberOfRows();
 	    return (float)column/(float)model.getTexture().getNumberOfRows();
 	}
-	     
+
 	public float getTextureYOffset(){
 		int row = textureIndex/model.getTexture().getNumberOfRows();
 		return (float)row/(float)model.getTexture().getNumberOfRows();
 	}
-	 
-	
+
+
 	public void increasePosition(float dx, float dy, float dz){
 		this.position.x += dx;
 		this.position.y += dy;
 		this.position.z += dz;
 	}
-	
+
 	public void increasePosition(Vector3f vec){
 		this.position.x += vec.x;
 		this.position.y += vec.y;
 		this.position.z += vec.z;
 	}
-	
+
 	public void increaseRotation(float dx, float dy, float dz){
 		this.rotVel.x += dx;
 		this.rotVel.y += dy;
 		this.rotVel.z += dz;
-		
+
 	}
 
 	public TexturedModel getModel() {
@@ -118,6 +184,6 @@ public class Entity {
 	public void setScale(float scale) {
 		this.scale = scale;
 	}
-	
-	
+
+
 }

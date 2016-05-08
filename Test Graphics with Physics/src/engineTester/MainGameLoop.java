@@ -44,13 +44,14 @@ public class MainGameLoop {
 		Loader loader = new Loader();
 		
 		ModelData human = OBJFileLoader.loadOBJ("person");
-		ModelData ball = OBJFileLoader.loadOBJ("ball_oth_high");
+		ModelData ball = OBJFileLoader.loadOBJ("ball_centred");
 		ModelData tree = OBJFileLoader.loadOBJ("tree");
 		ModelData fern = OBJFileLoader.loadOBJ("fern");
 		ModelData grass = OBJFileLoader.loadOBJ("grassModel");
 		ModelData pine = OBJFileLoader.loadOBJ("pine");
 		ModelData flower = OBJFileLoader.loadOBJ("grassModel");
 		ModelData box = OBJFileLoader.loadOBJ("box");
+		box.print();
 		
 		RawModel humanModel = loader.loadToVAO(human.getVertices(), human.getTextureCoords(), human.getNormals(), human.getIndices());
 		RawModel ballModel = loader.loadToVAO(ball.getVertices(), ball.getTextureCoords(), ball.getNormals(), ball.getIndices());

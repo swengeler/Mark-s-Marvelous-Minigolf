@@ -17,7 +17,7 @@ public class PhysicalFace {
 		prepareBounds();
 	}
 	
-	public boolean collidesBall(Ball b) {
+	public boolean collidesWithBall(Ball b) {
 		dist.set((point1.x - b.getPosition().x), (point1.y - b.getPosition().y), (point1.z - b.getPosition().z));
 		double distance = Vector3f.dot(normal, dist)/normal.length();
 		double r = b.getRadius();

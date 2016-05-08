@@ -86,6 +86,15 @@ public class Ball extends Entity{
 	}
 
 	public void checkGroundCollision(World world) {
+		
+		// get list of possible "ground-tiles"
+		// get list of possible faces of obstacles
+		// test for collision for all of those faces -> get list of colliding faces
+		// push ball back in direction of movement until none of those collide anymore
+		// (check again whether new collision?)
+		// check for closest face -> if multiple within d < 0.0001 or smth then resolve with multiple
+		// resolve with closest face or "new face" from multiple
+		
 		float terrainHeight = world.getHeightOfTerrain(this.getPosition().x, this.getPosition().z);
 		
 		if (this.getPosition().y < terrainHeight) {
