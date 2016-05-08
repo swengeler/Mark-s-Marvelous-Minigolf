@@ -39,6 +39,8 @@ import water.WaterTile;
 public class MainGameLoop {
 
 	public static void main(String[] args) {
+		
+		long before = System.currentTimeMillis();
 
 		DisplayManager.createDisplay();
 		Loader loader = new Loader();
@@ -175,11 +177,14 @@ public class MainGameLoop {
 		WaterRenderer waterRenderer = new WaterRenderer(loader, waterShader, renderer.getProjectionMatrix(), fbos);
 		List<WaterTile> waters = new ArrayList<WaterTile>();
 		waters.add(new WaterTile(75, 120, 0));
-
+		
+		long after = System.currentTimeMillis();
+		System.out.println("\nTIME TO PREPARE MODES ETC.: " + (after - before) + "\n");
 
 		while(!Display.isCloseRequested()){
-			player1.move(world);
+			//player1.move(world);
 			world.start();
+			player1.move(world);
 			picker.update();
 			mainEngine.tick();
 

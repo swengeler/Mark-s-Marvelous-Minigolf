@@ -122,7 +122,7 @@ public class Terrain {
 				indices[pointer++] = bottomRight;
 			}
 		}
-		createCollisionData(vertices,indices);
+		//createCollisionData(vertices,indices);
 		return loader.loadToVAO(vertices, textureCoords, normals, indices);
 	}
 	
@@ -174,7 +174,7 @@ public class Terrain {
 				indices[pointer++] = bottomRight;
 			}
 		}
-		createCollisionData(vertices,indices);
+		//createCollisionData(vertices,indices);
 		return loader.loadToVAO(vertices, textureCoords, normals, indices);
 	}
 	

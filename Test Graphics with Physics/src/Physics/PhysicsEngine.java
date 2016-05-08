@@ -40,7 +40,7 @@ public class PhysicsEngine {
 				b.move(world);
 				b.checkGroundCollision(world);
 				//b.checkMinSpeed(world);
-				checkOrdinaryCollision(b);
+				//checkOrdinaryCollision(b);
 			//}
 		}
 	}
@@ -75,10 +75,8 @@ public class PhysicsEngine {
 					collidingFaces.remove(f);
 			}
 		}
-	}
-	
-	public void checkObstacleCollision(Ball b) {
-		// also include collision with a ball!!!
+		// get closest face and resolve collision with that one
+		// if two or more are within a certain margin, say 0.001 something, then resolve with both
 	}
 	
 	public void checkBallCollision(Ball b1) {
