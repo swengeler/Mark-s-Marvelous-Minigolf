@@ -20,10 +20,15 @@ public class PhysicalFace {
 	
 	public boolean collidesWithBall(Ball b) {
 		dist.set((point1.x - b.getPosition().x), (point1.y - b.getPosition().y), (point1.z - b.getPosition().z));
-		double distance = Vector3f.dot(normal, dist)/normal.length();
-		if (distance <= b.getRadius() && bbox.inBoundingBox(b))
+		double distance = Math.abs(Vector3f.dot(normal, dist))/normal.length();
+		if ((float)distance <= b.getRadius() && bbox.inBoundingBox(b)) {
 			return true;
+		}
 		return false;
+	}
+	
+	public Vector3f getNormal() {
+		return normal;
 	}
 	
 	private void prepareBounds() {

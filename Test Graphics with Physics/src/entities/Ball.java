@@ -20,15 +20,15 @@ public class Ball extends Entity{
 	private static final float MIN_YVEL = 0;
 	private static final float MIN_ZVEL = 0;
 	private static final float COEFF_RESTITUTION = 0.56f;
-	
+
 	private static final float BR_DECIDER = (float) (Math.PI * 0.1);
-	
+
 	private Vector3f currentVel = new Vector3f();
 	private Vector3f currentAcc = new Vector3f();
 	private float currentTurnSpeed = 0;
-	
+
 	private boolean bouncingEnabled = true;
-	
+
 	public Ball(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
 		super(model, position, rotX, rotY, rotZ, scale);
 	}
@@ -38,43 +38,43 @@ public class Ball extends Entity{
 		super.increaseRotation(0, currentTurnSpeed * DisplayManager.getFrameTimeSeconds(), 0);
 		Vector3f gravity = new Vector3f(PhysicsEngine.GRAVITY.x, PhysicsEngine.GRAVITY.y, PhysicsEngine.GRAVITY.z);
 		gravity = (Vector3f) gravity.scale(DisplayManager.getFrameTimeSeconds());
-		
+
 		Vector3f.add(currentVel, gravity, currentVel);
-		
+
 		Vector3f delta = new Vector3f(currentVel.x, currentVel.y, currentVel.z);
 		delta.scale(DisplayManager.getFrameTimeSeconds());
-		
+
 		super.increasePosition(delta);
-		
+
 		float terrainHeight = world.getHeightOfTerrain(super.getPosition().x, super.getPosition().z);
 	}
-	
+
 	private void jump(World world){
 		if(!(super.getPosition().y > world.getHeightOfTerrain(this.getPosition().x, this.getPosition().z)))
 			this.currentVel.y = JUMP_POWER;
 	}
-	
+
 	private void checkInputs(World world){
 		if(Keyboard.isKeyDown(Keyboard.KEY_W)){
 			this.currentVel.x += (float) (RUN_SPEED * Math.sin(Math.toRadians(super.getRotY())));
 			this.currentVel.z += (float) (RUN_SPEED * Math.cos(Math.toRadians(super.getRotY())));
-			
+
 		} else if (Keyboard.isKeyDown(Keyboard.KEY_S)){
 			this.currentVel.x += (float) -(RUN_SPEED * Math.sin(Math.toRadians(super.getRotY())));
 			this.currentVel.z += (float) -(RUN_SPEED * Math.cos(Math.toRadians(super.getRotY())));
 		}
-		
+
 		if(Keyboard.isKeyDown(Keyboard.KEY_D))
 			this.currentTurnSpeed = -TURN_SPEED;
 		else if (Keyboard.isKeyDown(Keyboard.KEY_A))
 			this.currentTurnSpeed = TURN_SPEED;
 		else
 			this.currentTurnSpeed = 0;
-		
+
 		if(Keyboard.isKeyDown(Keyboard.KEY_SPACE))
 			jump(world);
 	}
-	
+
 	public boolean collidesWith(ArrayList<PhysicalFace> faces) {
 		for (PhysicalFace f : faces) {
 			if (f.collidesWithBall(this))
@@ -84,7 +84,7 @@ public class Ball extends Entity{
 	}
 
 	public void checkGroundCollision(World world) { // should be obsolete once PhysicsEngine is working properly
-		
+
 		// get list of possible "ground-tiles"
 		// get list of possible faces of obstacles
 		// test for collision for all of those faces -> get list of colliding faces
@@ -92,9 +92,9 @@ public class Ball extends Entity{
 		// (check again whether new collision?)
 		// check for closest face -> if multiple within d < 0.0001 or smth then resolve with multiple
 		// resolve with closest face or "new face" from multiple
-		
+
 		float terrainHeight = world.getHeightOfTerrain(this.getPosition().x, this.getPosition().z);
-		
+
 		if (this.getPosition().y < terrainHeight) {
 			System.out.println("Current velocity: ( " + currentVel.x + " | " + currentVel.y + " | " + currentVel.z + " )");
 			System.out.println("Position before: ( " + getPosition().x + " | " + getPosition().y + " | " + getPosition().z + " )");
@@ -105,16 +105,16 @@ public class Ball extends Entity{
 			float angleme = (float) Math.acos((Vector3f.dot(normal, currentVel))/(normal.length() * currentVel.length()));
 			float angle = (float)Math.PI - Vector3f.angle(normal, currentVel);
 			System.out.println("Angle: " + angle + " Angleme: " + angleme);
-			
+
 			Vector3f newPartialVel = (Vector3f) normal.scale(2*Vector3f.dot(currentVel, normal));
 			Vector3f.sub(newPartialVel, currentVel, currentVel);
 			currentVel.negate();
-			
+
 			if (bouncingEnabled && (angle < (float)(Math.PI/2 - BR_DECIDER))) {
 				System.out.println("Bouncing");
 				// implement more complex mechanism for rolling/sliding behaviour on the ground
 				currentVel.scale(COEFF_RESTITUTION);
-			} else if (currentVel.length() > 0){
+			} else if (currentVel.length() > 0) {
 				System.out.println("Rolling");
 				Vector3f projectionOnPlane = new Vector3f();
 				Vector3f projection = (Vector3f) normal.scale(Vector3f.dot(currentVel, normal)/normal.lengthSquared());
@@ -138,16 +138,16 @@ public class Ball extends Entity{
 					currentVel.set(0,0,0);
 				bouncingEnabled = false;
 			}
-			
+
 			System.out.println("Velocity after: ( " + currentVel.x + " | " + currentVel.y + " | " + currentVel.z + " )\n");
-			
-			
+
+
 		} else if (!bouncingEnabled) {
 			bouncingEnabled = true;
 		}
-		
+
 		/*
-		
+
 		if(this.getPosition().y < terrainHeight ){
 			super.getPosition().y = terrainHeight;
 			Vector3f normal = world.getNormalOfTerrain(getPosition().x, getPosition().z);
@@ -158,7 +158,7 @@ public class Ball extends Entity{
 		}
 		*/
 	}
-	
+
 	public void checkMinSpeed(World world){
 		if(currentVel.x < MIN_XVEL)
 			currentVel.x = 0;
@@ -169,13 +169,13 @@ public class Ball extends Entity{
 		if(currentVel.z < MIN_ZVEL)
 			currentVel.z = 0;
 	}
-	
+
 	public float getRadius() {
 		return 5;
 	}
-	
+
 	public Vector3f getVelocity() {
 		return currentVel;
 	}
-	
+
 }

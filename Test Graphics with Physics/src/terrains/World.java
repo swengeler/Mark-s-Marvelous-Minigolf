@@ -73,6 +73,7 @@ public class World {
 	}
 	
 	public ArrayList<PhysicalFace> getCollidingFaces(Ball b) {
+		System.out.println("getCollidingFaces in World is called");
 		ArrayList<PhysicalFace> collidingFaces = new ArrayList<PhysicalFace>();
 		for (Terrain t : terrains) {
 			if (t.ballInTerrain(b)) {

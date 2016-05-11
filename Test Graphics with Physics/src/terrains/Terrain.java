@@ -34,6 +34,7 @@ public class Terrain {
 
 	private float x;
 	private float z;
+	private float maxHeight;
 	private RawModel model;
 	private ModelTexture texture;
 	private CollisionData cdata;
@@ -179,64 +180,6 @@ public class Terrain {
 		return loader.loadToVAO(vertices, textureCoords, normals, indices);
 	}
 
-	/*private void createCollisionData(float[] ver, int[] ind) {
-		long before = System.currentTimeMillis();
-		cdata = new CollisionData();
-		Matrix4f transformationMatrix = Maths.createTransformationMatrix(new Vector3f(1,1,1),1,1,1,1);
-		Vector4f tfVector = new Vector4f(0,0,0,1f);
-		Vector3f p1 = new Vector3f(0,0,0), p2 = new Vector3f(0,0,0), p3 = new Vector3f(0,0,0);
-		Vector3f normal = new Vector3f(0,0,0), v1 = new Vector3f(0,0,0), v2 = new Vector3f(0,0,0);
-
-		float minX = Float.MAX_VALUE;
-		float minY = minX;
-		float minZ = minX;
-		float maxX = Float.MIN_VALUE;
-		float maxY = maxX;
-		float maxZ = maxX;
-
-		PhysicalFace face;
-		int[] currInd = new int[3];
-		for (int i = 0; i < ind.length; i += 3) {
-			currInd[0] = ind[i] * 3;
-			currInd[1] = ind[i + 1] * 3;
-			currInd[2] = ind[i + 2] * 3;
-
-			// first vertex
-			tfVector.set(ver[currInd[0]], ver[currInd[0] + 1], ver[currInd[0] + 2]);
-			Matrix4f.transform(transformationMatrix, tfVector, tfVector);
-			p1.set(tfVector.x, tfVector.y, tfVector.z);
-			// second vertex
-			tfVector.set(ver[currInd[1]], ver[currInd[1] + 1], ver[currInd[1] + 2]);
-			Matrix4f.transform(transformationMatrix, tfVector, tfVector);
-			p2.set(tfVector.x, tfVector.y, tfVector.z);
-			// third vertex
-			tfVector.set(ver[currInd[2]], ver[currInd[2] + 1], ver[currInd[2] + 2]);
-			Matrix4f.transform(transformationMatrix, tfVector, tfVector);
-			p3.set(tfVector.x, tfVector.y, tfVector.z);
-
-			// adjusting max/min values
-			minX = Math.min(minX, Math.min(p1.x, Math.min(p2.x, p3.x)));
-			minY = Math.min(minY, Math.min(p1.y, Math.min(p2.y, p3.y)));
-			minZ = Math.min(minZ, Math.min(p1.z, Math.min(p2.z, p3.z)));
-			maxX = Math.max(maxX, Math.max(p1.x, Math.max(p2.x, p3.x)));
-			maxY = Math.max(maxY, Math.max(p1.y, Math.max(p2.y, p3.y)));
-			maxZ = Math.max(maxZ, Math.max(p1.z, Math.max(p2.z, p3.z)));
-
-			// constructing a face from the three points p1, p2 and p3 and their resulting normal
-			Vector3f.sub(p2, p1, v1);
-			Vector3f.sub(p3, p1, v2);
-			Vector3f.cross(v1, v2, normal);
-			normal.normalise();
-			face = new PhysicalFace(normal, p1, p2, p3);
-
-			cdata.addFace(face);
-		}
-		cdata.setBoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
-		long after = System.currentTimeMillis();
-		long difference = after - before;
-		System.out.println("Time to construct faces (for terrain): " + difference + "\n");
-	}*/
-
 	private float getHeight(int x, int z, BufferedImage image){
 		if(x<0 || x>=image.getHeight() || z<0 || z>=image.getHeight()){
 			return 0;
@@ -258,9 +201,13 @@ public class Terrain {
 	}
 
 	public ArrayList<PhysicalFace> getCollidingFaces(Ball b) {
+		System.out.println("getCollidingFaces in Terrain is called");
 		float ballR = b.getRadius();
 		float ballX = b.getPosition().x - this.x;
 		float ballZ = b.getPosition().z - this.z;
+		
+		if ((b.getPosition().y - ballR) > this.maxHeight)
+			return new ArrayList<PhysicalFace>(0);
 
 		int leftX = (int) Math.floor(ballX - ballR);
 		if (leftX < 0) 
@@ -278,8 +225,8 @@ public class Terrain {
 		Vector3f p1 = new Vector3f(0,0,0), p2 = new Vector3f(0,0,0), p3 = new Vector3f(0,0,0), normal = new Vector3f(0,0,0), v1 = new Vector3f(0,0,0), v2 = new Vector3f(0,0,0);
 
 		ArrayList<PhysicalFace> collidingFaces = new ArrayList<PhysicalFace>();
-		for (int i = leftX; i < rightX - 1; i++) {
-			for (int j = upperZ; i < lowerZ - 1; j++) {
+		for (int i = leftX; i < rightX - 1 && i < heights.length - 1; i++) {
+			for (int j = upperZ; i < lowerZ - 1 && j < heights[0].length - 1; j++) {
 				// upper left corner
 				p1.set(i + this.x, this.heights[i][j], j + this.z);
 				// lower left corner
