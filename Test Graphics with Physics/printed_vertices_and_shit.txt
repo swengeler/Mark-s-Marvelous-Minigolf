@@ -314,7 +314,6 @@ VERTICES AND NORMALS
 312) Vertex: ( 1.0 | -1.0 | -1.0 ) --- Normal: ( 1.0 | -0.0 | 0.0 )
 313) Vertex: ( 0.999999 | 1.0 | 1.000001 ) --- Normal: ( 1.0 | -0.0 | 0.0 )
 
-
 INDICES
 0) Vertices: ( 0 | 1 | 2)
 3) Vertices: ( 14 | 22 | 20)

@@ -39,7 +39,7 @@ import water.WaterTile;
 public class MainGameLoop {
 
 	public static void main(String[] args) {
-		
+
 		long before = System.currentTimeMillis();
 
 		DisplayManager.createDisplay();
@@ -74,6 +74,17 @@ public class MainGameLoop {
 		TexturedModel flowerTModel = new TexturedModel(flowerModel,new ModelTexture(loader.loadTexture("flower")));
 
 
+		long beforeHumans = System.currentTimeMillis();
+		Entity h = new Entity(humanTModel, human, new Vector3f(0, 0, 0), 0, 0, 0, 1);
+		Entity a = new Entity(ballTModel, ball, new Vector3f(0, 0, 0), 0, 0, 0, 1);
+		Entity b = new Entity(treeTModel, tree, new Vector3f(0, 0, 0), 0, 0, 0, 1);
+		Entity c = new Entity(fernTModel, fern, new Vector3f(0, 0, 0), 0, 0, 0, 1);
+		Entity d = new Entity(grassTModel, grass, new Vector3f(0, 0, 0), 0, 0, 0, 1);
+		Entity e = new Entity(boxTModel, box, new Vector3f(0, 0, 0), 0, 0, 0, 1);
+		long afterHumans = System.currentTimeMillis();
+		System.out.println("Time to load entities: " + (afterHumans - beforeHumans));
+
+
 		fernTModel.getTexture().setNumberOfRows(2);
 		fernTModel.getTexture().setHasTransparency(true);
 		grassTModel.getTexture().setUseFakeLighting(true);
@@ -91,15 +102,26 @@ public class MainGameLoop {
 		lights.add(new Light(new Vector3f(35,17,35),new Vector3f(0,2,2), new Vector3f(1,0.01f,0.002f)));
 		lights.add(new Light(new Vector3f(0,7,70),new Vector3f(2,2,0), new Vector3f(1,0.01f,0.002f)));
 
-		Ball player1 = new Ball(ballTModel, new Vector3f(200, 0, 200), 0, 0, 0, 1);
+		Ball player1 = new Ball(ballTModel, new Vector3f(200, 30, 200), 0, 0, 0, 1);
 		List<Ball> balls = new ArrayList<Ball>();
 		balls.add(player1);
 
 
 		Camera camera = new Camera(player1);
 		World world = new World(camera);
-		world.add(new Terrain(0, 0, loader,new ModelTexture(loader.loadTexture("grass")), "arena"/*, "heightmap"*/));
-		
+		world.add(new Terrain(0, 0, loader,new ModelTexture(loader.loadTexture("grass"))/*, "arena"/*, "heightmap"*/));
+
+
+		/*float[][] heights = world.getTerrains().get(0).getHeights();
+		System.out.println("Heights = " + heights.length + "x" + heights[0].length);
+		System.out.println("Height at 1000|1000: " + heights[1000][1000]);
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
+				System.out.print(heights[i][j] + " ");
+			}
+			System.out.println();
+		}*/
+
 		/*List<Entity> nature = new ArrayList<Entity>();
 		nature.add(new Entity(humanTModel, human, new Vector3f(45, 300, 23),0,0,0,1));
 		Random r = new Random();
@@ -177,7 +199,7 @@ public class MainGameLoop {
 		WaterRenderer waterRenderer = new WaterRenderer(loader, waterShader, renderer.getProjectionMatrix(), fbos);
 		List<WaterTile> waters = new ArrayList<WaterTile>();
 		waters.add(new WaterTile(75, 120, 0));
-		
+
 		long after = System.currentTimeMillis();
 		System.out.println("\nTIME TO PREPARE MODES ETC.: " + (after - before) + "\n");
 

@@ -28,6 +28,7 @@ public class PhysicsEngine {
 		this.balls = balls;
 		this.world = world;
 		this.entities = world.getEntities();
+		this.terrains = world.getTerrains();
 	}
 	
 	public void addBall(Ball ball) {
@@ -56,8 +57,8 @@ public class PhysicsEngine {
 		}
 		for (Terrain t : terrains) {
 			// add faces as well, possibly based on location of the ball, since it takes too much time to get faces for the entire surface?
-			// check whether ball is above highest point -> then no other check is necessary
-			// construct faces of where the ball is actually position (x and y)
+			// check whether ball is above highest point -> then no other check is necessary (perhaps also do so with checking the height of the terrain?)
+			// construct faces of where the ball is positioned (x and y)
 			// might actually get empty list here since ball might getCollidingFaces method already checks for actual collision
 			// -> should also check for x/y position though, to narrow down results
 			
@@ -69,14 +70,14 @@ public class PhysicsEngine {
 		revBallMovement.negate(revBallMovement.normalise(revBallMovement)).scale(0.0001f);
 		while (b.collidesWith(collidingFaces)) {
 			// move the ball back out
-			//b.translate(revBallMovement);
-			for (PhysicalFace f : collidingFaces) { // maybe overkill/takes more time than checking every time?
+			b.increasePosition(revBallMovement);
+			for (PhysicalFace f : collidingFaces) { // maybe overkill/takes more time than checking every time? - also, would in the end remove all faces, not a good idea
 				if (!f.collidesWithBall(b))
 					collidingFaces.remove(f);
 			}
 		}
 		// get closest face and resolve collision with that one
-		// if two or more are within a certain margin, say 0.001 something, then resolve with both
+		// if two or more are within a certain range, say 0.001 or something, then resolve with both using contact points and their normals (same for three)
 	}
 	
 	public void checkBallCollision(Ball b1) {

@@ -73,8 +73,13 @@ public class World {
 	}
 	
 	public ArrayList<PhysicalFace> getCollidingFaces(Ball b) {
-		// delegate the work further down to a specific terrain
-		return null;
+		ArrayList<PhysicalFace> collidingFaces = new ArrayList<PhysicalFace>();
+		for (Terrain t : terrains) {
+			if (t.ballInTerrain(b)) {
+				collidingFaces.addAll(t.getCollidingFaces(b));
+			}
+		}
+		return collidingFaces;
 	}
 	
 	public Terrain getTerrain(float x, float z){
