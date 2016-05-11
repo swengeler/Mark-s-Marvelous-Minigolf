@@ -221,6 +221,8 @@ public class Terrain {
 		int lowerZ = (int) Math.ceil(ballZ + ballR);
 		if (lowerZ >= heights.length)
 			lowerZ = heights.length - 1;
+		
+		System.out.println("leftX = " + leftX + ", rightX = " + rightX + ", upperZ = " + upperZ + ", lowerZ = " + lowerZ);
 
 		Vector3f p1 = new Vector3f(0,0,0), p2 = new Vector3f(0,0,0), p3 = new Vector3f(0,0,0), normal = new Vector3f(0,0,0), v1 = new Vector3f(0,0,0), v2 = new Vector3f(0,0,0);
 
@@ -254,6 +256,7 @@ public class Terrain {
 				collidingFaces.add(new PhysicalFace(normal,p1,p2,p3));
 			}
 		}
+		System.out.println("Number of colliding faces in terrain: " + collidingFaces.size());
 		return collidingFaces;
 	}
 

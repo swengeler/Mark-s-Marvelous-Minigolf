@@ -168,13 +168,16 @@ public class PhysicsEngine {
 				System.out.println("Velocity as projection: ( " + b.getVelocity().x + " | " + b.getVelocity().y + " | " + b.getVelocity().z + " )");
 				if (b.getVelocity().length() > frictionDir.length())
 					Vector3f.add(b.getVelocity(), frictionDir, b.getVelocity());
-				else
+				else {
 					b.getVelocity().set(0,0,0);
+					//PhysicsEngine.disable();
+				}
 			}
 
 			System.out.println("Velocity after: ( " + b.getVelocity().x + " | " + b.getVelocity().y + " | " + b.getVelocity().z + " )\n");
 		} else if (combined.size() == 2) {
-			// resolve with two planes by using their normals and
+			// resolve with two planes by using their normals and contact points with the ball
+			
 		}
 	}
 

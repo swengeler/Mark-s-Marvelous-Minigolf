@@ -202,10 +202,11 @@ public class MainGameLoop {
 
 		long after = System.currentTimeMillis();
 		System.out.println("\nTIME TO PREPARE MODES ETC.: " + (after - before) + "\n");
-
+		int i = 0;
 		while(!Display.isCloseRequested()){
 			//player1.move(world);
 			world.start();
+			System.out.println("While loop run " + (i++) + " times");
 			player1.move(world);
 			picker.update();
 			mainEngine.tick();

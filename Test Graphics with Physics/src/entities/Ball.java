@@ -171,7 +171,7 @@ public class Ball extends Entity{
 	}
 
 	public float getRadius() {
-		return 5;
+		return 1.1925f;
 	}
 
 	public Vector3f getVelocity() {
