@@ -122,9 +122,9 @@ public class MainGameLoop {
 			System.out.println();
 		}*/
 
-		/*List<Entity> nature = new ArrayList<Entity>();
-		nature.add(new Entity(humanTModel, human, new Vector3f(45, 300, 23),0,0,0,1));
-		Random r = new Random();
+		List<Entity> nature = new ArrayList<Entity>();
+		nature.add(new Entity(boxTModel, box, new Vector3f(200, 0, 300),0,0,0,50));
+		/*Random r = new Random();
 		for(int i=0; i<200; i++){
 			if(i<40){
 				float x = r.nextFloat()*Terrain.getSize();
@@ -185,7 +185,7 @@ public class MainGameLoop {
 
 		GuiRenderer guiRenderer = new GuiRenderer(loader);
 
-		//world.addEntities(nature);
+		world.addEntities(nature);
 		//world.add(big_Human);
 		world.addLights(lights);
 

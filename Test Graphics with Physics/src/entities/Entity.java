@@ -116,6 +116,10 @@ public class Entity {
 	public ArrayList<PhysicalFace> getCollidingFaces(Ball b) {
 		return this.cdata.getCollidingFaces(b);
 	}
+	
+	public boolean inBounds(Ball b) {
+		return this.cdata.inBounds(b);
+	}
 
 	public float getTextureXOffset(){
 		int column = textureIndex%model.getTexture().getNumberOfRows();

@@ -28,7 +28,7 @@ public class Terrain {
 	private static final int VERTEX_COUNT = 512;
 	private static final float MAX_HEIGHT = 40;
 	private static final float MAX_PIXEL_COLOR = 256 * 256 * 256;
-	
+
 	//private static float MAX_HEIGHT; // when constructing all terrains, check for the maximum height, if the ball is above that no point in checking
 	// maybe make individual max_heights for one terrain!!
 
@@ -196,7 +196,7 @@ public class Terrain {
 		return height;
 
 	}
-	
+
 	public boolean ballInTerrain(Ball b) {
 		float ballR = b.getRadius();
 		float ballX = b.getPosition().x;
@@ -210,23 +210,34 @@ public class Terrain {
 		float ballR = b.getRadius();
 		float ballX = b.getPosition().x - this.x;
 		float ballZ = b.getPosition().z - this.z;
-		
+
 		if ((b.getPosition().y - ballR) > this.maxHeight)
 			return new ArrayList<PhysicalFace>(0);
 
 		int leftX = (int) Math.floor(ballX - ballR);
-		if (leftX < 0) 
-			leftX = 0;
 		int rightX = (int) Math.ceil(ballX + ballR);
+		if (leftX > rightX) {
+			int temp = leftX;
+			leftX = rightX;
+			rightX = temp;
+		}
+		if (leftX < 0)
+			leftX = 0;
 		if (rightX >= heights[0].length)
 			rightX = heights[0].length - 1;
+
 		int upperZ = (int) Math.floor(ballZ - ballR);
+		int lowerZ = (int) Math.ceil(ballZ + ballR);
+		if (upperZ > lowerZ) {
+			int temp = upperZ;
+			upperZ = lowerZ;
+			lowerZ = temp;
+		}
 		if (upperZ < 0)
 			upperZ = 0;
-		int lowerZ = (int) Math.ceil(ballZ + ballR);
 		if (lowerZ >= heights.length)
 			lowerZ = heights.length - 1;
-		
+
 		System.out.println("leftX = " + leftX + ", rightX = " + rightX + ", upperZ = " + upperZ + ", lowerZ = " + lowerZ);
 
 		Vector3f p1 = new Vector3f(0,0,0), p2 = new Vector3f(0,0,0), p3 = new Vector3f(0,0,0), normal = new Vector3f(0,0,0), v1 = new Vector3f(0,0,0), v2 = new Vector3f(0,0,0);
@@ -259,7 +270,7 @@ public class Terrain {
 				Vector3f.cross(v1, v2, normal);
 				normal.normalise();
 				collidingFaces.add(new PhysicalFace(normal,p1,p2,p3));
-				System.out.println("2 faces added at " + i + "|" + j);
+				System.out.println("2 faces added at (" + i + "|" + j + ")");
 			}
 		}
 		System.out.println("Number of colliding faces (in Terrain): " + collidingFaces.size());
