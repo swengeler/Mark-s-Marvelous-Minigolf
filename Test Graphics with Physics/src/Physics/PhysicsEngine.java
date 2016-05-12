@@ -76,6 +76,22 @@ public class PhysicsEngine {
 			System.out.println();
 			return;
 		}
+		
+		ArrayList<PhysicalFace> combined = new ArrayList<PhysicalFace>();
+		combined.add(collidingFaces.get(0));
+		for (PhysicalFace f : collidingFaces) {
+			boolean found = false;
+			for (int i = 0; !found && i < combined.size(); i++) {
+				if (f.getNormal().x == combined.get(i).getNormal().x && f.getNormal().y == combined.get(i).getNormal().y && f.getNormal().z == combined.get(i).getNormal().z)
+					found = true;
+			}
+			if (!found) {
+				System.out.println("Normal added: (" + f.getNormal().x + "|" + f.getNormal().y + "|" + f.getNormal().z + ")");
+				combined.add(f);
+			}
+		}
+		System.out.println("Number of planes after reduction: " + combined.size());
+		collidingFaces = combined;
 
 		// moving the ball out of the obstacles/terrains that collision was detected with
 		System.out.println("Ball's position before pushing it out: (" + b.getPosition().x + "|" + b.getPosition().y + "|" + b.getPosition().z + ")");
@@ -85,6 +101,7 @@ public class PhysicsEngine {
 		while (b.collidesWith(collidingFaces)) {
 			// move the ball back out
 			b.increasePosition(revBallMovement);
+			//System.out.println("Ball pushed out");
 			/*for (PhysicalFace f : collidingFaces) { // maybe overkill/takes more time than checking every time? - also, would in the end remove all faces, not a good idea
 				if (!f.collidesWithBall(b))
 					collidingFaces.remove(f);
@@ -113,7 +130,7 @@ public class PhysicsEngine {
 
 	private void bounceOrdinaryCollision(ArrayList<PhysicalFace> faces, Ball b) {
 		long before = System.currentTimeMillis();
-		ArrayList<PhysicalFace> combined = new ArrayList<PhysicalFace>();
+		/*ArrayList<PhysicalFace> combined = new ArrayList<PhysicalFace>();
 		combined.add(faces.get(0));
 		for (PhysicalFace f : faces) {
 			boolean found = false;
@@ -128,13 +145,13 @@ public class PhysicsEngine {
 		}
 		System.out.println("Number of planes after reduction: " + combined.size());
 		long after = System.currentTimeMillis();
-		System.out.println("Time to reduce colliding planes: " + (after - before));
-		if (combined.size() == 1) {
+		System.out.println("Time to reduce colliding planes: " + (after - before));*/
+		if (faces.size() == 1) {
 			// resolve with one plane
 			System.out.println("Current velocity: ( " + b.getVelocity().x + " | " + b.getVelocity().y + " | " + b.getVelocity().z + " )");
 			System.out.println("Position before: ( " + b.getPosition().x + " | " + b.getPosition().y + " | " + b.getPosition().z + " )");
 			System.out.println("Position after: ( " + b.getPosition().x + " | " + b.getPosition().y + " | " + b.getPosition().z + " )");
-			Vector3f normal = combined.get(0).getNormal();
+			Vector3f normal = faces.get(0).getNormal();
 			System.out.println("Normal: ( " + normal.x + " | " + normal.y + " | " + normal.z + " )");
 			float angleme = (float) Math.acos((Vector3f.dot(normal, b.getVelocity()))/(normal.length() * b.getVelocity().length()));
 			float angle = (float)Math.PI - Vector3f.angle(normal, b.getVelocity());
@@ -175,7 +192,7 @@ public class PhysicsEngine {
 			}
 
 			System.out.println("Velocity after: ( " + b.getVelocity().x + " | " + b.getVelocity().y + " | " + b.getVelocity().z + " )\n");
-		} else if (combined.size() == 2) {
+		} else if (faces.size() == 2) {
 			// resolve with two planes by using their normals and contact points with the ball
 			
 		}

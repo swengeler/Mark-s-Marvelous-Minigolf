@@ -38,6 +38,7 @@ public class Ball extends Entity{
 		super.increaseRotation(0, currentTurnSpeed * DisplayManager.getFrameTimeSeconds(), 0);
 		Vector3f gravity = new Vector3f(PhysicsEngine.GRAVITY.x, PhysicsEngine.GRAVITY.y, PhysicsEngine.GRAVITY.z);
 		gravity = (Vector3f) gravity.scale(DisplayManager.getFrameTimeSeconds());
+		System.out.println("DisplayManager.getFrameTimeSeconds(): " + DisplayManager.getFrameTimeSeconds());
 
 		Vector3f.add(currentVel, gravity, currentVel);
 
@@ -45,6 +46,7 @@ public class Ball extends Entity{
 		delta.scale(DisplayManager.getFrameTimeSeconds());
 
 		super.increasePosition(delta);
+		System.out.println("Ball's position after moving: (" + getPosition().x  + "|" + getPosition().y + "|" + getPosition().z + ")");
 
 		float terrainHeight = world.getHeightOfTerrain(super.getPosition().x, super.getPosition().z);
 	}
@@ -76,6 +78,7 @@ public class Ball extends Entity{
 	}
 
 	public boolean collidesWith(ArrayList<PhysicalFace> faces) {
+		//System.out.println("Check for collision with " + faces.size() + " faces in the Ball class");
 		for (PhysicalFace f : faces) {
 			if (f.collidesWithBall(this))
 				return true;

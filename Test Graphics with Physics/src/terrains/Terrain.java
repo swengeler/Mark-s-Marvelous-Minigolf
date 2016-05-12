@@ -46,6 +46,7 @@ public class Terrain {
 		this.texture = texture;
 		this.x = gridX * getSize();
 		this.z = gridZ * getSize();
+		this.maxHeight = Float.MIN_VALUE;
 		this.model = generateTerrain(loader);
 
 	}
@@ -55,6 +56,7 @@ public class Terrain {
 		this.texture = texture;
 		this.x = gridX * getSize();
 		this.z = gridZ * getSize();
+		this.maxHeight = Float.MIN_VALUE;
 		this.model = generateTerrain(loader, heightMap);
 
 	}
@@ -126,6 +128,7 @@ public class Terrain {
 				indices[pointer++] = bottomRight;
 			}
 		}
+		maxHeight = 0;
 		return loader.loadToVAO(vertices, textureCoords, normals, indices);
 	}
 
@@ -151,6 +154,8 @@ public class Terrain {
 			for(int j=0;j<VERTEX_COUNT;j++){
 				vertices[vertexPointer*3] = (float)j/((float)VERTEX_COUNT - 1) * getSize();
 				heights[j][i] = getHeight(j,i,image);
+				if (heights[j][i] > maxHeight)
+					maxHeight = heights[j][i];
 				vertices[vertexPointer*3+1] = heights[j][i];
 				vertices[vertexPointer*3+2] = (float)i/((float)VERTEX_COUNT - 1) * getSize();
 				Vector3f normal = calculateNormal(j, i, image);
@@ -227,8 +232,8 @@ public class Terrain {
 		Vector3f p1 = new Vector3f(0,0,0), p2 = new Vector3f(0,0,0), p3 = new Vector3f(0,0,0), normal = new Vector3f(0,0,0), v1 = new Vector3f(0,0,0), v2 = new Vector3f(0,0,0);
 
 		ArrayList<PhysicalFace> collidingFaces = new ArrayList<PhysicalFace>();
-		for (int i = leftX; i < rightX - 1 && i < heights.length - 1; i++) {
-			for (int j = upperZ; i < lowerZ - 1 && j < heights[0].length - 1; j++) {
+		for (int i = leftX; i < rightX && i < heights.length; i++) {
+			for (int j = upperZ; j < lowerZ && j < heights[0].length; j++) {
 				// upper left corner
 				p1.set(i + this.x, this.heights[i][j], j + this.z);
 				// lower left corner
@@ -254,9 +259,10 @@ public class Terrain {
 				Vector3f.cross(v1, v2, normal);
 				normal.normalise();
 				collidingFaces.add(new PhysicalFace(normal,p1,p2,p3));
+				System.out.println("2 faces added at " + i + "|" + j);
 			}
 		}
-		System.out.println("Number of colliding faces in terrain: " + collidingFaces.size());
+		System.out.println("Number of colliding faces (in Terrain): " + collidingFaces.size());
 		return collidingFaces;
 	}
 

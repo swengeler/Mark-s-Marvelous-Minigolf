@@ -49,6 +49,10 @@ public class DisplayManager {
 		return delta;
 	}
 	
+	public static void resetFrameTime() {
+		delta = 0.001f;
+	}
+	
 	public static void closeDisplay(){
 		
 		Display.destroy();
