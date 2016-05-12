@@ -38,7 +38,10 @@ public class PhysicsEngine {
 
 	public void tick(){
 		for(Ball b:balls){
-			//if (b.getVelocity() > 0) {
+			// apply accelerations and stuff like that first, to make sure that a ball can move due to gusts of wind or similar
+			//b.applyAccelerations();
+			//b.resolveBallCollision();
+			//if (b.isMoving()) {
 				b.move(world);
 				//b.checkMinSpeed(world);
 				resolveOrdinaryCollision(b);
@@ -56,18 +59,10 @@ public class PhysicsEngine {
 		ArrayList<PhysicalFace> useForCollision = new ArrayList<PhysicalFace>();
 		// might consider putting these for-loops into the world class and letting it do all the work on its entities/terrains!!
 		for (Entity e : entities) {
-			collidingFaces.addAll(e.getCollidingFaces(b));
+			if (e.inBounds(b))
+				collidingFaces.addAll(e.getCollidingFaces(b));
 		}
 		collidingFaces.addAll(world.getCollidingFaces(b));
-		/*for (Terrain t : terrains) {
-		// add faces as well, possibly based on location of the ball, since it takes too much time to get faces for the entire surface?
-		// check whether ball is above highest point -> then no other check is necessary (perhaps also do so with checking the height of the terrain?)
-		// construct faces of where the ball is positioned (x and y)
-		// might actually get empty list here since getCollidingFaces method already checks for actual collision
-		// -> should also check for x/y position though, to narrow down results
-
-		// collidingFaces.addAll(t.getCollidingFaces(b));
-		}*/
 
 		long intermediate1 = System.currentTimeMillis();
 		System.out.println("Time to get faces with new method: " + (intermediate1 - before) + " (there are " + collidingFaces.size() + " faces)");
@@ -79,6 +74,7 @@ public class PhysicsEngine {
 		
 		ArrayList<PhysicalFace> combined = new ArrayList<PhysicalFace>();
 		combined.add(collidingFaces.get(0));
+		System.out.println("Normal added: (" + combined.get(0).getNormal().x + "|" + combined.get(0).getNormal().y + "|" + combined.get(0).getNormal().z + ")");
 		for (PhysicalFace f : collidingFaces) {
 			boolean found = false;
 			for (int i = 0; !found && i < combined.size(); i++) {
@@ -96,34 +92,30 @@ public class PhysicsEngine {
 		// moving the ball out of the obstacles/terrains that collision was detected with
 		System.out.println("Ball's position before pushing it out: (" + b.getPosition().x + "|" + b.getPosition().y + "|" + b.getPosition().z + ")");
 		Vector3f revBallMovement = new Vector3f(b.getVelocity().x, b.getVelocity().y, b.getVelocity().z);
-		revBallMovement.negate(revBallMovement.normalise(revBallMovement)).scale(0.000001f);
+		revBallMovement.negate(revBallMovement.normalise(revBallMovement)).scale(0.0001f);
 		System.out.println("Reverse ball movement vector: (" + revBallMovement.x + "|" + revBallMovement.y + "|" + revBallMovement.z + ")");
-		while (b.collidesWith(collidingFaces)) {
-			// move the ball back out
+		
+		//if (revBallMovement.y > 0) {
+			while (b.collidesWith(collidingFaces)) {
+				// move the ball back out
+				b.increasePosition(revBallMovement);
+			}
+			System.out.println("Ball's position after pushing it out: (" + b.getPosition().x + "|" + b.getPosition().y + "|" + b.getPosition().z + ")");
+	
+			// go back one step, so that there is at least on face the ball collides with
+			revBallMovement.negate(revBallMovement);
 			b.increasePosition(revBallMovement);
-			//System.out.println("Ball pushed out");
-			/*for (PhysicalFace f : collidingFaces) { // maybe overkill/takes more time than checking every time? - also, would in the end remove all faces, not a good idea
-				if (!f.collidesWithBall(b))
-					collidingFaces.remove(f);
-			}*/
-		}
-		System.out.println("Ball's position after pushing it out: (" + b.getPosition().x + "|" + b.getPosition().y + "|" + b.getPosition().z + ")");
-
-		// go back one step, so that there is at least on face the ball collides with
-		revBallMovement.negate(revBallMovement);
-		b.increasePosition(revBallMovement);
-
-		for (PhysicalFace f : collidingFaces) {
-			if (f.collidesWithBall(b))
-				useForCollision.add(f);
-		}
-
-		long intermediate2 = System.currentTimeMillis();
-		System.out.println("Time to push ball out and get remaining faces: " + (intermediate2 - before) + " (there are " + useForCollision.size() + " faces)");
-
-		bounceOrdinaryCollision(useForCollision, b);
-		// get closest face and resolve collision with that one
-		// if two or more are within a certain range, say 0.001 or something, then resolve with both using contact points and their normals (same for three)
+	
+			for (PhysicalFace f : collidingFaces) {
+				if (f.collidesWithBall(b))
+					useForCollision.add(f);
+			}
+	
+			long intermediate2 = System.currentTimeMillis();
+			System.out.println("Time to push ball out and get remaining faces: " + (intermediate2 - before) + " (there are " + useForCollision.size() + " faces)");
+	
+			bounceOrdinaryCollision(useForCollision, b);
+		//}
 		long after = System.currentTimeMillis();
 		System.out.println("Time to check collision with new method: " + (after - before) + "\n");
 	}
@@ -194,7 +186,7 @@ public class PhysicsEngine {
 			System.out.println("Velocity after: ( " + b.getVelocity().x + " | " + b.getVelocity().y + " | " + b.getVelocity().z + " )\n");
 		} else if (faces.size() == 2) {
 			// resolve with two planes by using their normals and contact points with the ball
-			
+			System.out.println("THERE ARE TWO FACES, HALP WHAT DO\n");
 		}
 	}
 

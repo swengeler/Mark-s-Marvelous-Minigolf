@@ -27,6 +27,7 @@ public class Ball extends Entity{
 	private Vector3f currentAcc = new Vector3f();
 	private float currentTurnSpeed = 0;
 
+	private boolean moving;
 	private boolean bouncingEnabled = true;
 
 	public Ball(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
@@ -49,6 +50,14 @@ public class Ball extends Entity{
 		System.out.println("Ball's position after moving: (" + getPosition().x  + "|" + getPosition().y + "|" + getPosition().z + ")");
 
 		float terrainHeight = world.getHeightOfTerrain(super.getPosition().x, super.getPosition().z);
+	}
+	
+	public void setMoving(boolean moving) {
+		this.moving = moving;
+	}
+	
+	public boolean isMoving() {
+		return moving;
 	}
 
 	private void jump(World world){
