@@ -19,8 +19,8 @@ public class Terrain {
 	private static final float SIZE = 800;
 	private static final int VERTEX_COUNT = 512;
 	private static final float MAX_HEIGHT = 40;
-	private static final float HEIGHT = 30;
-	private static final float RADIUS = 20;
+	private static final float HEIGHT = 20;
+	private static final float RADIUS = 25;
 	private static final float MAX_PIXEL_COLOR = 256 * 256 * 256;
 	
 	private float x;
@@ -98,12 +98,13 @@ public class Terrain {
 				if (x == 0 && y == 0) {
 					heights[(int)(256+x)][(int)(256+y)] = HEIGHT;
 				} else {
-					float xTmp = Math.abs(x);
-					float yTmp = Math.abs(y);
-					float max = Math.max(xTmp, yTmp);
-					float height = (float) ((HEIGHT/2) * -(Math.cos(Math.PI - (Math.PI * (max/RADIUS))))+(HEIGHT/2));
-					//float height = (HEIGHT/(RADIUS*max));
-					heights[(int)(256+x)][(int)(256+y)] =  height;
+					float distance = (float) Math.sqrt((x*x)+(y*y));
+					if (distance <= RADIUS) {
+						float height = (float) ((HEIGHT/2) * -(Math.cos(Math.PI - (Math.PI * (distance/RADIUS))))+(HEIGHT/2));
+						if (height > heights[(int)(256+x)][(int)(256+y)]) {
+							heights[(int)(256+x)][(int)(256+y)] =  height;
+						}
+					}
 				}
 			}
 		}
