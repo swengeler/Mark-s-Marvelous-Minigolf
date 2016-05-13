@@ -46,7 +46,7 @@ public class Loader {
 		storeDataInAttributeList(0,3,positions);
 		storeDataInAttributeList(1,2,textureCoords);
 		storeDataInAttributeList(2,3,normals);
-		storeDataInAttributeList(3, 3, tangents);
+		storeDataInAttributeList(3,3,tangents);
 		unbindVAO();
 		return new RawModel(vaoID,indices.length);
 	}

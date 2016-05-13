@@ -20,6 +20,8 @@ import guis.GuiRenderer;
 import guis.GuiTexture;
 import models.RawModel;
 import models.TexturedModel;
+import normalMappingObjConverter.ModelDataNM;
+import normalMappingObjConverter.NormalMappedObjLoader;
 import objConverter.ModelData;
 import objConverter.OBJFileLoader;
 import renderEngine.DisplayManager;
@@ -44,13 +46,14 @@ public class MainGameLoop {
 		Loader loader = new Loader();
 		
 		ModelData human = OBJFileLoader.loadOBJ("person");
-		ModelData ball = OBJFileLoader.loadOBJ("ball_centred");
+		ModelData ball = OBJFileLoader.loadOBJ("ball_oth_high");
 		ModelData tree = OBJFileLoader.loadOBJ("tree");
 		ModelData fern = OBJFileLoader.loadOBJ("fern");
 		ModelData grass = OBJFileLoader.loadOBJ("grassModel");
 		ModelData pine = OBJFileLoader.loadOBJ("pine");
 		ModelData flower = OBJFileLoader.loadOBJ("grassModel");
 		ModelData box = OBJFileLoader.loadOBJ("box");
+		
 		
 		RawModel humanModel = loader.loadToVAO(human.getVertices(), human.getTextureCoords(), human.getNormals(), human.getIndices());
 		RawModel ballModel = loader.loadToVAO(ball.getVertices(), ball.getTextureCoords(), ball.getNormals(), ball.getIndices());
@@ -69,7 +72,9 @@ public class MainGameLoop {
 		TexturedModel pineTModel = new TexturedModel(pineModel,new ModelTexture(loader.loadTexture("pine")));
 		TexturedModel boxTModel = new TexturedModel(boxModel,new ModelTexture(loader.loadTexture("box")));
 		TexturedModel flowerTModel = new TexturedModel(flowerModel,new ModelTexture(loader.loadTexture("flower")));
-		
+		TexturedModel barrelTModel = new TexturedModel(NormalMappedObjLoader.loadOBJ("barrel", loader), new ModelTexture(loader.loadTexture("barrel")));
+		TexturedModel crateTModel = new TexturedModel(NormalMappedObjLoader.loadOBJ("crate", loader), new ModelTexture(loader.loadTexture("crate")));
+		TexturedModel boulderTModel = new TexturedModel(NormalMappedObjLoader.loadOBJ("boulder", loader), new ModelTexture(loader.loadTexture("boulder")));
 		
 		fernTModel.getTexture().setNumberOfRows(2);
 		fernTModel.getTexture().setHasTransparency(true);
@@ -78,15 +83,26 @@ public class MainGameLoop {
 		flowerTModel.getTexture().setUseFakeLighting(true);
 		flowerTModel.getTexture().setHasTransparency(true);
 		
+		barrelTModel.getTexture().setShineDamper(10);
+		barrelTModel.getTexture().setReflectivity(0.5f);
+		barrelTModel.getTexture().setNormalMap(loader.loadTexture("barrelNormal"));
+		
+		crateTModel.getTexture().setShineDamper(10);
+		crateTModel.getTexture().setReflectivity(0.5f);
+		crateTModel.getTexture().setNormalMap(loader.loadTexture("crateNormal"));
+		
+		boulderTModel.getTexture().setShineDamper(10);
+		boulderTModel.getTexture().setReflectivity(0.5f);
+		boulderTModel.getTexture().setNormalMap(loader.loadTexture("boulderNormal"));
 		
 		ballTModel.getTexture().setShineDamper(10);
 		ballTModel.getTexture().setReflectivity(1);
 		
 		List<Light> lights = new ArrayList<Light>();
-		lights.add(new Light(new Vector3f(0,1000,400),new Vector3f(1,1,1)));
-		lights.add(new Light(new Vector3f(70,10,0),new Vector3f(2,0,0), new Vector3f(1,0.01f,0.002f)));
-		lights.add(new Light(new Vector3f(35,17,35),new Vector3f(0,2,2), new Vector3f(1,0.01f,0.002f)));
-		lights.add(new Light(new Vector3f(0,7,70),new Vector3f(2,2,0), new Vector3f(1,0.01f,0.002f)));
+		lights.add(new Light(new Vector3f(400,1000,400),new Vector3f(1,1,1)));
+		//lights.add(new Light(new Vector3f(70,10,0),new Vector3f(2,0,0), new Vector3f(1,0.01f,0.002f)));
+		//lights.add(new Light(new Vector3f(35,17,35),new Vector3f(0,2,2), new Vector3f(1,0.01f,0.002f)));
+		//lights.add(new Light(new Vector3f(0,7,70),new Vector3f(2,2,0), new Vector3f(1,0.01f,0.002f)));
 		
 		Ball player1 = new Ball(ballTModel, new Vector3f(50, 3, 0), 0, 0, 0, 1);
 		List<Ball> balls = new ArrayList<Ball>();
@@ -95,7 +111,7 @@ public class MainGameLoop {
 		
 		Camera camera = new Camera(player1);
 		World world = new World(camera);
-		world.add(new Terrain(0, 0, loader,new ModelTexture(loader.loadTexture("grass"))/*, "heightmap"*/));
+		world.add(new Terrain(0, 0, loader,new ModelTexture(loader.loadTexture("grass")), "heightmap"));
 		
 		List<Entity> nature = new ArrayList<Entity>();
 		Random r = new Random();
@@ -160,7 +176,6 @@ public class MainGameLoop {
 		GuiRenderer guiRenderer = new GuiRenderer(loader);
 		
 		world.addEntities(nature);
-		world.add(big_Human);
 		world.addLights(lights);
 		
 		PhysicsEngine mainEngine = new PhysicsEngine(balls, world);
@@ -174,6 +189,12 @@ public class MainGameLoop {
 		List<WaterTile> waters = new ArrayList<WaterTile>();
 		waters.add(new WaterTile(75, 120, 0));
 		
+		List<Entity> normalMapEntities = new ArrayList<Entity>();
+		normalMapEntities.add(new Entity(barrelTModel, new Vector3f(20, 20, 20), 0f, 0f, 0f, 1));
+		normalMapEntities.add(new Entity(crateTModel, new Vector3f(40, 20, 20), 0f, 0f, 0f, 0.05f));
+		normalMapEntities.add(new Entity(boulderTModel, new Vector3f(60, 20, 20), 0f, 0f, 0f, 1));
+		world.addNormE(normalMapEntities);
+		
 		
 		while(!Display.isCloseRequested()){
 			player1.move(world);
@@ -183,7 +204,7 @@ public class MainGameLoop {
 			
 			Vector3f terrainPoint = picker.getCurrentTerrainPoint();
 			if(terrainPoint != null){
-				nature.get(0).setPosition(terrainPoint);
+				//nature.get(0).setPosition(terrainPoint);
 			}
 			
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
