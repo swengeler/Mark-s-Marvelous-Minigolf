@@ -130,7 +130,7 @@ public class Ball extends Entity{
 				System.out.println("Friction1: ( " + frictionDir.x + " | " + frictionDir.y + " | " + frictionDir.z + " )");
 				float angleSN = Vector3f.angle(new Vector3f(frictionDir.x,0,frictionDir.z), frictionDir);
 				System.out.println("Gravity scaling: " + Math.cos(angleSN) + " Angle: " + angleSN);
-				float frictionAcc = PhysicsEngine.COEFF_FRICTION * (PhysicsEngine.GRAVITY.length() * (20 * DisplayManager.getFrameTimeSeconds()) * (float)(Math.cos(angleSN)));
+				float frictionAcc = PhysicsEngine.COEFF_FRICTION * (PhysicsEngine.GRAVITY.length() * (DisplayManager.getFrameTimeSeconds()) * (float)(Math.cos(angleSN)));
 				System.out.println("Friction accleration: " + frictionAcc);
 				frictionDir = (Vector3f) frictionDir.scale(frictionAcc); // should now be the correctly scaled vector of the frictional ACCELERATION
 				System.out.println("Friction2: ( " + frictionDir.x + " | " + frictionDir.y + " | " + frictionDir.z + " )");

@@ -10,7 +10,7 @@ import terrains.World;
 
 public class PhysicsEngine {
 	
-	public static final float COEFF_FRICTION = 0.8f;
+	public static final float COEFF_FRICTION = 1f;
 	
 	public static final Vector3f GRAVITY = new Vector3f(0, -30, 0);
 	private List<Ball> balls;
