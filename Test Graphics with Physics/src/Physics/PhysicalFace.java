@@ -12,12 +12,12 @@ public class PhysicalFace {
 	public PhysicalFace(Vector3f normal, Vector3f point1, Vector3f point2, Vector3f point3) {
 		this.normal = new Vector3f(normal.x, normal.y, normal.z);
 		if (Math.abs(normal.x) < 0.0001f)
-			normal.setX(0);
+			this.normal.setX(0);
 		if (Math.abs(normal.y) < 0.0001f)
-			normal.setY(0);
+			this.normal.setY(0);
 		if (Math.abs(normal.z) < 0.0001f)
-			normal.setZ(0);
-		normal.normalise();
+			this.normal.setZ(0);
+		this.normal.normalise();
 		this.point1 = new Vector3f(point1.x, point1.y, point1.z);
 		this.point2 = new Vector3f(point2.x, point2.y, point2.z);
 		this.point3 = new Vector3f(point3.x, point3.y, point3.z);
@@ -39,6 +39,18 @@ public class PhysicalFace {
 	
 	public Vector3f getNormal() {
 		return normal;
+	}
+	
+	public Vector3f getP1() {
+		return point1;
+	}
+	
+	public Vector3f getP2() {
+		return point2;
+	}
+	
+	public Vector3f getP3() {
+		return point3;
 	}
 	
 	private void prepareBounds() {

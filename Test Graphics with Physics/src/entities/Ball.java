@@ -32,10 +32,11 @@ public class Ball extends Entity{
 
 	public Ball(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
 		super(model, position, rotX, rotY, rotZ, scale);
+		this.moving = true;
 	}
 
-	public void move(World world){ // world really necessary?
-		checkInputs(world);
+	public void move(){ // world really necessary?
+		//checkInputs(world);
 		super.increaseRotation(0, currentTurnSpeed * DisplayManager.getFrameTimeSeconds(), 0);
 		Vector3f gravity = new Vector3f(PhysicsEngine.GRAVITY.x, PhysicsEngine.GRAVITY.y, PhysicsEngine.GRAVITY.z);
 		gravity = (Vector3f) gravity.scale(DisplayManager.getFrameTimeSeconds());
@@ -48,34 +49,42 @@ public class Ball extends Entity{
 
 		super.increasePosition(delta);
 		System.out.println("Ball's position after moving: (" + getPosition().x  + "|" + getPosition().y + "|" + getPosition().z + ")");
-
-		float terrainHeight = world.getHeightOfTerrain(super.getPosition().x, super.getPosition().z);
 	}
-	
+
 	public void setMoving(boolean moving) {
+		System.out.println("Moving set to " + moving);
 		this.moving = moving;
 	}
-	
+
 	public boolean isMoving() {
 		return moving;
 	}
 
-	private void jump(World world){
-		if(!(super.getPosition().y > world.getHeightOfTerrain(this.getPosition().x, this.getPosition().z)))
-			this.currentVel.y = JUMP_POWER;
+	private void jump(){
+		setMoving(true);
+		this.currentVel.y = JUMP_POWER;
+		System.out.println("Moving set to " + moving + " (velocity now: (" + currentVel.x + "|" + currentVel.y + "|" + currentVel.z + ")");
 	}
 
-	private void checkInputs(World world){
-		if(Keyboard.isKeyDown(Keyboard.KEY_W)){
+	public void checkInputs(){
+		if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
 			this.currentVel.x += (float) (RUN_SPEED * Math.sin(Math.toRadians(super.getRotY())));
 			this.currentVel.z += (float) (RUN_SPEED * Math.cos(Math.toRadians(super.getRotY())));
 
-		} else if (Keyboard.isKeyDown(Keyboard.KEY_S)){
+		} else if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
 			this.currentVel.x += (float) -(RUN_SPEED * Math.sin(Math.toRadians(super.getRotY())));
 			this.currentVel.z += (float) -(RUN_SPEED * Math.cos(Math.toRadians(super.getRotY())));
+		} else if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
+			this.currentVel.x += 50;
+			System.out.println("x-speed increased by pressing up-arrow");
+			setMoving(true);
+		} else if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
+			this.currentVel.x -= 50;
+			System.out.println("x-speed decreased by pressing down-arrow");
+			setMoving(true);
 		}
 
-		if(Keyboard.isKeyDown(Keyboard.KEY_D))
+		if (Keyboard.isKeyDown(Keyboard.KEY_D))
 			this.currentTurnSpeed = -TURN_SPEED;
 		else if (Keyboard.isKeyDown(Keyboard.KEY_A))
 			this.currentTurnSpeed = TURN_SPEED;
@@ -83,7 +92,7 @@ public class Ball extends Entity{
 			this.currentTurnSpeed = 0;
 
 		if(Keyboard.isKeyDown(Keyboard.KEY_SPACE))
-			jump(world);
+			jump();
 	}
 
 	public boolean collidesWith(ArrayList<PhysicalFace> faces) {
@@ -183,7 +192,8 @@ public class Ball extends Entity{
 	}
 
 	public float getRadius() {
-		return 1.1925f;
+		//return 1.1925f;
+		return 1f;
 	}
 
 	public Vector3f getVelocity() {

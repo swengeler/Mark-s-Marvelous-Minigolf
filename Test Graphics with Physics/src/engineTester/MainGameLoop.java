@@ -46,7 +46,7 @@ public class MainGameLoop {
 		Loader loader = new Loader();
 
 		ModelData human = OBJFileLoader.loadOBJ("person");
-		ModelData ball = OBJFileLoader.loadOBJ("ball_centred");
+		ModelData ball = OBJFileLoader.loadOBJ("ball_centred_scaled2");
 		ModelData tree = OBJFileLoader.loadOBJ("tree");
 		ModelData fern = OBJFileLoader.loadOBJ("fern");
 		ModelData grass = OBJFileLoader.loadOBJ("grassModel");
@@ -98,18 +98,19 @@ public class MainGameLoop {
 
 		List<Light> lights = new ArrayList<Light>();
 		lights.add(new Light(new Vector3f(0,1000,400),new Vector3f(1,1,1)));
-		lights.add(new Light(new Vector3f(70,10,0),new Vector3f(2,0,0), new Vector3f(1,0.01f,0.002f)));
-		lights.add(new Light(new Vector3f(35,17,35),new Vector3f(0,2,2), new Vector3f(1,0.01f,0.002f)));
-		lights.add(new Light(new Vector3f(0,7,70),new Vector3f(2,2,0), new Vector3f(1,0.01f,0.002f)));
+		//lights.add(new Light(new Vector3f(70,10,0),new Vector3f(2,0,0), new Vector3f(1,0.01f,0.002f)));
+		//lights.add(new Light(new Vector3f(35,17,35),new Vector3f(0,2,2), new Vector3f(1,0.01f,0.002f)));
+		//lights.add(new Light(new Vector3f(0,7,70),new Vector3f(2,2,0), new Vector3f(1,0.01f,0.002f)));
 
-		Ball player1 = new Ball(ballTModel, new Vector3f(200, 30, 200), 0, 0, 0, 1);
+		Ball player1 = new Ball(ballTModel, new Vector3f(100, 1, 200), 0, 0, 0, 1);
 		List<Ball> balls = new ArrayList<Ball>();
 		balls.add(player1);
 
 
 		Camera camera = new Camera(player1);
 		World world = new World(camera);
-		world.add(new Terrain(0, 0, loader,new ModelTexture(loader.loadTexture("grass"))/*, "arena"/*, "heightmap"*/));
+		world.add(new Terrain(0, 0, loader, new ModelTexture(loader.loadTexture("grass"))/*, "arena"/*, "heightmap"*/));
+		world.add(new Terrain(0, 1, loader, new ModelTexture(loader.loadTexture("grass"))/*, "arena"/*, "heightmap"*/));
 
 
 		/*float[][] heights = world.getTerrains().get(0).getHeights();
@@ -198,7 +199,7 @@ public class MainGameLoop {
 		WaterShader waterShader = new WaterShader();
 		WaterRenderer waterRenderer = new WaterRenderer(loader, waterShader, renderer.getProjectionMatrix(), fbos);
 		List<WaterTile> waters = new ArrayList<WaterTile>();
-		waters.add(new WaterTile(75, 120, 0));
+		//waters.add(new WaterTile(75, 120, 0));
 
 		long after = System.currentTimeMillis();
 		System.out.println("\nTIME TO PREPARE MODES ETC.: " + (after - before) + "\n");
@@ -220,8 +221,8 @@ public class MainGameLoop {
 			}
 
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
-
-			fbos.bindReflectionFrameBuffer();
+			
+			/*fbos.bindReflectionFrameBuffer();
 			float distance = 2 * (camera.getPosition().y - waters.get(0).getHeight());
 			camera.getPosition().y -= distance;
 			camera.invertPitch();
@@ -236,7 +237,7 @@ public class MainGameLoop {
 			renderer.processWorld(world, new Vector4f(0, -1, 0, waters.get(0).getHeight()));
 
 
-			fbos.unbindCurrentFrameBuffer();
+			fbos.unbindCurrentFrameBuffer();*/
 			renderer.processEntity(player1);
 			renderer.processWorld(world, new Vector4f(0, -1, 0, 10000));
 			waterRenderer.render(waters, camera);

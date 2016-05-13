@@ -206,7 +206,7 @@ public class Terrain {
 	}
 
 	public ArrayList<PhysicalFace> getCollidingFaces(Ball b) {
-		System.out.println("getCollidingFaces in Terrain is called");
+		System.out.println("getCollidingFaces in Terrain is called (Terrain at " + this.x + "|" + this.z + ")");
 		float ballR = b.getRadius();
 		float ballX = b.getPosition().x - this.x;
 		float ballZ = b.getPosition().z - this.z;
@@ -223,8 +223,12 @@ public class Terrain {
 		}
 		if (leftX < 0)
 			leftX = 0;
+		else if (leftX >= heights[0].length)
+			leftX = heights[0].length - 1;
 		if (rightX >= heights[0].length)
 			rightX = heights[0].length - 1;
+		else if (rightX < 0)
+			rightX = 0;
 
 		int upperZ = (int) Math.floor(ballZ - ballR);
 		int lowerZ = (int) Math.ceil(ballZ + ballR);
@@ -235,16 +239,20 @@ public class Terrain {
 		}
 		if (upperZ < 0)
 			upperZ = 0;
+		else if (upperZ >= heights.length) 
+			upperZ = heights.length - 1;
 		if (lowerZ >= heights.length)
 			lowerZ = heights.length - 1;
+		else if (lowerZ < 0)
+			lowerZ = 0;
 
 		System.out.println("leftX = " + leftX + ", rightX = " + rightX + ", upperZ = " + upperZ + ", lowerZ = " + lowerZ);
 
 		Vector3f p1 = new Vector3f(0,0,0), p2 = new Vector3f(0,0,0), p3 = new Vector3f(0,0,0), normal = new Vector3f(0,0,0), v1 = new Vector3f(0,0,0), v2 = new Vector3f(0,0,0);
 
 		ArrayList<PhysicalFace> collidingFaces = new ArrayList<PhysicalFace>();
-		for (int i = leftX; i < rightX && i < heights.length; i++) {
-			for (int j = upperZ; j < lowerZ && j < heights[0].length; j++) {
+		for (int i = leftX; i <= rightX && i < heights.length; i++) {
+			for (int j = upperZ; j <= lowerZ && j < heights[0].length; j++) {
 				// upper left corner
 				p1.set(i + this.x, this.heights[i][j], j + this.z);
 				// lower left corner
