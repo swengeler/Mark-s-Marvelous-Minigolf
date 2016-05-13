@@ -1,4 +1,3 @@
-<<<<<<< 7587350cd33e08b9e41705397b08b45619d7f629
 package entities;
 
 import java.util.ArrayList;
@@ -13,6 +12,8 @@ import terrains.World;
 import Physics.PhysicsEngine;
 
 public class Ball extends Entity{
+	public static final float RADIUS = 1.1925f;
+	
 	private static final float RUN_SPEED = 2;
 	private static final float TURN_SPEED = 100;
 	private static final float JUMP_POWER = 40;
@@ -98,10 +99,10 @@ public class Ball extends Entity{
 
 		float terrainHeight = world.getHeightOfTerrain(this.getPosition().x, this.getPosition().z);
 
-		if (this.getPosition().y < terrainHeight) {
+		if (this.getPosition().y - Ball.RADIUS < terrainHeight) {
 			System.out.println("Current velocity: ( " + currentVel.x + " | " + currentVel.y + " | " + currentVel.z + " )");
 			System.out.println("Position before: ( " + getPosition().x + " | " + getPosition().y + " | " + getPosition().z + " )");
-			super.getPosition().y = terrainHeight;
+			super.getPosition().y = terrainHeight + Ball.RADIUS;
 			System.out.println("Position after: ( " + getPosition().x + " | " + getPosition().y + " | " + getPosition().z + " )");
 			Vector3f normal = world.getNormalOfTerrain(getPosition().x, getPosition().z);
 			System.out.println("Normal: ( " + normal.x + " | " + normal.y + " | " + normal.z + " )");
