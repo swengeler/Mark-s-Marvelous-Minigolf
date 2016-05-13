@@ -88,9 +88,18 @@ public class Terrain {
 		int vertexPointer = 0;
 		for(int i=0;i<VERTEX_COUNT;i++){
 			for(int j=0;j<VERTEX_COUNT;j++){
+				heights[j][i]=0;
+			}
+		}
+		for(int x = -1; x < 2; x++) {
+			for (int y = -1; y  < 2; y++) {
+				heights[256+x][256+y] = (float) Math.cos(3.142);
+			}
+		}
+		for(int i=0;i<VERTEX_COUNT;i++){
+			for(int j=0;j<VERTEX_COUNT;j++){
 				vertices[vertexPointer*3] = (float)j/((float)VERTEX_COUNT - 1) * getSize();
-				heights[j][i] = 0;
-				vertices[vertexPointer*3+1] = 0;
+				vertices[vertexPointer*3+1] = heights[j][i];
 				vertices[vertexPointer*3+2] = (float)i/((float)VERTEX_COUNT - 1) * getSize();
 				normals[vertexPointer*3] = 0;
 				normals[vertexPointer*3+1] = 1;

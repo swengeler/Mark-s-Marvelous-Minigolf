@@ -55,20 +55,20 @@ public class Empty extends Ball{
 	}
 	
 	private void checkInputs(World world){
-		if(Keyboard.isKeyDown(Keyboard.KEY_W)){
+		if(Keyboard.isKeyDown(Keyboard.KEY_UP)){
 			this.currentVel.x = (float) (RUN_SPEED * -Math.sin(Math.toRadians(-camera.getYaw())));
 			this.currentVel.z = (float) (RUN_SPEED * -Math.cos(Math.toRadians(-camera.getYaw())));
 			
-		} else if (Keyboard.isKeyDown(Keyboard.KEY_S)){
+		} else if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)){
 			this.currentVel.x = (float) -(RUN_SPEED * -Math.sin(Math.toRadians(-camera.getYaw())));
-			this.currentVel.z = (float) -(RUN_SPEED * -Math.sin(Math.toRadians(-camera.getYaw())));
+			this.currentVel.z = (float) -(RUN_SPEED * -Math.cos(Math.toRadians(-camera.getYaw())));
 		} else {
 			this.currentVel = new Vector3f();
 		}
 		
-		if(Keyboard.isKeyDown(Keyboard.KEY_D))
+		if(Keyboard.isKeyDown(Keyboard.KEY_RIGHT))
 			this.currentTurnSpeed = -TURN_SPEED;
-		else if (Keyboard.isKeyDown(Keyboard.KEY_A))
+		else if (Keyboard.isKeyDown(Keyboard.KEY_LEFT))
 			this.currentTurnSpeed = TURN_SPEED;
 		else
 			this.currentTurnSpeed = 0;
