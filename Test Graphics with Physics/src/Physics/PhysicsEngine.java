@@ -93,6 +93,7 @@ public class PhysicsEngine {
 		System.out.println("Ball's position before pushing it out: (" + b.getPosition().x + "|" + b.getPosition().y + "|" + b.getPosition().z + ")");
 		Vector3f revBallMovement = new Vector3f(b.getVelocity().x, b.getVelocity().y, b.getVelocity().z);
 		revBallMovement.negate(revBallMovement.normalise(revBallMovement)).scale(0.0001f);
+		System.out.println("Unscaled ball movement vector: (" + b.getVelocity().x + "|" + b.getVelocity().y + "|" + b.getVelocity().z + ")");
 		System.out.println("Reverse ball movement vector: (" + revBallMovement.x + "|" + revBallMovement.y + "|" + revBallMovement.z + ")");
 		
 		//if (revBallMovement.y > 0) {
@@ -121,6 +122,7 @@ public class PhysicsEngine {
 	}
 
 	private void bounceOrdinaryCollision(ArrayList<PhysicalFace> faces, Ball b) {
+		System.out.println("COLLISION OCCURS");
 		long before = System.currentTimeMillis();
 		/*ArrayList<PhysicalFace> combined = new ArrayList<PhysicalFace>();
 		combined.add(faces.get(0));
@@ -138,7 +140,7 @@ public class PhysicsEngine {
 		System.out.println("Number of planes after reduction: " + combined.size());
 		long after = System.currentTimeMillis();
 		System.out.println("Time to reduce colliding planes: " + (after - before));*/
-		if (faces.size() == 1) {
+		//if (faces.size() == 1) {
 			// resolve with one plane
 			System.out.println("Current velocity: ( " + b.getVelocity().x + " | " + b.getVelocity().y + " | " + b.getVelocity().z + " )");
 			System.out.println("Position before: ( " + b.getPosition().x + " | " + b.getPosition().y + " | " + b.getPosition().z + " )");
@@ -150,8 +152,8 @@ public class PhysicsEngine {
 			System.out.println("Angle: " + angle + " Angleme: " + angleme);
 
 			Vector3f newPartialVel = (Vector3f) normal.scale(2*Vector3f.dot(b.getVelocity(), normal));
-			Vector3f.sub(newPartialVel, b.getVelocity(), b.getVelocity());
-			b.getVelocity().negate();
+			Vector3f.sub(b.getVelocity(), newPartialVel, b.getVelocity());
+			//b.getVelocity().negate();
 
 			if ((angle > (float)(Math.PI/2 - (float) (Math.PI * 0.1)))) {
 				System.out.println("Bouncing");
@@ -184,10 +186,10 @@ public class PhysicsEngine {
 			}
 
 			System.out.println("Velocity after: ( " + b.getVelocity().x + " | " + b.getVelocity().y + " | " + b.getVelocity().z + " )\n");
-		} else if (faces.size() == 2) {
+		//} else if (faces.size() == 2) {
 			// resolve with two planes by using their normals and contact points with the ball
-			System.out.println("THERE ARE TWO FACES, HALP WHAT DO\n");
-		}
+			//System.out.println("THERE ARE TWO FACES, HALP WHAT DO\n");
+		//}
 	}
 
 	public void checkBallCollision(Ball b1) {

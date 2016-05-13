@@ -52,7 +52,7 @@ public class MainGameLoop {
 		ModelData grass = OBJFileLoader.loadOBJ("grassModel");
 		ModelData pine = OBJFileLoader.loadOBJ("pine");
 		ModelData flower = OBJFileLoader.loadOBJ("grassModel");
-	    ModelData box = OBJFileLoader.loadOBJ("box");
+	    ModelData box = OBJFileLoader.loadOBJ("box_big");
 		box.print(ModelData.PRINT_DATA_FILE);
 
 		RawModel humanModel = loader.loadToVAO(human.getVertices(), human.getTextureCoords(), human.getNormals(), human.getIndices());
@@ -123,7 +123,7 @@ public class MainGameLoop {
 		}*/
 
 		List<Entity> nature = new ArrayList<Entity>();
-		nature.add(new Entity(boxTModel, box, new Vector3f(200, 0, 300),0,0,0,50));
+		nature.add(new Entity(boxTModel, box, new Vector3f(200, 0, 300),0,0,0,5));
 		/*Random r = new Random();
 		for(int i=0; i<200; i++){
 			if(i<40){

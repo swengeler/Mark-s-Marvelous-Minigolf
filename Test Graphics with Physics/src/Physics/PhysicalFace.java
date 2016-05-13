@@ -17,6 +17,7 @@ public class PhysicalFace {
 			normal.setY(0);
 		if (Math.abs(normal.z) < 0.0001f)
 			normal.setZ(0);
+		normal.normalise();
 		this.point1 = new Vector3f(point1.x, point1.y, point1.z);
 		this.point2 = new Vector3f(point2.x, point2.y, point2.z);
 		this.point3 = new Vector3f(point3.x, point3.y, point3.z);
