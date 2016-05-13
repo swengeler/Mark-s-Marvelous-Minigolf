@@ -44,7 +44,7 @@ public class MainGameLoop {
 		Loader loader = new Loader();
 		
 		ModelData human = OBJFileLoader.loadOBJ("person");
-		ModelData ball = OBJFileLoader.loadOBJ("ball_oth_high");
+		ModelData ball = OBJFileLoader.loadOBJ("ball_centred");
 		ModelData tree = OBJFileLoader.loadOBJ("tree");
 		ModelData fern = OBJFileLoader.loadOBJ("fern");
 		ModelData grass = OBJFileLoader.loadOBJ("grassModel");
@@ -95,7 +95,7 @@ public class MainGameLoop {
 		
 		Camera camera = new Camera(player1);
 		World world = new World(camera);
-		world.add(new Terrain(0, 0, loader,new ModelTexture(loader.loadTexture("grass")), "heightmap"));
+		world.add(new Terrain(0, 0, loader,new ModelTexture(loader.loadTexture("grass"))/*, "heightmap"*/));
 		
 		List<Entity> nature = new ArrayList<Entity>();
 		Random r = new Random();
