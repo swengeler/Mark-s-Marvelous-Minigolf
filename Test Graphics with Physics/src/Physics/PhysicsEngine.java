@@ -13,9 +13,9 @@ import terrains.Terrain;
 import terrains.World;
 
 public class PhysicsEngine {
-	public static final Vector3f GRAVITY = new Vector3f(0, -30f, 0);
+	public static final Vector3f GRAVITY = new Vector3f(0, -40f, 0);
 	public static final float COEFF_GRAVITY = 9.813f;
-	public static final float COEFF_RESTITUTION = 0.83f;
+	public static final float COEFF_RESTITUTION = 0.67f;
 	public static final float COEFF_FRICTION = 0.15f;
 
 	private List<Ball> balls;
@@ -90,8 +90,16 @@ public class PhysicsEngine {
 
 		// moving the ball out of the obstacles/terrains that collision was detected with
 		System.out.println("Ball's position before pushing it out: (" + b.getPosition().x + "|" + b.getPosition().y + "|" + b.getPosition().z + ")");
-		Vector3f revBallMovement = new Vector3f(b.getVelocity().x, b.getVelocity().y, b.getVelocity().z);
-		revBallMovement.negate(revBallMovement.normalise(revBallMovement)).scale(0.0001f);
+		Vector3f normal = new Vector3f(collidingFaces.get(0).getNormal().x, collidingFaces.get(0).getNormal().y, collidingFaces.get(0).getNormal().z);
+		Vector3f revBallMovement = (Vector3f) normal.scale(Vector3f.dot(b.getVelocity(), normal)/normal.lengthSquared());
+		System.out.println("Projection (revBallMovement): ( " + revBallMovement.x + " | " + revBallMovement.y + " | " + revBallMovement.z + " )");
+		revBallMovement.normalise();
+		revBallMovement.negate();
+		revBallMovement.scale(0.0001f);
+		System.out.println("After scaling and shit: ( " + revBallMovement.x + " | " + revBallMovement.y + " | " + revBallMovement.z + " )");
+
+		//Vector3f revBallMovement = new Vector3f(b.getVelocity().x, b.getVelocity().y, b.getVelocity().z);
+		//revBallMovement.negate(revBallMovement.normalise(revBallMovement)).scale(0.0001f);
 		System.out.println("Unscaled ball movement vector: (" + b.getVelocity().x + "|" + b.getVelocity().y + "|" + b.getVelocity().z + ")");
 		System.out.println("Reverse ball movement vector: (" + revBallMovement.x + "|" + revBallMovement.y + "|" + revBallMovement.z + ")");
 
@@ -102,8 +110,8 @@ public class PhysicsEngine {
 			}
 			System.out.println("Ball's position after pushing it out: (" + b.getPosition().x + "|" + b.getPosition().y + "|" + b.getPosition().z + ")");
 
-			// go back one step, so that there is at least on face the ball collides with
-			revBallMovement.negate(revBallMovement);
+			/* go back one step, so that there is at least on face the ball collides with
+			revBallMovement.scale(-1f);
 			while (!b.collidesWith(collidingFaces))
 				b.increasePosition(revBallMovement);
 
@@ -114,7 +122,7 @@ public class PhysicsEngine {
 
 			long intermediate2 = System.currentTimeMillis();
 			System.out.println("Time to push ball out and get remaining faces: " + (intermediate2 - before) + " (there are " + useForCollision.size() + " faces)");
-
+			*/ useForCollision = collidingFaces;
 			bounceOrdinaryCollision(useForCollision, b);
 		//}
 		long after = System.currentTimeMillis();
@@ -153,15 +161,17 @@ public class PhysicsEngine {
 			System.out.println("Position before: ( " + b.getPosition().x + " | " + b.getPosition().y + " | " + b.getPosition().z + " )");
 			System.out.println("Position after: ( " + b.getPosition().x + " | " + b.getPosition().y + " | " + b.getPosition().z + " )");
 			Vector3f normal = faces.get(0).getNormal(); // THIS IS WHERE THE PROGRAM CRASHES
+			Vector3f normalForCalculation = new Vector3f(normal.x, normal.y, normal.z);
 			System.out.println("Normal: ( " + normal.x + " | " + normal.y + " | " + normal.z + " )");
 			float alpha = (float) Math.acos((Vector3f.dot(normal, b.getVelocity()))/(normal.length() * b.getVelocity().length()));
 			float angle = Math.min(alpha, (float)(Math.PI - alpha));
 			//float angle = (float)Math.PI - Vector3f.angle(normal, b.getVelocity());
 			System.out.println("Angle to normal: " + angle + " Angle to plane: " + (Math.PI/2 - angle));
 
-			Vector3f newPartialVel = (Vector3f) normal.scale(2 * Vector3f.dot(b.getVelocity(), normal) * (1/normal.lengthSquared()));
+			Vector3f newPartialVel = (Vector3f) normalForCalculation.scale(2 * Vector3f.dot(b.getVelocity(), normal) * (1/normal.lengthSquared()));
 			Vector3f.sub(b.getVelocity(), newPartialVel, b.getVelocity());
 			//b.getVelocity().negate();
+			System.out.println("Normal after using in operations: ( " + normal.x + " | " + normal.y + " | " + normal.z + " )");
 
 			if ((Math.PI/2 - angle) > (Math.PI / 12)) {
 				System.out.println("Bouncing");
@@ -170,6 +180,7 @@ public class PhysicsEngine {
 			} else if (b.getVelocity().length() > 0) {
 				System.out.println("Rolling");
 				Vector3f projectionOnPlane = new Vector3f();
+				System.out.println("Normal length squared: " + normal.lengthSquared());
 				Vector3f projection = (Vector3f) normal.scale(Vector3f.dot(b.getVelocity(), normal)/normal.lengthSquared());
 				System.out.println("Normal part: ( " + projection.x + " | " + projection.y + " | " + projection.z + " )");
 				Vector3f.sub(b.getVelocity(), projection, projectionOnPlane);
