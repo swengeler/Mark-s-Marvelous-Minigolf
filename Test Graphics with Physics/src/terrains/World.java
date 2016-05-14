@@ -72,13 +72,21 @@ public class World {
 		return lights;
 	}
 	
-	public ArrayList<PhysicalFace> getCollidingFaces(Ball b) {
+	public ArrayList<PhysicalFace> getCollidingFacesEntities(Ball b) {
+		ArrayList<PhysicalFace> collidingFaces = new ArrayList<PhysicalFace>();
+		for (Entity e : entities) {
+			if (e.inBounds(b))
+				collidingFaces.addAll(e.getCollidingFaces(b));
+		}
+		return collidingFaces;
+	}
+	
+	public ArrayList<PhysicalFace> getCollidingFacesTerrains(Ball b) {
 		System.out.println("getCollidingFaces in World is called (there are " + terrains.size() + " terrains)");
 		ArrayList<PhysicalFace> collidingFaces = new ArrayList<PhysicalFace>();
 		for (Terrain t : terrains) {
-			if (t.ballInTerrain(b)) {
+			if (t.ballInTerrain(b))
 				collidingFaces.addAll(t.getCollidingFaces(b));
-			}
 		}
 		return collidingFaces;
 	}

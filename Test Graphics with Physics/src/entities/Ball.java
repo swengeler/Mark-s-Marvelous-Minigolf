@@ -19,8 +19,8 @@ public class Ball extends Entity{
 	private static final float MIN_YVEL = 0;
 	private static final float MIN_ZVEL = 0;
 	
-	private static final float RADIUS_IN_M = 0.04267f;
-	private static final float RADIUS = 1f;
+	public static final float RADIUS_IN_M = 0.04267f;
+	public static final float RADIUS = 1f;
 
 	private Vector3f currentVel = new Vector3f();
 	private Vector3f currentAcc = new Vector3f();
@@ -122,11 +122,6 @@ public class Ball extends Entity{
 		}
 		if(currentVel.z < MIN_ZVEL)
 			currentVel.z = 0;
-	}
-
-	public float getRadius() {
-		//return 1.1925f;
-		return 1f;
 	}
 
 	public Vector3f getVelocity() {

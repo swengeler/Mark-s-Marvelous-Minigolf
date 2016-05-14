@@ -22,15 +22,11 @@ public class PhysicsEngine {
 	public static final float COEFF_FRICTION = 0.15f;
 
 	private List<Ball> balls;
-	private List<Entity> entities;
-	private List<Terrain> terrains;
 	private World world;
 
 	public PhysicsEngine(List<Ball> balls, World world){
 		this.balls = balls;
 		this.world = world;
-		this.entities = world.getEntities();
-		this.terrains = world.getTerrains();
 	}
 
 	public void addBall(Ball ball) {
@@ -38,16 +34,13 @@ public class PhysicsEngine {
 	}
 
 	public void tick(){
-		for(Ball b:balls){
+		for (Ball b : balls){
 			// apply accelerations and stuff like that first, to make sure that a ball can move due to gusts of wind or similar
 			//b.applyAccelerations();
-			//b.resolveBallCollision();
 			b.checkInputs();
 			if (b.isMoving()) {
 				b.move();
-				//b.checkMinSpeed(world);
 				resolveOrdinaryCollision(b);
-				//b.checkGroundCollision(world);
 			}
 		}
 	}
@@ -60,11 +53,8 @@ public class PhysicsEngine {
 		ArrayList<PhysicalFace> collidingFaces = new ArrayList<PhysicalFace>();
 		ArrayList<PhysicalFace> useForCollision = new ArrayList<PhysicalFace>();
 		// might consider putting these for-loops into the world class and letting it do all the work on its entities/terrains!!
-		for (Entity e : entities) {
-			if (e.inBounds(b))
-				collidingFaces.addAll(e.getCollidingFaces(b));
-		}
-		collidingFaces.addAll(world.getCollidingFaces(b));
+		collidingFaces.addAll(world.getCollidingFacesEntities(b));
+		collidingFaces.addAll(world.getCollidingFacesTerrains(b));
 
 		long intermediate1 = System.currentTimeMillis();
 		System.out.println("Time to get faces with new method: " + (intermediate1 - before) + " (there are " + collidingFaces.size() + " faces)");
@@ -139,32 +129,17 @@ public class PhysicsEngine {
 
 	private void bounceOrdinaryCollision(ArrayList<PhysicalFace> faces, Ball b) {
 		if (b.getVelocity().length() > 0.1) {
-		System.out.println("COLLISION OCCURS (with " + faces.size() + " faces)");
-		for (PhysicalFace f : faces) {
-			System.out.println(	"Normal: (" + f.getNormal().x + "|" + f.getNormal().y + "|" + f.getNormal().z + ") " +
-								"P1: (" + f.getP1().x + "|" + f.getP1().y + "|" + f.getP1().z + ") " +
-								"P2: (" + f.getP2().x + "|" + f.getP2().y + "|" + f.getP2().z + ") " +
-								"P3: (" + f.getP3().x + "|" + f.getP3().y + "|" + f.getP3().z + ")");
-		}
-		long before = System.currentTimeMillis();
-		/*ArrayList<PhysicalFace> combined = new ArrayList<PhysicalFace>();
-		combined.add(faces.get(0));
-		for (PhysicalFace f : faces) {
-			boolean found = false;
-			for (int i = 0; !found && i < combined.size(); i++) {
-				if (f.getNormal().x == combined.get(i).getNormal().x && f.getNormal().y == combined.get(i).getNormal().y && f.getNormal().z == combined.get(i).getNormal().z)
-					found = true;
+			System.out.println("COLLISION OCCURS (with " + faces.size() + " faces)");
+			for (PhysicalFace f : faces) {
+				System.out.println(	"Normal: (" + f.getNormal().x + "|" + f.getNormal().y + "|" + f.getNormal().z + ") " +
+									"P1: (" + f.getP1().x + "|" + f.getP1().y + "|" + f.getP1().z + ") " +
+									"P2: (" + f.getP2().x + "|" + f.getP2().y + "|" + f.getP2().z + ") " +
+									"P3: (" + f.getP3().x + "|" + f.getP3().y + "|" + f.getP3().z + ")");
 			}
-			if (!found) {
-				System.out.println("Normal added: (" + f.getNormal().x + "|" + f.getNormal().y + "|" + f.getNormal().z + ")");
-				combined.add(f);
-			}
-		}
-		System.out.println("Number of planes after reduction: " + combined.size());
-		long after = System.currentTimeMillis();
-		System.out.println("Time to reduce colliding planes: " + (after - before));*/
-		//if (faces.size() == 1) {
-			// resolve with one plane
+			
+			// the one true face of all faces, a face among faces
+			PhysicalFace collidingFace = PhysicalFace.combineFaces(faces, b);
+		
 			System.out.println("Current velocity: ( " + b.getVelocity().x + " | " + b.getVelocity().y + " | " + b.getVelocity().z + " )");
 			System.out.println("Position before: ( " + b.getPosition().x + " | " + b.getPosition().y + " | " + b.getPosition().z + " )");
 			System.out.println("Position after: ( " + b.getPosition().x + " | " + b.getPosition().y + " | " + b.getPosition().z + " )");
@@ -208,15 +183,10 @@ public class PhysicsEngine {
 					Vector3f.add(b.getVelocity(), frictionDir, b.getVelocity());
 				else {
 					b.getVelocity().set(0,0,0);
-					//PhysicsEngine.disable();
 				}
 			}
 
 			System.out.println("Velocity after: ( " + b.getVelocity().x + " | " + b.getVelocity().y + " | " + b.getVelocity().z + " )\n");
-		//} else if (faces.size() == 2) {w
-			// resolve with two planes by using their normals and contact points with the ball
-			//System.out.println("THERE ARE TWO FACES, HALP WHAT DO\n");
-		//}
 		} else {
 			b.getVelocity().set(0,0,0);
 			b.setMoving(false);
@@ -228,7 +198,7 @@ public class PhysicsEngine {
 		for (Ball b2 : this.balls) {
 			if (!b1.equals(b2)) { // nested if -> not good
 				Vector3f.sub(b1.getPosition(), b2.getPosition(), dist);
-				if (dist.length() < (2 * b1.getRadius())) {
+				if (dist.length() < (2 * Ball.RADIUS)) {
 					// do a back-flip
 				}
 			}

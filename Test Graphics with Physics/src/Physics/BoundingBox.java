@@ -19,7 +19,7 @@ public class BoundingBox {
 
 	public boolean inBoundingBox(Ball b) {
 		Vector3f p = b.getPosition();
-		float r = b.getRadius();
+		float r = Ball.RADIUS;
 		return 	(p.x - r <= maxX && p.x + r >= minX) &&
 				(p.y - r <= maxY && p.y + r >= minY) &&
 				(p.z - r <= maxZ && p.z + r >= minZ);
