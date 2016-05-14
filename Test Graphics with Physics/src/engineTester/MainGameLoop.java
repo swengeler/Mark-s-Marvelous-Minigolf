@@ -46,7 +46,7 @@ public class MainGameLoop {
 		Loader loader = new Loader();
 
 		ModelData human = OBJFileLoader.loadOBJ("person");
-		ModelData ball = OBJFileLoader.loadOBJ("ball_centred_scaled2");
+		ModelData ball = OBJFileLoader.loadOBJ("ball_centred_hight_scaled2");
 		ModelData tree = OBJFileLoader.loadOBJ("tree");
 		ModelData fern = OBJFileLoader.loadOBJ("fern");
 		ModelData grass = OBJFileLoader.loadOBJ("grassModel");
@@ -102,7 +102,7 @@ public class MainGameLoop {
 		//lights.add(new Light(new Vector3f(35,17,35),new Vector3f(0,2,2), new Vector3f(1,0.01f,0.002f)));
 		//lights.add(new Light(new Vector3f(0,7,70),new Vector3f(2,2,0), new Vector3f(1,0.01f,0.002f)));
 
-		Ball player1 = new Ball(ballTModel, new Vector3f(200, 100, 200), 0, 0, 0, 1);
+		Ball player1 = new Ball(ballTModel, new Vector3f(200, 50, 200), 0, 0, 0, 1);
 		List<Ball> balls = new ArrayList<Ball>();
 		balls.add(player1);
 

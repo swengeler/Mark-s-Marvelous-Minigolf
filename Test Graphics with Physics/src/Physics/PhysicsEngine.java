@@ -160,7 +160,7 @@ public class PhysicsEngine {
 			System.out.println("Current velocity: ( " + b.getVelocity().x + " | " + b.getVelocity().y + " | " + b.getVelocity().z + " )");
 			System.out.println("Position before: ( " + b.getPosition().x + " | " + b.getPosition().y + " | " + b.getPosition().z + " )");
 			System.out.println("Position after: ( " + b.getPosition().x + " | " + b.getPosition().y + " | " + b.getPosition().z + " )");
-			Vector3f normal = faces.get(0).getNormal(); // THIS IS WHERE THE PROGRAM CRASHES
+			Vector3f normal = new Vector3f(faces.get(0).getNormal().x, faces.get(0).getNormal().y, faces.get(0).getNormal().z); // THIS IS WHERE THE PROGRAM CRASHES
 			Vector3f normalForCalculation = new Vector3f(normal.x, normal.y, normal.z);
 			System.out.println("Normal: ( " + normal.x + " | " + normal.y + " | " + normal.z + " )");
 			float alpha = (float) Math.acos((Vector3f.dot(normal, b.getVelocity()))/(normal.length() * b.getVelocity().length()));
