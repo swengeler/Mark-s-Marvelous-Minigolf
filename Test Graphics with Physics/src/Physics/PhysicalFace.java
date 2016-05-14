@@ -67,13 +67,14 @@ public class PhysicalFace {
 	
 	public static PhysicalFace combineFaces(ArrayList<PhysicalFace> faces, Ball b) {
 		if (faces.size() == 1) {
+			System.out.println("COLLISION WITH ONE PLANE");
 			return faces.get(0);
 		} else if (faces.size() == 2) {
 			PhysicalFace f1 = faces.get(0), f2 = faces.get(1);
 			Vector3f v1 = new Vector3f(), v2 = new Vector3f(), p1 = new Vector3f(), p2 = new Vector3f(), temp = new Vector3f();
 			
 			// getting the first vector out of the cross product of both normal vectors (parallel to the line of intersection of both planes)
-			Vector3f.cross(f1.getNormal(), f1.getNormal(), v1);
+			Vector3f.cross(f1.getNormal(), f2.getNormal(), v1);
 			
 			// getting the first point needed for the second vector in the first face/plane
 			Vector3f.sub(b.getPosition(), f1.getP1(), temp);
@@ -92,9 +93,13 @@ public class PhysicalFace {
 			// getting the second vector out of difference between the calculated points p1 and p2 and then constructing the face
 			Vector3f.sub(p1, p2, v2);
 			Vector3f.cross(v1, v2, temp);
+			System.out.println("COLLISION WITH TWO PLANES");
+			System.out.printf("Vector 1: (%f|%f|%f)\n", v1.x, v1.y, v1.z);
+			System.out.printf("Vector 2: (%f|%f|%f)\n", v2.x, v2.y, v2.z);
+			System.out.printf("Normal vector out of two planes: (%f|%f|%f)\n", temp.x, temp.y, temp.z);
 			return new PhysicalFace(temp, p1, p1, p2);
 		}
-		
+		System.out.println("COLLISION WITH THREE PLANES");
 		PhysicalFace f1 = faces.get(0), f2 = faces.get(1), f3 = faces.get(2);
 		Vector3f v1 = new Vector3f(), v2 = new Vector3f(), p1 = new Vector3f(), p2 = new Vector3f(), p3 = new Vector3f(), temp = new Vector3f();
 		
