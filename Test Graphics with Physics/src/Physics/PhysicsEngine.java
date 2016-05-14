@@ -13,9 +13,12 @@ import terrains.Terrain;
 import terrains.World;
 
 public class PhysicsEngine {
-	public static final Vector3f GRAVITY = new Vector3f(0, -40f, 0);
+	
+	public static final float[] COEFFS_RESTITUTION = {0.67f, 0.85f}; 
+	
+	public static final Vector3f GRAVITY = new Vector3f(0, -230f, 0);
 	public static final float COEFF_GRAVITY = 9.813f;
-	public static final float COEFF_RESTITUTION = 0.67f;
+	public static final float COEFF_RESTITUTION = 0.75f;
 	public static final float COEFF_FRICTION = 0.15f;
 
 	private List<Ball> balls;
@@ -77,7 +80,12 @@ public class PhysicsEngine {
 		for (PhysicalFace f : collidingFaces) {
 			boolean found = false;
 			for (int i = 0; !found && i < combined.size(); i++) {
-				if (f.getNormal().x == combined.get(i).getNormal().x && f.getNormal().y == combined.get(i).getNormal().y && f.getNormal().z == combined.get(i).getNormal().z)
+				if (f.getNormal().x == combined.get(i).getNormal().x && 
+					f.getNormal().y == combined.get(i).getNormal().y && 
+					f.getNormal().z == combined.get(i).getNormal().z ||
+					f.getNormal().x == -combined.get(i).getNormal().x && 
+					f.getNormal().y == -combined.get(i).getNormal().y && 
+					f.getNormal().z == -combined.get(i).getNormal().z)
 					found = true;
 			}
 			if (!found) {
