@@ -154,19 +154,20 @@ public class PhysicsEngine {
 			System.out.println("Position after: ( " + b.getPosition().x + " | " + b.getPosition().y + " | " + b.getPosition().z + " )");
 			Vector3f normal = faces.get(0).getNormal(); // THIS IS WHERE THE PROGRAM CRASHES
 			System.out.println("Normal: ( " + normal.x + " | " + normal.y + " | " + normal.z + " )");
-			float angleme = (float) Math.acos((Vector3f.dot(normal, b.getVelocity()))/(normal.length() * b.getVelocity().length()));
-			float angle = (float)Math.PI - Vector3f.angle(normal, b.getVelocity());
-			System.out.println("Angle: " + angle + " Angleme: " + angleme);
+			float alpha = (float) Math.acos((Vector3f.dot(normal, b.getVelocity()))/(normal.length() * b.getVelocity().length()));
+			float angle = Math.min(alpha, (float)(Math.PI - alpha));
+			//float angle = (float)Math.PI - Vector3f.angle(normal, b.getVelocity());
+			System.out.println("Angle to normal: " + angle + " Angle to plane: " + (Math.PI/2 - angle));
 
 			Vector3f newPartialVel = (Vector3f) normal.scale(2 * Vector3f.dot(b.getVelocity(), normal) * (1/normal.lengthSquared()));
 			Vector3f.sub(b.getVelocity(), newPartialVel, b.getVelocity());
 			//b.getVelocity().negate();
 
-			//if ((angle > (float)(Math.PI/2 - (float) (Math.PI * 0.1)))) {
+			if ((Math.PI/2 - angle) > (Math.PI / 12)) {
 				System.out.println("Bouncing");
 				// implement more complex mechanism for rolling/sliding behaviour on the ground
 				b.getVelocity().scale(COEFF_RESTITUTION);
-			/*} else if (b.getVelocity().length() > 0) {
+			} else if (b.getVelocity().length() > 0) {
 				System.out.println("Rolling");
 				Vector3f projectionOnPlane = new Vector3f();
 				Vector3f projection = (Vector3f) normal.scale(Vector3f.dot(b.getVelocity(), normal)/normal.lengthSquared());
@@ -178,7 +179,7 @@ public class PhysicsEngine {
 				System.out.println("Friction1: ( " + frictionDir.x + " | " + frictionDir.y + " | " + frictionDir.z + " )");
 				float angleSN = Vector3f.angle(new Vector3f(frictionDir.x,0,frictionDir.z), frictionDir);
 				System.out.println("Gravity scaling: " + Math.cos(angleSN) + " Angle: " + angleSN);
-				float frictionAcc = PhysicsEngine.COEFF_FRICTION * (PhysicsEngine.GRAVITY.length() * (20 * DisplayManager.getFrameTimeSeconds()) * (float)(Math.cos(angleSN)));
+				float frictionAcc = PhysicsEngine.COEFF_FRICTION * (PhysicsEngine.GRAVITY.length() * DisplayManager.getFrameTimeSeconds() * (float)(Math.cos(angleSN)));
 				System.out.println("Friction accleration: " + frictionAcc);
 				frictionDir = (Vector3f) frictionDir.scale(frictionAcc); // should now be the correctly scaled vector of the frictional ACCELERATION
 				System.out.println("Friction2: ( " + frictionDir.x + " | " + frictionDir.y + " | " + frictionDir.z + " )");
@@ -190,7 +191,7 @@ public class PhysicsEngine {
 					b.getVelocity().set(0,0,0);
 					//PhysicsEngine.disable();
 				}
-			}*/
+			}
 
 			System.out.println("Velocity after: ( " + b.getVelocity().x + " | " + b.getVelocity().y + " | " + b.getVelocity().z + " )\n");
 		//} else if (faces.size() == 2) {w

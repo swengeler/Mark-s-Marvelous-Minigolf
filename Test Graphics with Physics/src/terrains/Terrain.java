@@ -24,7 +24,7 @@ import org.lwjgl.util.vector.Vector2f;
 
 public class Terrain {
 
-	private static final float SIZE = 800;
+	private static final float SIZE = 512;
 	private static final int VERTEX_COUNT = 512;
 	private static final float MAX_HEIGHT = 40;
 	private static final float MAX_PIXEL_COLOR = 256 * 256 * 256;
@@ -251,8 +251,8 @@ public class Terrain {
 		Vector3f p1 = new Vector3f(0,0,0), p2 = new Vector3f(0,0,0), p3 = new Vector3f(0,0,0), normal = new Vector3f(0,0,0), v1 = new Vector3f(0,0,0), v2 = new Vector3f(0,0,0);
 
 		ArrayList<PhysicalFace> collidingFaces = new ArrayList<PhysicalFace>();
-		for (int i = leftX; i <= rightX && i < heights.length; i++) {
-			for (int j = upperZ; j <= lowerZ && j < heights[0].length; j++) {
+		for (int i = leftX; i <= rightX && i < heights.length - 1; i++) {
+			for (int j = upperZ; j <= lowerZ && j < heights[0].length - 1; j++) {
 				// upper left corner
 				p1.set(i + this.x, this.heights[i][j], j + this.z);
 				// lower left corner

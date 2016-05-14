@@ -75,11 +75,11 @@ public class Ball extends Entity{
 			this.currentVel.x += (float) -(RUN_SPEED * Math.sin(Math.toRadians(super.getRotY())));
 			this.currentVel.z += (float) -(RUN_SPEED * Math.cos(Math.toRadians(super.getRotY())));
 		} else if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
-			this.currentVel.x += 50;
+			this.currentVel.x += 20;
 			System.out.println("x-speed increased by pressing up-arrow");
 			setMoving(true);
 		} else if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
-			this.currentVel.x -= 50;
+			this.currentVel.x -= 20;
 			System.out.println("x-speed decreased by pressing down-arrow");
 			setMoving(true);
 		}
