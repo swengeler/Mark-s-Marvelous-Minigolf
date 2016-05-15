@@ -73,6 +73,10 @@ public class CollisionData {
 	public void setBoundingBox(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
 		bbox = new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
 	}
+	
+	public BoundingBox getBoundingBox() {
+		return bbox;
+	}
 
 	public ArrayList<PhysicalFace> getCollidingFaces(Ball b) {
 		collisionList.clear();

@@ -84,8 +84,20 @@ public class PhysicsEngine {
 			}
 		}
 		System.out.println("Number of planes after reduction: " + combined.size());
-		collidingFaces = combined;
-
+		collidingFaces = (ArrayList<PhysicalFace>) combined.clone();
+		
+		if (collidingFaces.size() > 1) {
+			for (PhysicalFace f : combined) {
+				float angle = Vector3f.angle(b.getVelocity(), f.getNormal());
+				angle = (float) Math.min(angle, Math.PI - angle);
+				System.out.println("Angle between vel and normal: " + Math.toDegrees(angle));
+				if (Math.abs(Math.PI/2 - angle) < Math.toRadians(15)) {
+					System.out.println("Normal removed: (" + f.getNormal().x + "|" + f.getNormal().y + "|" + f.getNormal().z + ")");
+					collidingFaces.remove(f);
+				}
+			}
+		}
+		/*
 		// moving the ball out of the obstacles/terrains that collision was detected with
 		System.out.println("Ball's position before pushing it out: (" + b.getPosition().x + "|" + b.getPosition().y + "|" + b.getPosition().z + ")");
 		Vector3f normal = new Vector3f(collidingFaces.get(0).getNormal().x, collidingFaces.get(0).getNormal().y, collidingFaces.get(0).getNormal().z);
@@ -107,7 +119,7 @@ public class PhysicsEngine {
 				b.increasePosition(revBallMovement);
 			}
 			System.out.println("Ball's position after pushing it out: (" + b.getPosition().x + "|" + b.getPosition().y + "|" + b.getPosition().z + ")");
-
+	*/
 			/* go back one step, so that there is at least on face the ball collides with
 			revBallMovement.scale(-1f);
 			while (!b.collidesWith(collidingFaces))
@@ -135,10 +147,39 @@ public class PhysicsEngine {
 									"P1: (" + f.getP1().x + "|" + f.getP1().y + "|" + f.getP1().z + ") " +
 									"P2: (" + f.getP2().x + "|" + f.getP2().y + "|" + f.getP2().z + ") " +
 									"P3: (" + f.getP3().x + "|" + f.getP3().y + "|" + f.getP3().z + ")");
+				System.out.printf("Angle between normal and vector of movement: %f \n", Math.toDegrees(Vector3f.angle(b.getVelocity(), f.getNormal())));
 			}
 			
 			// the one true face of all faces, a face among faces
 			PhysicalFace collidingFace = PhysicalFace.combineFaces(faces, b);
+	
+			
+			
+			
+			// moving the ball out of the obstacles/terrains that collision was detected with
+			System.out.println("Ball's position before pushing it out: (" + b.getPosition().x + "|" + b.getPosition().y + "|" + b.getPosition().z + ")");
+			Vector3f normal1 = new Vector3f(collidingFace.getNormal().x, collidingFace.getNormal().y, collidingFace.getNormal().z);
+			Vector3f revBallMovement = (Vector3f) normal1.scale(Vector3f.dot(b.getVelocity(), normal1)/normal1.lengthSquared());
+			System.out.println("Projection (revBallMovement): ( " + revBallMovement.x + " | " + revBallMovement.y + " | " + revBallMovement.z + " )");
+			revBallMovement.normalise();
+			revBallMovement.negate();
+			revBallMovement.scale(0.0001f);
+			System.out.println("After scaling and shit: ( " + revBallMovement.x + " | " + revBallMovement.y + " | " + revBallMovement.z + " )");
+			
+			//Vector3f revBallMovement = new Vector3f(b.getVelocity().x, b.getVelocity().y, b.getVelocity().z);
+			//revBallMovement.negate(revBallMovement.normalise(revBallMovement)).scale(0.0001f);
+			System.out.println("Unscaled ball movement vector: (" + b.getVelocity().x + "|" + b.getVelocity().y + "|" + b.getVelocity().z + ")");
+			System.out.println("Reverse ball movement vector: (" + revBallMovement.x + "|" + revBallMovement.y + "|" + revBallMovement.z + ")");
+			
+			//if (revBallMovement.y > 0) {
+			while (collidingFace.collidesWithBall(b)) {
+				// move the ball back out
+				b.increasePosition(revBallMovement);
+			}
+			System.out.println("Ball's position after pushing it out: (" + b.getPosition().x + "|" + b.getPosition().y + "|" + b.getPosition().z + ")");
+
+				
+				
 		
 			System.out.println("Current velocity: ( " + b.getVelocity().x + " | " + b.getVelocity().y + " | " + b.getVelocity().z + " )");
 			System.out.println("Position before: ( " + b.getPosition().x + " | " + b.getPosition().y + " | " + b.getPosition().z + " )");

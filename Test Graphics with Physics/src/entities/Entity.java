@@ -113,6 +113,10 @@ public class Entity {
 		System.out.println("Time to construct faces (for entity): " + difference + "\n");
 	}
 	
+	public CollisionData getCollisionData() {
+		return cdata;
+	}
+	
 	public ArrayList<PhysicalFace> getCollidingFaces(Ball b) {
 		return this.cdata.getCollidingFaces(b);
 	}

@@ -12,6 +12,7 @@ import Physics.PhysicalFace;
 import Physics.PhysicsEngine;
 
 public class Ball extends Entity{
+	private static final float FACTOR = 1;
 	private static final float RUN_SPEED = 2;
 	private static final float TURN_SPEED = 100;
 	private static final float JUMP_POWER = 40;
@@ -66,12 +67,12 @@ public class Ball extends Entity{
 
 	public void checkInputs(){
 		if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
-			this.currentVel.x += (float) (RUN_SPEED * Math.sin(Math.toRadians(super.getRotY())));
-			this.currentVel.z += (float) (RUN_SPEED * Math.cos(Math.toRadians(super.getRotY())));
+			this.currentVel.x += (float) (RUN_SPEED * Math.sin(Math.toRadians(super.getRotY())))/FACTOR;
+			this.currentVel.z += (float) (RUN_SPEED * Math.cos(Math.toRadians(super.getRotY())))/FACTOR;
 			setMoving(true);
 		} else if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
-			this.currentVel.x += (float) -(RUN_SPEED * Math.sin(Math.toRadians(super.getRotY())));
-			this.currentVel.z += (float) -(RUN_SPEED * Math.cos(Math.toRadians(super.getRotY())));
+			this.currentVel.x += (float) -(RUN_SPEED * Math.sin(Math.toRadians(super.getRotY())))/FACTOR;
+			this.currentVel.z += (float) -(RUN_SPEED * Math.cos(Math.toRadians(super.getRotY())))/FACTOR;
 			setMoving(true);
 		} else if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
 			this.currentVel.x += 5;

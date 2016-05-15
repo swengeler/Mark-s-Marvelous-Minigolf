@@ -11,6 +11,7 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import Physics.BoundingBox;
 import Physics.PhysicsEngine;
 import entities.Ball;
 import entities.Camera;
@@ -124,6 +125,9 @@ public class MainGameLoop {
 
 		List<Entity> nature = new ArrayList<Entity>();
 		nature.add(new Entity(boxTModel, box, new Vector3f(200, 0, 200),0,0,0,5));
+		BoundingBox bbox = nature.get(0).getCollisionData().getBoundingBox();
+		bbox.print();
+		
 		/*Random r = new Random();
 		for(int i=0; i<200; i++){
 			if(i<40){

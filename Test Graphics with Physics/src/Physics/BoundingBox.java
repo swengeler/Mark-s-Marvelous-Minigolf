@@ -24,5 +24,30 @@ public class BoundingBox {
 				(p.y - r <= maxY && p.y + r >= minY) &&
 				(p.z - r <= maxZ && p.z + r >= minZ);
 	}
+	
+	public void print() {
+		System.out.printf(	"\n\n" +
+							"     (%9.4f|%9.4f|%9.4f) _____________ (%9.4f|%9.4f|%9.4f)\n" +
+				"                                    /|           /|\n" + 
+				"                                   / |          / |\n" +
+				"                                  /  |         /  |\n" +
+							" (%9.4f|%9.4f|%9.4f) /____________/ (%9.4f|%9.4f|%9.4f)\n" +
+				"                                 |   |        |   |\n" + 
+							"     (%9.4f|%9.4f|%9.4f) |________|___| (%9.4f|%9.4f|%9.4f)\n" +
+				"                                 |   /        |   /\n" +
+				"                                 |  /         |  /                                          y| /x\n" +
+				"                                 | /          | /                                            |/__\n" +
+							" (%9.4f|%9.4f|%9.4f) |/___________|/ (%9.4f|%9.4f|%9.4f)               z" +
+				"\n\n", 
+				maxX, maxY, minZ, 
+				maxX, maxY, maxZ, 
+				minX, maxY, minZ, 
+				minX, maxY, maxZ, 
+				maxX, minY, minZ, 
+				maxX, minY, maxZ, 
+				minX, minY, minZ, 
+				minX, minY, maxZ);
+
+	}
 
 }
