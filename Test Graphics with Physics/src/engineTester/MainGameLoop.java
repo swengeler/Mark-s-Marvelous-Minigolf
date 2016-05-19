@@ -24,6 +24,9 @@ import normalMappingObjConverter.ModelDataNM;
 import normalMappingObjConverter.NormalMappedObjLoader;
 import objConverter.ModelData;
 import objConverter.OBJFileLoader;
+import particles.ParticleMaster;
+import particles.ParticleSystem;
+import particles.ParticleTexture;
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
 import renderEngine.MasterRenderer;
@@ -44,6 +47,7 @@ public class MainGameLoop {
 	
 		DisplayManager.createDisplay();
 		Loader loader = new Loader();
+		
 		
 		ModelData human = OBJFileLoader.loadOBJ("person");
 		ModelData ball = OBJFileLoader.loadOBJ("ball_oth_high");
@@ -84,27 +88,27 @@ public class MainGameLoop {
 		flowerTModel.getTexture().setHasTransparency(true);
 		
 		barrelTModel.getTexture().setShineDamper(10);
-		barrelTModel.getTexture().setReflectivity(0.5f);
+		barrelTModel.getTexture().setReflectivity(0.3f);
 		barrelTModel.getTexture().setNormalMap(loader.loadTexture("barrelNormal"));
 		
 		crateTModel.getTexture().setShineDamper(10);
-		crateTModel.getTexture().setReflectivity(0.5f);
+		crateTModel.getTexture().setReflectivity(0.3f);
 		crateTModel.getTexture().setNormalMap(loader.loadTexture("crateNormal"));
 		
 		boulderTModel.getTexture().setShineDamper(10);
-		boulderTModel.getTexture().setReflectivity(0.5f);
+		boulderTModel.getTexture().setReflectivity(0.3f);
 		boulderTModel.getTexture().setNormalMap(loader.loadTexture("boulderNormal"));
 		
 		ballTModel.getTexture().setShineDamper(10);
 		ballTModel.getTexture().setReflectivity(1);
 		
 		List<Light> lights = new ArrayList<Light>();
-		lights.add(new Light(new Vector3f(400,1000,400),new Vector3f(1,1,1)));
+		lights.add(new Light(new Vector3f(400,1000,400),new Vector3f(0.4f,0.6f,0.6f)));
 		//lights.add(new Light(new Vector3f(70,10,0),new Vector3f(2,0,0), new Vector3f(1,0.01f,0.002f)));
 		//lights.add(new Light(new Vector3f(35,17,35),new Vector3f(0,2,2), new Vector3f(1,0.01f,0.002f)));
 		//lights.add(new Light(new Vector3f(0,7,70),new Vector3f(2,2,0), new Vector3f(1,0.01f,0.002f)));
 		
-		Ball player1 = new Ball(ballTModel, new Vector3f(50, 3, 0), 0, 0, 0, 1);
+		Ball player1 = new Ball(ballTModel, new Vector3f(50, 3, 0), 0, 0, 0, 0.5f);
 		List<Ball> balls = new ArrayList<Ball>();
 		balls.add(player1);
 		
@@ -196,16 +200,27 @@ public class MainGameLoop {
 		world.addNormE(normalMapEntities);
 		
 		
+		ParticleMaster.init(loader, renderer.getProjectionMatrix());
+		ParticleTexture particleTexture = new ParticleTexture(loader.loadTexture("particleStar"), 1);
+		ParticleSystem system = new ParticleSystem(particleTexture, 40, 10, -0.5f, 3, 1.6f);
+		system.setLifeError(0.1f);
+		system.setSpeedError(0.25f);
+		system.setScaleError(0.5f);
+		system.randomizeRotation();
+		
 		while(!Display.isCloseRequested()){
 			player1.move(world);
 			world.start();
 			picker.update();
 			mainEngine.tick();
+			normalMapEntities.get(0).increaseRotation(0, 30*DisplayManager.getFrameTimeSeconds(), 0);
+			normalMapEntities.get(1).increaseRotation(0, 60*DisplayManager.getFrameTimeSeconds(), 0);
+			normalMapEntities.get(2).increaseRotation(0, 120*DisplayManager.getFrameTimeSeconds(), 0);
 			
 			Vector3f terrainPoint = picker.getCurrentTerrainPoint();
 			if(terrainPoint != null){
-				//nature.get(0).setPosition(terrainPoint);
-			}
+				
+			}system.generateParticles(player1.getPosition());
 			
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 			
@@ -228,6 +243,8 @@ public class MainGameLoop {
 			renderer.processEntity(player1);
 			renderer.processWorld(world, new Vector4f(0, -1, 0, 10000));
 			waterRenderer.render(waters, camera);
+			ParticleMaster.renderParticles(camera);
+			ParticleMaster.update();
 			guiRenderer.render(guis);
 			
 			DisplayManager.updateDisplay();
@@ -237,6 +254,7 @@ public class MainGameLoop {
 		guiRenderer.cleanUp();
 		renderer.cleanUp();
 		loader.cleanUp();
+		ParticleMaster.cleanUp();
 		DisplayManager.closeDisplay();
 		
 	}
