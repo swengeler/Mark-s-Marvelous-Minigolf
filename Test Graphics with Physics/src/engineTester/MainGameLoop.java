@@ -54,6 +54,8 @@ public class MainGameLoop {
 		ModelData pine = OBJFileLoader.loadOBJ("pine");
 		ModelData flower = OBJFileLoader.loadOBJ("grassModel");
 	    ModelData box = OBJFileLoader.loadOBJ("box_big");
+	    ModelData dragon = OBJFileLoader.loadOBJ("dragon");
+	    ModelData dragon_low = OBJFileLoader.loadOBJ("dragon_lowpoly");
 		box.print(ModelData.PRINT_DATA_FILE);
 
 		RawModel humanModel = loader.loadToVAO(human.getVertices(), human.getTextureCoords(), human.getNormals(), human.getIndices());
@@ -64,6 +66,8 @@ public class MainGameLoop {
 		RawModel pineModel = loader.loadToVAO(pine.getVertices(), pine.getTextureCoords(), pine.getNormals(), pine.getIndices());
 		RawModel boxModel = loader.loadToVAO(box.getVertices(), box.getTextureCoords(), box.getNormals(), box.getIndices());
 		RawModel flowerModel = loader.loadToVAO(flower.getVertices(), flower.getTextureCoords(), flower.getNormals(), flower.getIndices());
+		RawModel dragonModel = loader.loadToVAO(dragon.getVertices(), dragon.getTextureCoords(), dragon.getNormals(), dragon.getIndices());
+		
 
 		TexturedModel humanTModel = new TexturedModel(humanModel,new ModelTexture(loader.loadTexture("playerTexture")));
 		TexturedModel ballTModel = new TexturedModel(ballModel,new ModelTexture(loader.loadTexture("white")));
@@ -73,6 +77,7 @@ public class MainGameLoop {
 		TexturedModel pineTModel = new TexturedModel(pineModel,new ModelTexture(loader.loadTexture("pine")));
 		TexturedModel boxTModel = new TexturedModel(boxModel,new ModelTexture(loader.loadTexture("box")));
 		TexturedModel flowerTModel = new TexturedModel(flowerModel,new ModelTexture(loader.loadTexture("flower")));
+		TexturedModel dragonTModel = new TexturedModel(dragonModel,new ModelTexture(loader.loadTexture("white")));
 
 
 		long beforeHumans = System.currentTimeMillis();
@@ -125,6 +130,7 @@ public class MainGameLoop {
 
 		List<Entity> nature = new ArrayList<Entity>();
 		nature.add(new Entity(boxTModel, box, new Vector3f(200, 0, 200),0,0,0,5));
+		nature.add(new Entity(dragonTModel, dragon_low, new Vector3f(400, 0, 200),0,0,0,3));
 		BoundingBox bbox = nature.get(0).getCollisionData().getBoundingBox();
 		bbox.print();
 		
