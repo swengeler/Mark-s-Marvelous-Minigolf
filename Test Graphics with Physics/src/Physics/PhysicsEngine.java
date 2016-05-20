@@ -12,7 +12,7 @@ public class PhysicsEngine {
 	
 	public static final float COEFF_FRICTION = 1f;
 	
-	public static final Vector3f GRAVITY = new Vector3f(0, -30, 0);
+	public static final Vector3f GRAVITY = new Vector3f(0, -60f, 0);
 	private List<Ball> balls;
 	private World world;
 	
