@@ -14,9 +14,11 @@ import terrains.World;
 
 public class PhysicsEngine {
 	
+	private static final float NORMAL_TH = 0.001f;
+	
 	public static final float[] COEFFS_RESTITUTION = {0.67f, 0.85f}; 
 	
-	public static final Vector3f GRAVITY = new Vector3f(0, -230f, 0);
+	public static final Vector3f GRAVITY = new Vector3f(0, -0f, 0);
 	public static final float COEFF_GRAVITY = 9.813f;
 	public static final float COEFF_RESTITUTION = 0.75f;
 	public static final float COEFF_FRICTION = 0.15f;
@@ -70,12 +72,9 @@ public class PhysicsEngine {
 		for (PhysicalFace f : collidingFaces) {
 			boolean found = false;
 			for (int i = 0; !found && i < combined.size(); i++) {
-				if (f.getNormal().x == combined.get(i).getNormal().x && 
-					f.getNormal().y == combined.get(i).getNormal().y && 
-					f.getNormal().z == combined.get(i).getNormal().z ||
-					f.getNormal().x == -combined.get(i).getNormal().x && 
-					f.getNormal().y == -combined.get(i).getNormal().y && 
-					f.getNormal().z == -combined.get(i).getNormal().z)
+				if (Math.abs(Math.abs(f.getNormal().x) - Math.abs(combined.get(i).getNormal().x)) < NORMAL_TH && 
+					Math.abs(Math.abs(f.getNormal().y) - Math.abs(combined.get(i).getNormal().y)) < NORMAL_TH &&
+					Math.abs(Math.abs(f.getNormal().z) - Math.abs(combined.get(i).getNormal().z)) < NORMAL_TH)
 					found = true;
 			}
 			if (!found) {
@@ -91,7 +90,7 @@ public class PhysicsEngine {
 				float angle = Vector3f.angle(b.getVelocity(), f.getNormal());
 				angle = (float) Math.min(angle, Math.PI - angle);
 				System.out.println("Angle between vel and normal: " + Math.toDegrees(angle));
-				if (Math.abs(Math.PI/2 - angle) < Math.toRadians(15)) {
+				if (collidingFaces.size() != 1 && Math.abs(Math.PI/2 - angle) < Math.toRadians(15)) {
 					System.out.println("Normal removed: (" + f.getNormal().x + "|" + f.getNormal().y + "|" + f.getNormal().z + ")");
 					collidingFaces.remove(f);
 				}
@@ -240,7 +239,23 @@ public class PhysicsEngine {
 			if (!b1.equals(b2)) { // nested if -> not good
 				Vector3f.sub(b1.getPosition(), b2.getPosition(), dist);
 				if (dist.length() < (2 * Ball.RADIUS)) {
-					// do a back-flip
+					Vector3f normal = new Vector3f(b2.getPosition().x - b1.getPosition().x, b2.getPosition().y - b1.getPosition().y, b2.getPosition().z - b1.getPosition().z);
+					//Vector3f pointInPlane = new Vector3f(b1.getPosition().x + normal.x/2, b1.getPosition().y + normal.y/2, b1.getPosition().z + normal.z/2);
+					b1.getVelocity().scale(COEFF_RESTITUTION);
+					float alpha = Vector3f.angle(b1.getVelocity(), normal);
+					alpha = Math.min(alpha, (float) (Math.PI - alpha));
+					float factorB2 = (float) (Math.cos(alpha) * b1.getVelocity().length());
+					float factorB1 = (float) (Math.sin(alpha) * b1.getVelocity().length());
+					// set the velocity of the second ball to one along the normal of the collision (its already in the right direction because of the way the normal is created (from b1 to b2)
+					normal.normalise();
+					Vector3f projection = new Vector3f(b1.getVelocity().x, b1.getVelocity().y, b1.getVelocity().z);
+					Vector3f.sub(projection, (Vector3f) b1.getVelocity().scale(Vector3f.dot(normal, projection)), projection);
+					normal.scale(factorB2);
+					b2.setVelocity(normal);
+					b2.setMoving(true);
+					projection.normalise();
+					projection.scale(factorB1);
+					b1.setVelocity(projection);
 				}
 			}
 		}

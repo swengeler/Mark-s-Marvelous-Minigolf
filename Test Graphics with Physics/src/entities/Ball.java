@@ -128,5 +128,9 @@ public class Ball extends Entity{
 	public Vector3f getVelocity() {
 		return currentVel;
 	}
+	
+	public void setVelocity(Vector3f v) {
+		currentVel.set(v.x, v.y, v.y);
+	}
 
 }

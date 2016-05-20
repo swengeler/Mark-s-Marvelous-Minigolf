@@ -32,8 +32,6 @@ void main(void){
 		float nDotl = dot(unitNormal, unitLightVector);
 		float brightness = max(nDotl,0.0);
 		
-		float level = floor(brightness * levels);
-		brightness = level / levels;
 		
 		vec3 lightDirection = -unitLightVector;
 		vec3 reflectedLightDirection = reflect(lightDirection,unitNormal);
@@ -41,8 +39,6 @@ void main(void){
 		specularFactor = max(specularFactor, 0.0);
 		float dampedFactor = pow(specularFactor, shineDamper);
 		
-		level = floor(dampedFactor * levels);
-		dampedFactor = level / levels;
 		
 		totalSpecular = totalSpecular + dampedFactor * (reflectivity * lightColour[i])/attFactor;
 		totalDiffuse = totalDiffuse + (brightness * lightColour[i])/attFactor;

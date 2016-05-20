@@ -111,11 +111,12 @@ public class MainGameLoop {
 		Ball player1 = new Ball(ballTModel, new Vector3f(200, 25, 400), 0, 0, 0, 1);
 		List<Ball> balls = new ArrayList<Ball>();
 		balls.add(player1);
+		balls.add(new Ball(ballTModel, new Vector3f(200, 10, 200), 0, 0, 0, 1));
 
 		Camera camera = new Camera(player1);
 		World world = new World(camera);
-		world.add(new Terrain(0, 0, loader, new ModelTexture(loader.loadTexture("grass"))/*, "arena"/*, "heightmap"*/));
-		world.add(new Terrain(0, 1, loader, new ModelTexture(loader.loadTexture("grass"))/*, "arena"/*, "heightmap"*/));
+		world.add(new Terrain(0, 0, loader, new ModelTexture(loader.loadTexture("crate"))/*, "arena"/*, "heightmap"*/));
+		world.add(new Terrain(0, 1, loader, new ModelTexture(loader.loadTexture("crate"))/*, "arena"/*, "heightmap"*/));
 
 
 		/*float[][] heights = world.getTerrains().get(0).getHeights();
@@ -130,7 +131,7 @@ public class MainGameLoop {
 
 		List<Entity> nature = new ArrayList<Entity>();
 		nature.add(new Entity(boxTModel, box, new Vector3f(200, 0, 200),0,0,0,5));
-		nature.add(new Entity(dragonTModel, dragon_low, new Vector3f(400, 0, 200),0,0,0,3));
+		nature.add(new Entity(dragonTModel, dragon , new Vector3f(400, 0, 200),0,0,0,30));
 		BoundingBox bbox = nature.get(0).getCollisionData().getBoundingBox();
 		bbox.print();
 		
