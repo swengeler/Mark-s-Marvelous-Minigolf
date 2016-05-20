@@ -29,10 +29,12 @@ public class TerrainRenderer {
 		this.shader = shader;
 		shader.start();
 		shader.loadProjectionMatrix(projectionMatrix);
+		shader.connectTextureUnits();
 		shader.stop();
 	}
 	
-	public void render(List<Terrain> terrains){
+	public void render(List<Terrain> terrains, Matrix4f toShadowSpace){
+		shader.loadToShadowSpaceMatrix(toShadowSpace);
 		for(Terrain terrain:terrains){
 			prepareTerrain(terrain);
 			loadModelMatrix(terrain);

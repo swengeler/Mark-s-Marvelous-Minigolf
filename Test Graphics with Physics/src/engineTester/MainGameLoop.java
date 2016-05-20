@@ -57,6 +57,7 @@ public class MainGameLoop {
 		ModelData pine = OBJFileLoader.loadOBJ("pine");
 		ModelData flower = OBJFileLoader.loadOBJ("grassModel");
 		ModelData box = OBJFileLoader.loadOBJ("box");
+		ModelData dragon = OBJFileLoader.loadOBJ("dragon");
 		
 		
 		RawModel humanModel = loader.loadToVAO(human.getVertices(), human.getTextureCoords(), human.getNormals(), human.getIndices());
@@ -67,6 +68,7 @@ public class MainGameLoop {
 		RawModel pineModel = loader.loadToVAO(pine.getVertices(), pine.getTextureCoords(), pine.getNormals(), pine.getIndices());
 		RawModel boxModel = loader.loadToVAO(box.getVertices(), box.getTextureCoords(), box.getNormals(), box.getIndices());
 		RawModel flowerModel = loader.loadToVAO(flower.getVertices(), flower.getTextureCoords(), flower.getNormals(), flower.getIndices());
+		RawModel dragonModel = loader.loadToVAO(dragon.getVertices(), dragon.getTextureCoords(), dragon.getNormals(), dragon.getIndices());
 		
 		TexturedModel humanTModel = new TexturedModel(humanModel,new ModelTexture(loader.loadTexture("playerTexture")));
 		TexturedModel ballTModel = new TexturedModel(ballModel,new ModelTexture(loader.loadTexture("white")));
@@ -79,6 +81,7 @@ public class MainGameLoop {
 		TexturedModel barrelTModel = new TexturedModel(NormalMappedObjLoader.loadOBJ("barrel", loader), new ModelTexture(loader.loadTexture("barrel")));
 		TexturedModel crateTModel = new TexturedModel(NormalMappedObjLoader.loadOBJ("crate", loader), new ModelTexture(loader.loadTexture("crate")));
 		TexturedModel boulderTModel = new TexturedModel(NormalMappedObjLoader.loadOBJ("boulder", loader), new ModelTexture(loader.loadTexture("boulder")));
+		TexturedModel dragonTModel = new TexturedModel(dragonModel,new ModelTexture(loader.loadTexture("white")));
 		
 		fernTModel.getTexture().setNumberOfRows(2);
 		fernTModel.getTexture().setHasTransparency(true);
@@ -103,19 +106,16 @@ public class MainGameLoop {
 		ballTModel.getTexture().setReflectivity(1);
 		
 		List<Light> lights = new ArrayList<Light>();
-		lights.add(new Light(new Vector3f(400,1000,400),new Vector3f(0.4f,0.6f,0.6f)));
-		//lights.add(new Light(new Vector3f(70,10,0),new Vector3f(2,0,0), new Vector3f(1,0.01f,0.002f)));
-		//lights.add(new Light(new Vector3f(35,17,35),new Vector3f(0,2,2), new Vector3f(1,0.01f,0.002f)));
-		//lights.add(new Light(new Vector3f(0,7,70),new Vector3f(2,2,0), new Vector3f(1,0.01f,0.002f)));
+		lights.add(new Light(new Vector3f(1000000,1500000,-100000),new Vector3f(1f,1f,1f)));
 		
-		Ball player1 = new Ball(ballTModel, new Vector3f(50, 3, 0), 0, 0, 0, 0.5f);
+		Ball player1 = new Ball(ballTModel, new Vector3f(100, 3, 0), 0, 0, 0, 0.5f);
 		List<Ball> balls = new ArrayList<Ball>();
 		balls.add(player1);
 		
 		
 		Camera camera = new Camera(player1);
 		World world = new World(camera);
-		world.add(new Terrain(0, 0, loader,new ModelTexture(loader.loadTexture("grass")), "heightmap"));
+		world.add(new Terrain(0, 0, loader,new ModelTexture(loader.loadTexture("grass")), true));
 		
 		List<Entity> nature = new ArrayList<Entity>();
 		Random r = new Random();
@@ -170,12 +170,13 @@ public class MainGameLoop {
 			//dragons.add(new Entity(staticModel, new Vector3f(x, y, z), 0f, (float) (Math.random() * 180f), 0f, 1f ));
 		}
 		Entity big_Human = new Entity(humanTModel, new Vector3f(0,0,50), 0f, 0f, 0f, 10);
-		
-		MasterRenderer renderer = new MasterRenderer(loader);
+		nature.add(new Entity(dragonTModel, new Vector3f(100, 8, 60), -10f, 170f, 0f, 3 ));
+		MasterRenderer renderer = new MasterRenderer(loader, camera);
 		
 		List<GuiTexture> guis = new ArrayList<GuiTexture>();
-		GuiTexture gui = new GuiTexture(loader.loadTexture("fernAtlas"), new Vector2f(0.5f, 0.5f), new Vector2f(0.25f, 0.25f));
-		guis.add(gui);
+		//GuiTexture gui = new GuiTexture(loader.loadTexture("fernAtlas"), new Vector2f(0.5f, 0.5f), new Vector2f(0.25f, 0.25f));
+		GuiTexture shadowMap = new GuiTexture(renderer.getShadowMapTexture(), new Vector2f(0.5f, 0.5f), new Vector2f(0.5f, 0.5f));
+		//guis.add(shadowMap);
 		
 		GuiRenderer guiRenderer = new GuiRenderer(loader);
 		
@@ -191,22 +192,25 @@ public class MainGameLoop {
 		WaterShader waterShader = new WaterShader();
 		WaterRenderer waterRenderer = new WaterRenderer(loader, waterShader, renderer.getProjectionMatrix(), fbos);
 		List<WaterTile> waters = new ArrayList<WaterTile>();
-		waters.add(new WaterTile(75, 120, 0));
+		waters.add(new WaterTile(400, 400, -5));
 		
 		List<Entity> normalMapEntities = new ArrayList<Entity>();
 		normalMapEntities.add(new Entity(barrelTModel, new Vector3f(20, 20, 20), 0f, 0f, 0f, 1));
 		normalMapEntities.add(new Entity(crateTModel, new Vector3f(40, 20, 20), 0f, 0f, 0f, 0.05f));
 		normalMapEntities.add(new Entity(boulderTModel, new Vector3f(60, 20, 20), 0f, 0f, 0f, 1));
-		world.addNormE(normalMapEntities);
+		//world.addNormE(normalMapEntities);
 		
 		
 		ParticleMaster.init(loader, renderer.getProjectionMatrix());
-		ParticleTexture particleTexture = new ParticleTexture(loader.loadTexture("particleStar"), 1);
-		ParticleSystem system = new ParticleSystem(particleTexture, 40, 10, -0.5f, 3, 1.6f);
+		ParticleTexture particleTexture = new ParticleTexture(loader.loadTexture("fire"), 8);
+		ParticleSystem system = new ParticleSystem(particleTexture, 200, 30, -0.3f, 1.5f, 8.6f);
 		system.setLifeError(0.1f);
-		system.setSpeedError(0.25f);
 		system.setScaleError(0.5f);
+		system.setSpeedError(0.25f);
 		system.randomizeRotation();
+		system.setDirection(new Vector3f(1,0,0), 0.1f);
+		
+		DisplayManager.reset();
 		
 		while(!Display.isCloseRequested()){
 			player1.move(world);
@@ -220,8 +224,11 @@ public class MainGameLoop {
 			Vector3f terrainPoint = picker.getCurrentTerrainPoint();
 			if(terrainPoint != null){
 				
-			}system.generateParticles(player1.getPosition());
+			}
+			system.generateParticles(new Vector3f(113,29.3f,57));
 			
+			
+			renderer.renderShadowMap(nature, lights.get(0));
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 			
 			fbos.bindReflectionFrameBuffer();
@@ -230,21 +237,21 @@ public class MainGameLoop {
 			camera.invertPitch();
 			renderer.processEntity(player1);
 			renderer.processWorld(world, new Vector4f(0, 1, 0, -waters.get(0).getHeight()));
+			ParticleMaster.renderParticles(camera);
 			camera.getPosition().y += distance;
 			camera.invertPitch();
-			
 			
 			fbos.bindRefractionFrameBuffer();
 			renderer.processEntity(player1);
 			renderer.processWorld(world, new Vector4f(0, -1, 0, waters.get(0).getHeight()));
-			
+			ParticleMaster.renderParticles(camera);
 			
 			fbos.unbindCurrentFrameBuffer();
 			renderer.processEntity(player1);
 			renderer.processWorld(world, new Vector4f(0, -1, 0, 10000));
 			waterRenderer.render(waters, camera);
 			ParticleMaster.renderParticles(camera);
-			ParticleMaster.update();
+			ParticleMaster.update(camera);
 			guiRenderer.render(guis);
 			
 			DisplayManager.updateDisplay();

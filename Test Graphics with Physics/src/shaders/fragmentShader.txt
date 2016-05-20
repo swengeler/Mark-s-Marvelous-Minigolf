@@ -15,7 +15,6 @@ uniform float shineDamper;
 uniform float reflectivity;
 uniform vec3 skyColor;
 
-const float levels = 30.0;
 
 void main(void){
 	
@@ -32,8 +31,6 @@ void main(void){
 		float nDotl = dot(unitNormal, unitLightVector);
 		float brightness = max(nDotl,0.0);
 		
-		float level = floor(brightness * levels);
-		brightness = level / levels;
 		
 		vec3 lightDirection = -unitLightVector;
 		vec3 reflectedLightDirection = reflect(lightDirection,unitNormal);
@@ -41,13 +38,11 @@ void main(void){
 		specularFactor = max(specularFactor, 0.0);
 		float dampedFactor = pow(specularFactor, shineDamper);
 		
-		level = floor(dampedFactor * levels);
-		dampedFactor = level / levels;
 		
 		totalDiffuse = totalDiffuse + (brightness * lightColour[i])/attFactor;
 		totalSpecular = totalSpecular + (dampedFactor * reflectivity * lightColour[i])/attFactor;
 	}
-	totalDiffuse = max(totalDiffuse, 0.2);
+	totalDiffuse = max(totalDiffuse, 0.4);
 	
 	vec4 textureColor = texture(textureSampler,pass_textureCoords);
 	if (textureColor.a<0.5){

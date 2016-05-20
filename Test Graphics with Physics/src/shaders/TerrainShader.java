@@ -8,6 +8,8 @@ import org.lwjgl.util.vector.Vector4f;
 
 import entities.Camera;
 import entities.Light;
+import shadows.ShadowBox;
+import shadows.ShadowMapMasterRenderer;
 import toolbox.Maths;
 
 public class TerrainShader extends ShaderProgram{
@@ -27,10 +29,14 @@ public class TerrainShader extends ShaderProgram{
 	private int location_reflectivity;
 	private int location_skyColor;
 	private int location_plane;
+	private int location_toShadowMapSpace;
+	private int location_shadowMap;
+	private int location_mapSize;
 	
 	
 	public TerrainShader() {
 		super(VERTEX_FILE, FRAGMENT_FILE);
+		loadShadowInfo((float) ShadowMapMasterRenderer.SHADOW_MAP_SIZE);
 	}
 
 	@Override
@@ -49,6 +55,9 @@ public class TerrainShader extends ShaderProgram{
 		location_reflectivity = super.getUniformLocation("reflectivity");
 		location_skyColor = super.getUniformLocation("skyColor");
 		location_plane = super.getUniformLocation("plane");
+		location_toShadowMapSpace = super.getUniformLocation("toShadowMapSpace");
+		location_shadowMap = super.getUniformLocation("shadowMap");
+		location_mapSize = super.getUniformLocation("mapSize");
 		
 		location_lightPosition = new int[MAX_LIGHTS];
 		location_lightColour = new int[MAX_LIGHTS];
@@ -58,6 +67,14 @@ public class TerrainShader extends ShaderProgram{
 			location_lightColour[i] = super.getUniformLocation("lightColour[" + i + "]");
 			location_attenuation[i] = super.getUniformLocation("attenuation[" + i + "]");
 		}
+	}
+	
+	public void loadShadowInfo(float shadowMapSize){
+		super.loadFloat(location_mapSize, shadowMapSize);
+	}
+	
+	public void connectTextureUnits(){
+		super.loadInt(location_shadowMap, 5);
 	}
 	
 	public void loadClipPlane(Vector4f plane){
@@ -101,6 +118,10 @@ public class TerrainShader extends ShaderProgram{
 	
 	public void loadProjectionMatrix(Matrix4f projection){
 		super.loadMatrix(location_projectionMatrix, projection);
+	}
+	
+	public void loadToShadowSpaceMatrix(Matrix4f matrix){
+		super.loadMatrix(location_toShadowMapSpace, matrix);
 	}
 	
 }
