@@ -111,7 +111,7 @@ public class MainGameLoop {
 		Ball player1 = new Ball(ballTModel, new Vector3f(200, 25, 400), 0, 0, 0, 1);
 		List<Ball> balls = new ArrayList<Ball>();
 		balls.add(player1);
-		balls.add(new Ball(ballTModel, new Vector3f(200, 10, 200), 0, 0, 0, 1));
+		balls.add(new Ball(ballTModel, new Vector3f(500, 10, 200), 0, 0, 0, 10));
 
 		Camera camera = new Camera(player1);
 		World world = new World(camera);
@@ -132,6 +132,7 @@ public class MainGameLoop {
 		List<Entity> nature = new ArrayList<Entity>();
 		nature.add(new Entity(boxTModel, box, new Vector3f(200, 0, 200),0,0,0,5));
 		nature.add(new Entity(dragonTModel, dragon , new Vector3f(400, 0, 200),0,0,0,30));
+		
 		BoundingBox bbox = nature.get(0).getCollisionData().getBoundingBox();
 		bbox.print();
 		
@@ -214,10 +215,8 @@ public class MainGameLoop {
 		long after = System.currentTimeMillis();
 		System.out.println("\nTIME TO PREPARE MODES ETC.: " + (after - before) + "\n");
 		int i = 0;
-		//DisplayManager.resetFrameTime();
+		DisplayManager.resetFrameTime();
 		while(!Display.isCloseRequested()){
-			if (i < 2)
-				DisplayManager.resetFrameTime();
 			//player1.move(world);
 			world.start();
 			System.out.println("While loop run " + (i++) + " times");
@@ -249,6 +248,7 @@ public class MainGameLoop {
 
 			fbos.unbindCurrentFrameBuffer();*/
 			renderer.processEntity(player1);
+			renderer.processEntity(balls.get(1));
 			renderer.processWorld(world, new Vector4f(0, -1, 0, 10000));
 			waterRenderer.render(waters, camera);
 			guiRenderer.render(guis);

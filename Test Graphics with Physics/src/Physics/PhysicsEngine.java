@@ -18,7 +18,7 @@ public class PhysicsEngine {
 	
 	public static final float[] COEFFS_RESTITUTION = {0.67f, 0.85f}; 
 	
-	public static final Vector3f GRAVITY = new Vector3f(0, -0f, 0);
+	public static final Vector3f GRAVITY = new Vector3f(0, -230f, 0);
 	public static final float COEFF_GRAVITY = 9.813f;
 	public static final float COEFF_RESTITUTION = 0.75f;
 	public static final float COEFF_FRICTION = 0.15f;

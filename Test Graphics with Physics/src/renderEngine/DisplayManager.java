@@ -50,7 +50,7 @@ public class DisplayManager {
 	}
 	
 	public static void resetFrameTime() {
-		delta = 0.001f;
+		lastFrameTime = getCurrentTime();
 	}
 	
 	public static void closeDisplay(){
