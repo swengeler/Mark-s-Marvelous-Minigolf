@@ -16,6 +16,8 @@ public class DisplayManager {
 	
 	private static long lastFrameTime;
 	private static float delta;
+	private static int frames;
+	private static long lastFPStick;
 	
 	public static void createDisplay(){
 		
@@ -34,6 +36,7 @@ public class DisplayManager {
 		
 		GL11.glViewport(0, 0, WIDTH, HEIGHT);
 		lastFrameTime = getCurrentTime();
+		lastFPStick = lastFrameTime;
 	}
 	
 	public static void updateDisplay(){
@@ -43,6 +46,13 @@ public class DisplayManager {
 		long currentFrameTime = getCurrentTime();
 		delta = (currentFrameTime - lastFrameTime)/1000f;
 		lastFrameTime = currentFrameTime;
+		if(currentFrameTime - lastFPStick >= 1000){
+			lastFPStick = currentFrameTime;
+			System.out.println(frames + " frames per second");
+			frames = 0;
+		} else {
+			frames++;
+		}
 	}
 	
 	public static float getFrameTimeSeconds(){
@@ -57,6 +67,10 @@ public class DisplayManager {
 	
 	private static long getCurrentTime(){
 		return Sys.getTime()*1000/Sys.getTimerResolution();
+	}
+	
+	public static void reset(){
+		lastFrameTime = getCurrentTime();
 	}
 	
 }
