@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
@@ -88,7 +89,7 @@ public class MainGameLoop {
 		List<Light> lights = new ArrayList<Light>();
 		lights.add(new Light(new Vector3f(0,1000,400),new Vector3f(1,1,1)));
 		
-		Ball player1 = new Empty(emptyTModel, new Vector3f(400, 0, 400), 0, 0, 0, 1);
+		Ball player1 = new Empty(emptyTModel, new Vector3f(400, 5, 400), 0, 0, 0, 1);
 		List<Ball> balls = new ArrayList<Ball>();
 		balls.add(player1);
 		Camera camera = new Camera(player1);
@@ -121,7 +122,12 @@ public class MainGameLoop {
 			world.start();
 			picker.update();
 			mainEngine.tick();
-		
+			float mouseWheel = Mouse.getDWheel() / 120;
+			if (mouseWheel != 0) {
+				System.out.println(Mouse.getDWheel() + " " + mouseWheel);
+				world.getTerrains().get(0).updateTerrain(loader, ((picker.getCurrentTerrainPoint().x / (Terrain.getSize()/2)) * 256), ((picker.getCurrentTerrainPoint().z / (Terrain.getSize()/2)) * 256), mouseWheel );
+			}
+			
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 			
 			fbos.bindReflectionFrameBuffer();
