@@ -2,7 +2,7 @@ package particles;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import Physics.PhysicsEngine;
+import Physics.PhysicsEngineOld;
 import renderEngine.DisplayManager;
 
 public class Particle {
@@ -41,7 +41,7 @@ public class Particle {
 	}
 	
 	protected boolean update(){
-		velocity.y += PhysicsEngine.GRAVITY.y * gravityEffect * DisplayManager.getFrameTimeSeconds();
+		velocity.y += PhysicsEngineOld.GRAVITY.y * gravityEffect * DisplayManager.getFrameTimeSeconds();
 		Vector3f change = new Vector3f(velocity);
 		change.scale(DisplayManager.getFrameTimeSeconds());
 		Vector3f.add(change, position, position);

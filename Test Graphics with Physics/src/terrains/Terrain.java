@@ -90,7 +90,6 @@ public class Terrain {
 	}
 
 	private RawModel generateTerrain(Loader loader) {
-
 		heights = new float[VERTEX_COUNT][VERTEX_COUNT];
 
 		int count = VERTEX_COUNT * VERTEX_COUNT;
@@ -133,7 +132,6 @@ public class Terrain {
 	}
 
 	private RawModel generateTerrain(Loader loader, String heightMap){
-
 		BufferedImage image = null;
 		try {
 			image = ImageIO.read(new File("res/" + heightMap + ".png"));
@@ -185,8 +183,8 @@ public class Terrain {
 		return loader.loadToVAO(vertices, textureCoords, normals, indices);
 	}
 
-	private float getHeight(int x, int z, BufferedImage image){
-		if(x<0 || x>=image.getHeight() || z<0 || z>=image.getHeight()){
+	private float getHeight(int x, int z, BufferedImage image) {
+		if(x < 0 || x >= image.getHeight() || z < 0 || z >= image.getHeight()) {
 			return 0;
 		}
 		float height = image.getRGB(x,z);
@@ -211,7 +209,7 @@ public class Terrain {
 		float ballX = b.getPosition().x - this.x;
 		float ballZ = b.getPosition().z - this.z;
 
-		if ((b.getPosition().y - ballR) > this.maxHeight)
+		if ((b.getPosition().y - ballR - 1) > this.maxHeight)
 			return new ArrayList<PhysicalFace>(0);
 
 		int leftX = (int) Math.floor(ballX - ballR);

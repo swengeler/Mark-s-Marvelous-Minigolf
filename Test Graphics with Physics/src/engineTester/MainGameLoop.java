@@ -12,7 +12,7 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import Physics.BoundingBox;
-import Physics.PhysicsEngine;
+import Physics.PhysicsEngineOld;
 import entities.Ball;
 import entities.Camera;
 import entities.Entity;
@@ -55,7 +55,7 @@ public class MainGameLoop {
 		ModelData flower = OBJFileLoader.loadOBJ("grassModel");
 	    ModelData box = OBJFileLoader.loadOBJ("box_big");
 	    ModelData dragon = OBJFileLoader.loadOBJ("dragon");
-	    ModelData dragon_low = OBJFileLoader.loadOBJ("dragon_lowpoly");
+	    ModelData dragon_low = OBJFileLoader.loadOBJ("dragon_low_test");
 		box.print(ModelData.PRINT_DATA_FILE);
 
 		RawModel humanModel = loader.loadToVAO(human.getVertices(), human.getTextureCoords(), human.getNormals(), human.getIndices());
@@ -67,7 +67,7 @@ public class MainGameLoop {
 		RawModel boxModel = loader.loadToVAO(box.getVertices(), box.getTextureCoords(), box.getNormals(), box.getIndices());
 		RawModel flowerModel = loader.loadToVAO(flower.getVertices(), flower.getTextureCoords(), flower.getNormals(), flower.getIndices());
 		RawModel dragonModel = loader.loadToVAO(dragon.getVertices(), dragon.getTextureCoords(), dragon.getNormals(), dragon.getIndices());
-		
+
 
 		TexturedModel humanTModel = new TexturedModel(humanModel,new ModelTexture(loader.loadTexture("playerTexture")));
 		TexturedModel ballTModel = new TexturedModel(ballModel,new ModelTexture(loader.loadTexture("white")));
@@ -108,15 +108,17 @@ public class MainGameLoop {
 		//lights.add(new Light(new Vector3f(35,17,35),new Vector3f(0,2,2), new Vector3f(1,0.01f,0.002f)));
 		//lights.add(new Light(new Vector3f(0,7,70),new Vector3f(2,2,0), new Vector3f(1,0.01f,0.002f)));
 
-		Ball player1 = new Ball(ballTModel, new Vector3f(200, 25, 400), 0, 0, 0, 1);
+		Ball player1 = new Ball(ballTModel, new Vector3f(200, 25, 400), 0, 0, 0, 1, true);
 		List<Ball> balls = new ArrayList<Ball>();
 		balls.add(player1);
-		balls.add(new Ball(ballTModel, new Vector3f(500, 10, 200), 0, 0, 0, 10));
+		//wballs.add(new Ball(ballTModel, new Vector3f(200, 10, 500), 0, 0, 0, 1, false));
 
 		Camera camera = new Camera(player1);
 		World world = new World(camera);
 		world.add(new Terrain(0, 0, loader, new ModelTexture(loader.loadTexture("crate"))/*, "arena"/*, "heightmap"*/));
 		world.add(new Terrain(0, 1, loader, new ModelTexture(loader.loadTexture("crate"))/*, "arena"/*, "heightmap"*/));
+		world.add(new Terrain(0, 2, loader, new ModelTexture(loader.loadTexture("crate"))/*, "arena"/*, "heightmap"*/));
+		world.add(new Terrain(0, 3, loader, new ModelTexture(loader.loadTexture("crate"))/*, "arena"/*, "heightmap"*/));
 
 
 		/*float[][] heights = world.getTerrains().get(0).getHeights();
@@ -131,11 +133,11 @@ public class MainGameLoop {
 
 		List<Entity> nature = new ArrayList<Entity>();
 		nature.add(new Entity(boxTModel, box, new Vector3f(200, 0, 200),0,0,0,5));
-		nature.add(new Entity(dragonTModel, dragon , new Vector3f(400, 0, 200),0,0,0,30));
-		
-		BoundingBox bbox = nature.get(0).getCollisionData().getBoundingBox();
+		nature.add(new Entity(dragonTModel, dragon_low, new Vector3f(400, 0, 200),0,0,0,5));
+
+		BoundingBox bbox = nature.get(1).getCollisionData().getBoundingBox();
 		bbox.print();
-		
+
 		/*Random r = new Random();
 		for(int i=0; i<200; i++){
 			if(i<40){
@@ -201,7 +203,7 @@ public class MainGameLoop {
 		//world.add(big_Human);
 		world.addLights(lights);
 
-		PhysicsEngine mainEngine = new PhysicsEngine(balls, world);
+		PhysicsEngineOld mainEngine = new PhysicsEngineOld(balls, world);
 
 		MousePicker picker = new MousePicker(camera, renderer.getProjectionMatrix(), world);
 
@@ -216,11 +218,9 @@ public class MainGameLoop {
 		System.out.println("\nTIME TO PREPARE MODES ETC.: " + (after - before) + "\n");
 		int i = 0;
 		DisplayManager.resetFrameTime();
-		while(!Display.isCloseRequested()){
-			//player1.move(world);
+		while(!Display.isCloseRequested()) {
 			world.start();
 			System.out.println("While loop run " + (i++) + " times");
-			//player1.move(world);
 			picker.update();
 			mainEngine.tick();
 
@@ -230,7 +230,7 @@ public class MainGameLoop {
 			}
 
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
-			
+
 			/*fbos.bindReflectionFrameBuffer();
 			float distance = 2 * (camera.getPosition().y - waters.get(0).getHeight());
 			camera.getPosition().y -= distance;
@@ -248,13 +248,20 @@ public class MainGameLoop {
 
 			fbos.unbindCurrentFrameBuffer();*/
 			renderer.processEntity(player1);
-			renderer.processEntity(balls.get(1));
+			//renderer.processEntity(balls.get(1));
 			renderer.processWorld(world, new Vector4f(0, -1, 0, 10000));
 			waterRenderer.render(waters, camera);
 			guiRenderer.render(guis);
 
 			DisplayManager.updateDisplay();
+
+			if (player1.getPosition().y < 0) {
+				System.out.println("Ball sinks into ground.");
+				break;
+			}
+
 		}
+
 		fbos.cleanUp();
 		waterShader.cleanUp();
 		guiRenderer.cleanUp();

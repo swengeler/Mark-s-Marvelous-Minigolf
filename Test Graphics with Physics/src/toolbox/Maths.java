@@ -8,6 +8,79 @@ import entities.Camera;
 
 public class Maths {
 
+	public static Vector3f closestPtPointTriangle(Vector3f pOr, Vector3f aOr, Vector3f bOr, Vector3f cOr) {
+		// to make sure that the actual points aren't changed by the operations below
+		Vector3f p = new Vector3f(pOr.x, pOr.y, pOr.z);
+		Vector3f a = new Vector3f(aOr.x, aOr.y, aOr.z);
+		Vector3f b = new Vector3f(bOr.x, bOr.y, bOr.z);
+		Vector3f c = new Vector3f(cOr.x, cOr.y, cOr.z);
+
+        // check if p is in the vertex region outside a
+        Vector3f ab = new Vector3f(), ac = new Vector3f(), ap = new Vector3f();
+        Vector3f.sub(b, a, ab);
+        Vector3f.sub(c, a, ac);
+        Vector3f.sub(p, a, ap);
+        float d1 = Vector3f.dot(ab, ap);
+        float d2 = Vector3f.dot(ac, ap);
+        if (d1 <= 0 && d2 <= 0)
+            return a;
+
+        // check if p is in the vertex region outside of b
+        Vector3f bp = new Vector3f();
+        Vector3f.sub(p, b, bp);
+        float d3 = Vector3f.dot(ab, bp);
+        float d4 = Vector3f.dot(ac, bp);
+        if (d3 >= 0 && d4 <= d3)
+            return b;
+
+        // check if p is in the vertex region outside c
+        Vector3f cp = new Vector3f();
+        Vector3f.sub(p, c, cp);
+        float d5 = Vector3f.dot(ab, cp);
+        float d6 = Vector3f.dot(ac, cp);
+        if (d6 >= 0 && d5 <= d6)
+        return c;
+
+        // check if p is in the edge region of ab
+        float vc = d1 * d4 - d3 * d2;
+        if (vc <= 0 && d1 >= 0 && d3 <= 0) {
+            float v = d1 / (d1 - d3);
+            Vector3f temp = new Vector3f();
+            Vector3f.add(a, (Vector3f) ab.scale(v), temp);
+            return temp;
+        }
+
+        // check if p is in the edge region of ac
+        float vb = d5 * d2 - d1 * d6;
+        if (vb <= 0 && d2 >= 0 && d6 <= 0) {
+            float w = d2 / (d2 - d6);
+            Vector3f temp = new Vector3f();
+            Vector3f.add(a, (Vector3f) ac.scale(w), temp);
+            return temp;
+        }
+
+        // check if p is in the edge region of bc
+        float va = d3 * d6 - d5 * d4;
+        if (va <= 0 & (d4 - d3) >= 0 && (d5 - d6) >= 0) {
+            float w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+            Vector3f temp1 = new Vector3f();
+            Vector3f temp2 = new Vector3f();
+            Vector3f.sub(c, b, temp1);
+            Vector3f.add(b, (Vector3f) temp1.scale(w), temp2);
+            return temp2;
+        }
+
+        // p must be inside the face region
+        float denom = 1 / (va + vb + vc);
+        float v = vb * denom;
+        float w = vc * denom;
+        Vector3f temp1 = new Vector3f();
+        Vector3f temp2 = new Vector3f();
+        Vector3f.add((Vector3f) ab.scale(v), (Vector3f) ac.scale(w), temp1);
+        Vector3f.add(a, temp1, temp2);
+        return temp2;
+	}
+
 	public static float barryCentric(Vector3f p1, Vector3f p2, Vector3f p3, Vector2f pos) {
 		float det = (p2.z - p3.z) * (p1.x - p3.x) + (p3.x - p2.x) * (p1.z - p3.z);
 		float l1 = ((p2.z - p3.z) * (pos.x - p3.x) + (p3.x - p2.x) * (pos.y - p3.z)) / det;
@@ -15,7 +88,7 @@ public class Maths {
 		float l3 = 1.0f - l1 - l2;
 		return l1 * p1.y + l2 * p2.y + l3 * p3.y;
 	}
-	
+
 	public static Matrix4f createTransformationMatrix(Vector2f translation, Vector2f scale) {
 		Matrix4f matrix = new Matrix4f();
 		matrix.setIdentity();
@@ -23,7 +96,7 @@ public class Maths {
 		Matrix4f.scale(new Vector3f(scale.x, scale.y, 1f), matrix, matrix);
 		return matrix;
 	}
-	
+
 	public static Matrix4f createTransformationMatrix(Vector3f translation, float rx, float ry, float rz, float scale){
 		Matrix4f matrix = new Matrix4f();
 		matrix.setIdentity();
@@ -34,7 +107,7 @@ public class Maths {
 		Matrix4f.scale(new Vector3f(scale,scale,scale), matrix, matrix);
 		return matrix;
 	}
-	
+
 	public static Matrix4f createViewMatrix(Camera camera){
 		Matrix4f viewMatrix = new Matrix4f();
 		viewMatrix.setIdentity();
@@ -46,5 +119,5 @@ public class Maths {
 		Matrix4f.translate(negativeCameraPos, viewMatrix, viewMatrix);
 		return viewMatrix;
 	}
-	
+
 }
