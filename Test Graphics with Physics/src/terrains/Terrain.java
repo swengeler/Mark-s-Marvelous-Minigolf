@@ -251,6 +251,8 @@ public class Terrain {
 		ArrayList<PhysicalFace> collidingFaces = new ArrayList<PhysicalFace>();
 		for (int i = leftX; i <= rightX && i < heights.length - 1; i++) {
 			for (int j = upperZ; j <= lowerZ && j < heights[0].length - 1; j++) {
+				System.out.println("2 faces added at (" + i + "|" + j + ")");
+				
 				// upper left corner
 				p1.set(i + this.x, this.heights[i][j], j + this.z);
 				// lower left corner
@@ -262,7 +264,8 @@ public class Terrain {
 				Vector3f.sub(p3, p1, v2);
 				Vector3f.cross(v1, v2, normal);
 				normal.normalise();
-				collidingFaces.add(new PhysicalFace(normal,p1,p2,p3));
+				collidingFaces.add(new PhysicalFace(normal, p1, p2, p3));
+				System.out.println("Face added: " + collidingFaces.get(collidingFaces.size() - 1) + ".");
 
 				// upper right corner
 				p1.set(i + this.x, this.heights[i][j + 1], j + this.z + 1);
@@ -275,8 +278,8 @@ public class Terrain {
 				Vector3f.sub(p3, p1, v2);
 				Vector3f.cross(v1, v2, normal);
 				normal.normalise();
-				collidingFaces.add(new PhysicalFace(normal,p1,p2,p3));
-				System.out.println("2 faces added at (" + i + "|" + j + ")");
+				collidingFaces.add(new PhysicalFace(normal, p1, p2, p3));
+				System.out.println("Face added: " + collidingFaces.get(collidingFaces.size() - 1) + ".");
 			}
 		}
 		System.out.println("Number of colliding faces (in Terrain): " + collidingFaces.size());

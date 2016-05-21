@@ -31,7 +31,7 @@ public class Ball extends Entity{
 	private boolean enableControls;
 
 	public Ball(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale, boolean enableControls) {
-		super(model, position, rotX, rotY, rotZ, scale);
+		super(model, position, rotX, rotY, rotZ, scale, "ball");
 		this.moving = true;
 		this.enableControls = enableControls;
 	}
@@ -113,7 +113,7 @@ public class Ball extends Entity{
 	public boolean collidesWith(ArrayList<PhysicalFace> faces) {
 		//System.out.println("Check for collision with " + faces.size() + " faces in the Ball class");
 		for (PhysicalFace f : faces) {
-			if (f.collidesWithBall(this))
+			if (f.collidesWithFace(this))
 				return true;
 		}
 		return false;
@@ -142,6 +142,10 @@ public class Ball extends Entity{
 	public void setVelocity(float x, float y, float z) {
 		currentVel.set(x, y, z);
 		System.out.printf("Velocity of ball %s set to: (%f|%f|%f)\n", this.toString(), currentVel.x, currentVel.y, currentVel.z);
+	}
+	
+	public String toString() {
+		return "Ball at (" + getPosition().x + "|" + getPosition().y + "|" + getPosition().z + ") with velocity (" + currentVel.x + "|" + currentVel.y + "|" + currentVel.z + ")" ; 
 	}
 
 }

@@ -19,20 +19,21 @@ public class Entity {
 	private Vector3f position;
 	protected Vector3f rotVel = new Vector3f();
 	private float scale;
+	private String type;
 
 	private int textureIndex = 0;
 
-	public Entity(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
+	public Entity(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale, String type) {
 		this.model = model;
 		this.position = position;
 		this.rotVel.x = rotX;
 		this.rotVel.y = rotY;
 		this.rotVel.z = rotZ;
 		this.scale = scale;
+		this.type = type;
 	}
 
-	public Entity(TexturedModel model, int index, Vector3f position, float rotX, float rotY, float rotZ,
-            float scale) {
+	public Entity(TexturedModel model, int index, Vector3f position, float rotX, float rotY, float rotZ, float scale, String type) {
         this.textureIndex = index;
         this.model = model;
         this.position = position;
@@ -40,15 +41,28 @@ public class Entity {
         this.rotVel.y = rotY;
         this.rotVel.z = rotZ;
         this.scale = scale;
+        this.type = type;
     }
 
-	public Entity(TexturedModel model, ModelData data, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
+    public Entity(TexturedModel model, ModelData data, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
 		this.model = model;
 		this.position = position;
 		this.rotVel.x = rotX;
 		this.rotVel.y = rotY;
 		this.rotVel.z = rotZ;
 		this.scale = scale;
+        this.type = "not declared";
+		createCollisionData(data);
+	}
+
+	public Entity(TexturedModel model, ModelData data, Vector3f position, float rotX, float rotY, float rotZ, float scale, String type) {
+		this.model = model;
+		this.position = position;
+		this.rotVel.x = rotX;
+		this.rotVel.y = rotY;
+		this.rotVel.z = rotZ;
+		this.scale = scale;
+        this.type = type;
 		createCollisionData(data);
 	}
 
@@ -89,7 +103,7 @@ public class Entity {
 			tfVector.set(ver[currInd[2]], ver[currInd[2] + 1], ver[currInd[2] + 2]);
 			Matrix4f.transform(transformationMatrix, tfVector, tfVector);
 			p3.set(tfVector.x, tfVector.y, tfVector.z);
-			
+
 			// adjusting max/min values
 			minX = Math.min(minX, Math.min(p1.x, Math.min(p2.x, p3.x)));
 			minY = Math.min(minY, Math.min(p1.y, Math.min(p2.y, p3.y)));
@@ -97,7 +111,7 @@ public class Entity {
 			maxX = Math.max(maxX, Math.max(p1.x, Math.max(p2.x, p3.x)));
 			maxY = Math.max(maxY, Math.max(p1.y, Math.max(p2.y, p3.y)));
 			maxZ = Math.max(maxZ, Math.max(p1.z, Math.max(p2.z, p3.z)));
-			
+
 			// constructing a face from the three points p1, p2 and p3 and their resulting normal
 			Vector3f.sub(p2, p1, v1);
 			Vector3f.sub(p3, p1, v2);
@@ -112,15 +126,19 @@ public class Entity {
 		long difference = after - before;
 		System.out.println("Time to construct faces (for entity): " + difference + "\n");
 	}
-	
+
 	public CollisionData getCollisionData() {
 		return cdata;
 	}
 	
+	public void printBBox() {
+		cdata.getBoundingBox().print();
+	}
+
 	public ArrayList<PhysicalFace> getCollidingFaces(Ball b) {
 		return this.cdata.getCollidingFaces(b);
 	}
-	
+
 	public boolean inBounds(Ball b) {
 		return this.cdata.inBounds(b);
 	}
@@ -203,5 +221,8 @@ public class Entity {
 		this.scale = scale;
 	}
 
+	public String toString() {
+		return "Entity of type \"" + type + "\" at (" + position.x + "|" + position.y + "|" + position.z + ")";
+	}
 
 }

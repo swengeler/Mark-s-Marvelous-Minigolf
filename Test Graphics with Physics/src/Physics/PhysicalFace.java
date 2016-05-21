@@ -10,6 +10,7 @@ import toolbox.Maths;
 public class PhysicalFace {
 
 	private Vector3f normal, point1, point2, point3, dist;
+	private BoundingBox bbox;
 
 	public PhysicalFace(Vector3f normal, Vector3f point1, Vector3f point2, Vector3f point3) {
 		this.normal = new Vector3f(normal.x, normal.y, normal.z);
@@ -24,10 +25,10 @@ public class PhysicalFace {
 		this.point2 = new Vector3f(point2.x, point2.y, point2.z);
 		this.point3 = new Vector3f(point3.x, point3.y, point3.z);
 		dist = new Vector3f();
-		//prepareBounds();
+		prepareBounds();
 	}
 
-	/*public boolean collidesWithBall(Ball b) {
+	/*public boolean collidesWithFace(Ball b) {
 		dist.set((point1.x - b.getPosition().x), (point1.y - b.getPosition().y), (point1.z - b.getPosition().z));
 		double distance = Math.abs(Vector3f.dot(normal, dist))/normal.length();
 		//if (normal.x != 0 && normal.x != -0)
@@ -39,11 +40,19 @@ public class PhysicalFace {
 		return false;
 	}*/
 
-	public boolean collidesWithBall(Ball b) {
+	public boolean collidesWithFace(Ball b) {
 		Vector3f closest = Maths.closestPtPointTriangle(b.getPosition(), point1, point2, point3);
 		Vector3f.sub(b.getPosition(), closest, dist);
-		System.out.println("Distance stuff/ballcenter: " + dist.length());
+		//System.out.println("Distance stuff/ballcenter: " + dist.length());
 		if (dist.length() <= Ball.RADIUS)
+			return true;
+		return false;
+	}
+	
+	public boolean collidesWithPlane(Ball b) {
+		dist.set((point1.x - b.getPosition().x), (point1.y - b.getPosition().y), (point1.z - b.getPosition().z));
+		double distanceSq = Math.pow(Vector3f.dot(normal, dist), 2)/normal.lengthSquared();
+		if (distanceSq <= Ball.RADIUS * Ball.RADIUS)
 			return true;
 		return false;
 	}
@@ -64,7 +73,7 @@ public class PhysicalFace {
 		return point3;
 	}
 
-	/*private void prepareBounds() {
+	private void prepareBounds() {
 		float minX = Math.min(point1.x, Math.min(point2.x, point3.x));
 		float minY = Math.min(point1.y, Math.min(point2.y, point3.y));
 		float minZ = Math.min(point1.z, Math.min(point2.z, point3.z));
@@ -72,7 +81,7 @@ public class PhysicalFace {
 		float maxY = Math.max(point1.y, Math.max(point2.y, point3.y));
 		float maxZ = Math.max(point1.z, Math.max(point2.z, point3.z));
 		bbox = new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
-	}*/
+	}
 
 	public static PhysicalFace combineFaces(ArrayList<PhysicalFace> faces, Ball b) {
 		if (faces.size() == 1) {
@@ -138,6 +147,10 @@ public class PhysicalFace {
 		Vector3f.sub(p3, p1, v2);
 		Vector3f.cross(v1, v2, temp);
 		return new PhysicalFace(temp, p1, p2, p3);
+	}
+	
+	public String toString() {
+		return this.getClass().getName() + " with normal (" + normal.x + "|" + normal.y + "|" + normal.z + ") with " + bbox;
 	}
 
 }

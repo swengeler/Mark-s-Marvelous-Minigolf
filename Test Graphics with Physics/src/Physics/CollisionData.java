@@ -81,7 +81,7 @@ public class CollisionData {
 	public ArrayList<PhysicalFace> getCollidingFaces(Ball b) {
 		collisionList.clear();
 		for (PhysicalFace f : faces) {
-			if (f.collidesWithBall(b))
+			if (f.collidesWithFace(b))
 				collisionList.add(f);
 		}
 		return collisionList;

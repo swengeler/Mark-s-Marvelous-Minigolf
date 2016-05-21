@@ -16,7 +16,7 @@ public class PhysicsEngineOld {
 
 	private static final float NORMAL_TH = 0.001f;
 
-	public static final float[] COEFFS_RESTITUTION = {0.67f, 0.85f};
+	public static final float[] COEFFS_RESTITUTION = {0.75f, 0.85f};
 
 	public static final Vector3f GRAVITY = new Vector3f(0, -230f, 0);
 	public static final float COEFF_GRAVITY = 9.813f;
@@ -119,7 +119,7 @@ public class PhysicsEngineOld {
 				b.increasePosition(revBallMovement);
 
 			for (PhysicalFace f : collidingFaces) {
-				if (f.collidesWithBall(b))
+				if (f.collidesWithFace(b))
 					useForCollision.add(f);
 			}
 
@@ -160,7 +160,7 @@ public class PhysicsEngineOld {
 			System.out.println("Reverse ball movement vector: (" + revBallMovement.x + "|" + revBallMovement.y + "|" + revBallMovement.z + ")");
 
 			//if (revBallMovement.y > 0) {
-			while (collidingFace.collidesWithBall(b)) {
+			while (collidingFace.collidesWithPlane(b)) {
 				// move the ball back out
 				b.increasePosition(revBallMovement);
 			}

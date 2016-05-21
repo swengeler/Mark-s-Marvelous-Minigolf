@@ -105,7 +105,7 @@ public class PhysicsEngine {
 				b.increasePosition(revBallMovement);
 
 			for (PhysicalFace f : collidingFaces) {
-				if (f.collidesWithBall(b))
+				if (f.collidesWithFace(b))
 					useForCollision.add(f);
 			}
 
@@ -149,7 +149,7 @@ public class PhysicsEngine {
 			System.out.println("Reverse ball movement vector: (" + revBallMovement.x + "|" + revBallMovement.y + "|" + revBallMovement.z + ")");
 			
 			//if (revBallMovement.y > 0) {
-			while (collidingFace.collidesWithBall(b)) {
+			while (collidingFace.collidesWithFace(b)) {
 				// move the ball back out
 				b.increasePosition(revBallMovement);
 			}

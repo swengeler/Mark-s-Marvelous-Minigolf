@@ -54,7 +54,7 @@ public class MainGameLoop {
 		ModelData pine = OBJFileLoader.loadOBJ("pine");
 		ModelData flower = OBJFileLoader.loadOBJ("grassModel");
 	    ModelData box = OBJFileLoader.loadOBJ("box_big");
-	    ModelData dragon = OBJFileLoader.loadOBJ("dragon");
+	    ModelData dragon = OBJFileLoader.loadOBJ("dragon_100f");
 	    ModelData dragon_low = OBJFileLoader.loadOBJ("dragon_low_test");
 		box.print(ModelData.PRINT_DATA_FILE);
 
@@ -81,12 +81,12 @@ public class MainGameLoop {
 
 
 		long beforeHumans = System.currentTimeMillis();
-		Entity h = new Entity(humanTModel, human, new Vector3f(0, 0, 0), 0, 0, 0, 1);
+		Entity h = new Entity(humanTModel, human, new Vector3f(0, 0, 0), 0, 0, 0, 1, "human");
 		Entity a = new Entity(ballTModel, ball, new Vector3f(0, 0, 0), 0, 0, 0, 1);
-		Entity b = new Entity(treeTModel, tree, new Vector3f(0, 0, 0), 0, 0, 0, 1);
-		Entity c = new Entity(fernTModel, fern, new Vector3f(0, 0, 0), 0, 0, 0, 1);
-		Entity d = new Entity(grassTModel, grass, new Vector3f(0, 0, 0), 0, 0, 0, 1);
-		Entity e = new Entity(boxTModel, box, new Vector3f(0, 0, 0), 0, 0, 0, 1);
+		Entity b = new Entity(treeTModel, tree, new Vector3f(0, 0, 0), 0, 0, 0, 1, "tree");
+		Entity c = new Entity(fernTModel, fern, new Vector3f(0, 0, 0), 0, 0, 0, 1, "fern");
+		Entity d = new Entity(grassTModel, grass, new Vector3f(0, 0, 0), 0, 0, 0, 1, "grass");
+		Entity e = new Entity(boxTModel, box, new Vector3f(0, 0, 0), 0, 0, 0, 1, "box");
 		long afterHumans = System.currentTimeMillis();
 		System.out.println("Time to load entities: " + (afterHumans - beforeHumans));
 
@@ -115,10 +115,10 @@ public class MainGameLoop {
 
 		Camera camera = new Camera(player1);
 		World world = new World(camera);
-		world.add(new Terrain(0, 0, loader, new ModelTexture(loader.loadTexture("crate"))/*, "arena"/*, "heightmap"*/));
-		world.add(new Terrain(0, 1, loader, new ModelTexture(loader.loadTexture("crate"))/*, "arena"/*, "heightmap"*/));
-		world.add(new Terrain(0, 2, loader, new ModelTexture(loader.loadTexture("crate"))/*, "arena"/*, "heightmap"*/));
-		world.add(new Terrain(0, 3, loader, new ModelTexture(loader.loadTexture("crate"))/*, "arena"/*, "heightmap"*/));
+		world.add(new Terrain(0, 0, loader, new ModelTexture(loader.loadTexture("rock1"))/*, "arena"/*, "heightmap"*/));
+		world.add(new Terrain(0, 1, loader, new ModelTexture(loader.loadTexture("rock1"))/*, "arena"/*, "heightmap"*/));
+		world.add(new Terrain(0, 2, loader, new ModelTexture(loader.loadTexture("rock1"))/*, "arena"/*, "heightmap"*/));
+		world.add(new Terrain(0, 3, loader, new ModelTexture(loader.loadTexture("rock1"))/*, "arena"/*, "heightmap"*/));
 
 
 		/*float[][] heights = world.getTerrains().get(0).getHeights();
@@ -132,8 +132,8 @@ public class MainGameLoop {
 		}*/
 
 		List<Entity> nature = new ArrayList<Entity>();
-		nature.add(new Entity(boxTModel, box, new Vector3f(200, 0, 200),0,0,0,5));
-		nature.add(new Entity(dragonTModel, dragon_low, new Vector3f(400, 0, 200),0,0,0,5));
+		nature.add(new Entity(boxTModel, box, new Vector3f(200, 0, 200), 0, 0, 0, 5, "box"));
+		nature.add(new Entity(dragonTModel, dragon_low, new Vector3f(400, 0, 200), 0, 0, 0, 5, "dragon"));
 
 		BoundingBox bbox = nature.get(1).getCollisionData().getBoundingBox();
 		bbox.print();
@@ -195,7 +195,7 @@ public class MainGameLoop {
 
 		List<GuiTexture> guis = new ArrayList<GuiTexture>();
 		GuiTexture gui = new GuiTexture(loader.loadTexture("fernAtlas"), new Vector2f(0.5f, 0.5f), new Vector2f(0.25f, 0.25f));
-		guis.add(gui);
+		//guis.add(gui);
 
 		GuiRenderer guiRenderer = new GuiRenderer(loader);
 
