@@ -3,6 +3,7 @@ package terrains;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
@@ -35,28 +36,31 @@ public class Terrain {
 	private float x;
 	private float z;
 	private float maxHeight;
+	private float minHeight;
 	private RawModel model;
 	private ModelTexture texture;
 	private CollisionData cdata;
 
 	private float[][] heights;
 
-	public Terrain(int gridX, int gridZ, Loader loader, ModelTexture texture){
-
+	public Terrain(int gridX, int gridZ, Loader loader, ModelTexture texture) {
+ 
 		this.texture = texture;
 		this.x = gridX * getSize();
 		this.z = gridZ * getSize();
 		this.maxHeight = Float.MIN_VALUE;
+		this.minHeight = Float.MAX_VALUE;
 		this.model = generateTerrain(loader);
 
 	}
 
-	public Terrain(int gridX, int gridZ, Loader loader, ModelTexture texture, String heightMap){
+	public Terrain(int gridX, int gridZ, Loader loader, ModelTexture texture, String heightMap) {
 
 		this.texture = texture;
 		this.x = gridX * getSize();
 		this.z = gridZ * getSize();
 		this.maxHeight = Float.MIN_VALUE;
+		this.minHeight = Float.MAX_VALUE;
 		this.model = generateTerrain(loader, heightMap);
 
 	}
@@ -128,6 +132,7 @@ public class Terrain {
 			}
 		}
 		maxHeight = 0;
+		minHeight = 0;
 		return loader.loadToVAO(vertices, textureCoords, normals, indices);
 	}
 
@@ -152,8 +157,12 @@ public class Terrain {
 			for(int j=0;j<VERTEX_COUNT;j++){
 				vertices[vertexPointer*3] = (float)j/((float)VERTEX_COUNT - 1) * getSize();
 				heights[j][i] = getHeight(j,i,image);
-				if (heights[j][i] > maxHeight)
+				if (heights[j][i] > maxHeight) {
 					maxHeight = heights[j][i];
+				}
+				if (heights[j][i] < minHeight) {
+					minHeight = heights[j][i];
+				}
 				vertices[vertexPointer*3+1] = heights[j][i];
 				vertices[vertexPointer*3+2] = (float)i/((float)VERTEX_COUNT - 1) * getSize();
 				Vector3f normal = calculateNormal(j, i, image);
@@ -193,6 +202,14 @@ public class Terrain {
 		height *= MAX_HEIGHT;
 		return height;
 
+	}
+
+	public float getMaxHeight() {
+		return maxHeight;
+	}
+
+	public float getMinHeight() {
+		return minHeight;
 	}
 
 	public boolean ballInTerrain(Ball b) {
@@ -298,6 +315,22 @@ public class Terrain {
 
 	public static float getSize() {
 		return SIZE;
+	}
+	
+	public void printHeightsToFile(String fileName) {
+		try {
+			PrintWriter writer = new PrintWriter(fileName + ".txt","UTF-8");
+			writer.println("HEIGHTS ARRAY\n");
+			for (int i = 0; i < heights.length; i++) {
+				for (int j = 0; j < heights[0].length; j++) {
+					writer.printf("%.2f ", heights[i][j]);
+				}
+				writer.println(/*"---|---"*/);
+			}
+			writer.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

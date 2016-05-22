@@ -49,6 +49,12 @@ public class PhysicsEngineOld {
 	}
 
 	public void resolveOrdinaryCollision(Ball b) { // might delegate this to own class CollisionSD (Static-Dynamic) and ball-ball collision to CollisionDD
+		while (b.getPosition().y - Ball.RADIUS < world.getHeightOfTerrain(b.getPosition().x, b.getPosition().x))
+			b.increasePosition(0, 0.001f, 0);
+		
+		//if (b.getPosition().y - Ball.RADIUS < world.getHeightOfTerrain(b.getPosition().x, b.getPosition().z))
+			//b.getPosition().y = w
+		
 		System.out.printf("Ball's velocity at start of check: (%f|%f|%f)\n", b.getVelocity().x, b.getVelocity().y, b.getVelocity().z);
 		ArrayList<PhysicalFace> collidingFaces = new ArrayList<PhysicalFace>();
 		ArrayList<PhysicalFace> useForCollision = new ArrayList<PhysicalFace>();

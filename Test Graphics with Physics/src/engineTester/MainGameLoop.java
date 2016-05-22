@@ -108,7 +108,7 @@ public class MainGameLoop {
 		//lights.add(new Light(new Vector3f(35,17,35),new Vector3f(0,2,2), new Vector3f(1,0.01f,0.002f)));
 		//lights.add(new Light(new Vector3f(0,7,70),new Vector3f(2,2,0), new Vector3f(1,0.01f,0.002f)));
 
-		Ball player1 = new Ball(ballTModel, new Vector3f(200, 25, 400), 0, 0, 0, 1, true);
+		Ball player1 = new Ball(ballTModel, new Vector3f(200, 25, 520), 0, 0, 0, 1, true);
 		List<Ball> balls = new ArrayList<Ball>();
 		balls.add(player1);
 		//wballs.add(new Ball(ballTModel, new Vector3f(200, 10, 500), 0, 0, 0, 1, false));
@@ -116,7 +116,9 @@ public class MainGameLoop {
 		Camera camera = new Camera(player1);
 		World world = new World(camera);
 		world.add(new Terrain(0, 0, loader, new ModelTexture(loader.loadTexture("rock1"))/*, "arena"/*, "heightmap"*/));
-		world.add(new Terrain(0, 1, loader, new ModelTexture(loader.loadTexture("rock1"))/*, "arena"/*, "heightmap"*/));
+		world.add(new Terrain(0, 1, loader, new ModelTexture(loader.loadTexture("rock1"))/*, "arena"*/, "heightmap"));
+		world.getTerrains().get(1).printHeightsToFile("heights");
+		System.out.printf("\nmaxHeight for 2nd terrain: %f, minHeight: %f\n\n", world.getTerrains().get(1).getMaxHeight(), world.getTerrains().get(1).getMinHeight());
 		world.add(new Terrain(0, 2, loader, new ModelTexture(loader.loadTexture("rock1"))/*, "arena"/*, "heightmap"*/));
 		world.add(new Terrain(0, 3, loader, new ModelTexture(loader.loadTexture("rock1"))/*, "arena"/*, "heightmap"*/));
 
@@ -257,7 +259,7 @@ public class MainGameLoop {
 
 			if (player1.getPosition().y < 0) {
 				System.out.println("Ball sinks into ground.");
-				break;
+				//break;
 			}
 
 		}
