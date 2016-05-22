@@ -36,7 +36,7 @@ public class MenuState implements State {
 	private void loadGuis() {
 		guiRenderer = new GuiRenderer(loader);
 		guis = new ArrayList<GuiButton>();
-		GuiButton test = new GuiButton("Title", new Vector2f(1000f,800f), loader);
+		GuiButton test = new GuiButton("health", new Vector2f(1000f,800f), loader);
 		guis.add(test);
 	}
 

@@ -8,6 +8,7 @@ import javax.imageio.ImageIO;
 
 import org.lwjgl.util.vector.Vector2f;
 
+import renderEngine.DisplayManager;
 import renderEngine.Loader;
 
 public class GuiButton {
@@ -30,6 +31,8 @@ public class GuiButton {
 			e.printStackTrace();
 		}
 		this.position = position;
+		float SCREEN_WIDTH = DisplayManager.getWidth();
+		float SCREEN_HEIGHT = DisplayManager.getHeight();
 		float pX = (position.x - SCREEN_WIDTH/2f)/(SCREEN_WIDTH/2f);
 		float pY = (position.y - SCREEN_HEIGHT/2f)/(SCREEN_HEIGHT/2f);
 		float scaleX = width/SCREEN_WIDTH;

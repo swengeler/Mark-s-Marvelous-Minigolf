@@ -20,7 +20,7 @@ public class Ball extends Entity{
 	private static final float MIN_XVEL = 0;
 	private static final float MIN_YVEL = 0;
 	private static final float MIN_ZVEL = 0;
-	private static final float COEFF_RESTITUTION = 0.45f;
+	private static final float COEFF_RESTITUTION = 1f;
 
 	private static final float BR_DECIDER = (float) (Math.PI * 0.1);
 

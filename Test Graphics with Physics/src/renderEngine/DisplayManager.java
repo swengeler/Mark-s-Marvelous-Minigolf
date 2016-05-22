@@ -73,4 +73,12 @@ public class DisplayManager {
 		lastFrameTime = getCurrentTime();
 	}
 	
+	public static float getHeight(){
+		return HEIGHT;
+	}
+	
+	public static float getWidth(){
+		return WIDTH;
+	}
+	
 }
