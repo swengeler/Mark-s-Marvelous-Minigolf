@@ -29,6 +29,7 @@ import particles.ParticleSystem;
 import particles.ParticleTexture;
 import programStates.State;
 import programStates.GameState;
+import programStates.MenuState;
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
 import renderEngine.MasterRenderer;
@@ -50,8 +51,7 @@ public class MainGameLoop {
 	
 		DisplayManager.createDisplay();
 		Loader loader = new Loader();
-		State currState = new GameState();
-		currState.init(loader);
+		State currState = new GameState(loader);
 		GameState game = (GameState) currState;
 		game.createTerrain(0, 0, "grass", true);
 		game.createWaterTile(Terrain.getSize()/2f, Terrain.getSize()/2f, -8f);
@@ -219,13 +219,16 @@ public class MainGameLoop {
 		system.setDirection(new Vector3f(1,0,0), 0.1f);
 		*/
 		
-		game.createEntity("dragon", new Vector3f(100, 8, 60), -10f, 170f, 0f, 3 );
-		ParticleSystem system = game.createParticleSystem("fire", 8, 200, 30, -0.3f, 1.5f, 8.6f, new Vector3f(113,29.3f,57));
+		game.createEntity("dragon", new Vector3f(100, game.getWorld().getHeightOfTerrain(100, 60), 60), -10f, 170f, 0f, 3 );
+		ParticleSystem system = game.createParticleSystem("fire", 8, 200, 30, -0.3f, 1.5f, 8.6f, new Vector3f(113,game.getWorld().getHeightOfTerrain(100, 60) + 21.3f,57));
 		system.setLifeError(0.1f);
 		system.setScaleError(0.5f);
 		system.setSpeedError(0.25f);
 		system.randomizeRotation();
 		system.setDirection(new Vector3f(1,0,0), 0.1f);
+		
+		
+		currState = new MenuState(loader);
 		DisplayManager.reset();
 		
 		while(!Display.isCloseRequested()){

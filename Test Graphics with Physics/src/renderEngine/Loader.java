@@ -98,7 +98,7 @@ public class Loader {
 			
 			if(anisotropic){
 				if(GLContext.getCapabilities().GL_EXT_texture_filter_anisotropic){
-					float amount = Math.min(3f, GL11.glGetFloat(EXTTextureFilterAnisotropic.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT));
+					float amount = Math.min(4f, GL11.glGetFloat(EXTTextureFilterAnisotropic.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT));
 					GL11.glTexParameterf(GL11.GL_TEXTURE_2D, EXTTextureFilterAnisotropic.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, amount);
 				
 				} else {

@@ -36,9 +36,6 @@ import water.WaterTile;
 
 public class GameState implements State {
 	
-	private static final float DAY_DURATION = 24;
-	public static float currTime;
-	
 	private Map<String,TexturedModel> tModels = new HashMap<String,TexturedModel>();
 	private World world;
 	private ArrayList<WaterTile> waterTiles;
@@ -64,6 +61,10 @@ public class GameState implements State {
 	private boolean particle = true;
 	private boolean shadow = true;
 	private boolean normalMap = true;
+	
+	public GameState(Loader loader){
+		init(loader);
+	}
 	
 	@Override
 	public void init(Loader loader) {
@@ -272,5 +273,10 @@ public class GameState implements State {
 		particles.add(system);
 		return system;
 	}
+
+	public World getWorld() {
+		return world;
+	}
+	
 
 }
