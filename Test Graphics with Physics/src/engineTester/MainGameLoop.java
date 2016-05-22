@@ -108,7 +108,7 @@ public class MainGameLoop {
 		//lights.add(new Light(new Vector3f(35,17,35),new Vector3f(0,2,2), new Vector3f(1,0.01f,0.002f)));
 		//lights.add(new Light(new Vector3f(0,7,70),new Vector3f(2,2,0), new Vector3f(1,0.01f,0.002f)));
 
-		Ball player1 = new Ball(ballTModel, new Vector3f(200, 25, 520), 0, 0, 0, 1, true);
+		Ball player1 = new Ball(ballTModel, new Vector3f(200, 25, 400), 0, 0, 0, 1, true);
 		List<Ball> balls = new ArrayList<Ball>();
 		balls.add(player1);
 		//wballs.add(new Ball(ballTModel, new Vector3f(200, 10, 500), 0, 0, 0, 1, false));
@@ -222,7 +222,7 @@ public class MainGameLoop {
 		DisplayManager.resetFrameTime();
 		while(!Display.isCloseRequested()) {
 			world.start();
-			System.out.println("While loop run " + (i++) + " times");
+			System.out.println("\n---- While loop run " + (i++) + " times ----");
 			picker.update();
 			mainEngine.tick();
 
@@ -257,11 +257,11 @@ public class MainGameLoop {
 
 			DisplayManager.updateDisplay();
 
-			if (player1.getPosition().y < 0) {
-				System.out.println("Ball sinks into ground.");
-				//break;
+			if (player1.getPosition().y < world.getHeightOfTerrain(player1.getPosition().x, player1.getPosition().z)) {
+				System.out.println("\nBALL SINKS INTO GROUND.");
+				break;
 			}
-
+			System.out.println("---- While loop end ----\n");
 		}
 
 		fbos.cleanUp();

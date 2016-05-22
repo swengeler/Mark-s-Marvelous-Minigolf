@@ -28,18 +28,6 @@ public class PhysicalFace {
 		prepareBounds();
 	}
 
-	/*public boolean collidesWithFace(Ball b) {
-		dist.set((point1.x - b.getPosition().x), (point1.y - b.getPosition().y), (point1.z - b.getPosition().z));
-		double distance = Math.abs(Vector3f.dot(normal, dist))/normal.length();
-		//if (normal.x != 0 && normal.x != -0)
-			//System.out.println("Distance between ball and face: " + distance + " (radius of the ball = " + Ball.RADIUS + ")");
-		if (distance <= Ball.RADIUS && bbox.inBoundingBox(b)) {
-			//System.out.println("Collision between face and ball detected");
-			return true;
-		}
-		return false;
-	}*/
-
 	public boolean collidesWithFace(Ball b) {
 		Vector3f closest = Maths.closestPtPointTriangle(b.getPosition(), point1, point2, point3);
 		Vector3f.sub(b.getPosition(), closest, dist);
@@ -55,6 +43,18 @@ public class PhysicalFace {
 		if (distanceSq <= Ball.RADIUS * Ball.RADIUS)
 			return true;
 		return false;
+	}
+	
+	public float distanceToFace(Ball b) {
+		Vector3f closest = Maths.closestPtPointTriangle(b.getPosition(), point1, point2, point3);
+		Vector3f.sub(b.getPosition(), closest, dist);
+		return dist.length();
+	}
+	
+	public float distanceToFaceSq(Ball b) {
+		Vector3f closest = Maths.closestPtPointTriangle(b.getPosition(), point1, point2, point3);
+		Vector3f.sub(b.getPosition(), closest, dist);
+		return dist.lengthSquared();
 	}
 
 	public Vector3f getNormal() {

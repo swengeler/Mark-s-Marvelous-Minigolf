@@ -44,7 +44,7 @@ public class Terrain {
 	private float[][] heights;
 
 	public Terrain(int gridX, int gridZ, Loader loader, ModelTexture texture) {
- 
+
 		this.texture = texture;
 		this.x = gridX * getSize();
 		this.z = gridZ * getSize();
@@ -226,7 +226,7 @@ public class Terrain {
 		float ballX = b.getPosition().x - this.x;
 		float ballZ = b.getPosition().z - this.z;
 
-		if ((b.getPosition().y - ballR - 1) > this.maxHeight)
+		if ((b.getPosition().y - ballR) > this.maxHeight)
 			return new ArrayList<PhysicalFace>(0);
 
 		int leftX = (int) Math.floor(ballX - ballR);
@@ -268,8 +268,8 @@ public class Terrain {
 		ArrayList<PhysicalFace> collidingFaces = new ArrayList<PhysicalFace>();
 		for (int i = leftX; i <= rightX && i < heights.length - 1; i++) {
 			for (int j = upperZ; j <= lowerZ && j < heights[0].length - 1; j++) {
-				System.out.println("2 faces added at (" + i + "|" + j + ")");
-				
+				//System.out.println("2 faces added at (" + i + "|" + j + ")");
+
 				// upper left corner
 				p1.set(i + this.x, this.heights[i][j], j + this.z);
 				// lower left corner
@@ -282,28 +282,28 @@ public class Terrain {
 				Vector3f.cross(v1, v2, normal);
 				normal.normalise();
 				collidingFaces.add(new PhysicalFace(normal, p1, p2, p3));
-				System.out.println("Face added: " + collidingFaces.get(collidingFaces.size() - 1) + ".");
+				//System.out.println("Face added: " + collidingFaces.get(collidingFaces.size() - 1) + ".");
 
 				// upper right corner
 				p1.set(i + this.x, this.heights[i][j + 1], j + this.z + 1);
 				// lower left corner
 				p2.set(i + this.x + 1, this.heights[i + 1][j], j + this.z);
 				// lower right corner
-				p3.set(i + this.x + 1, this.heights[i + 1][j + 1], j + this.z + 1);
+				p3.set(i + this.x + 1, this.heights[i + 1][j + 1], j  + this.z + 1);
 
 				Vector3f.sub(p2, p1, v1);
 				Vector3f.sub(p3, p1, v2);
 				Vector3f.cross(v1, v2, normal);
 				normal.normalise();
 				collidingFaces.add(new PhysicalFace(normal, p1, p2, p3));
-				System.out.println("Face added: " + collidingFaces.get(collidingFaces.size() - 1) + ".");
+				//System.out.println("Face added: " + collidingFaces.get(collidingFaces.size() - 1) + ".");
 			}
 		}
 		System.out.println("Number of colliding faces (in Terrain): " + collidingFaces.size());
 		return collidingFaces;
 	}
 
-	private Vector3f calculateNormal(int x, int z, BufferedImage image){
+	private Vector3f calculateNormal(int x, int z, BufferedImage image) {
 		float heightL = getHeight(x-1, z, image);
 		float heightR = getHeight(x+1, z, image);
 		float heightD = getHeight(x, z-1, image);
@@ -316,7 +316,7 @@ public class Terrain {
 	public static float getSize() {
 		return SIZE;
 	}
-	
+
 	public void printHeightsToFile(String fileName) {
 		try {
 			PrintWriter writer = new PrintWriter(fileName + ".txt","UTF-8");

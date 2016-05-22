@@ -4,6 +4,7 @@ package Physics;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import entities.Ball;
@@ -11,15 +12,15 @@ import entities.Entity;
 import renderEngine.DisplayManager;
 import terrains.Terrain;
 import terrains.World;
+import toolbox.Maths;
 
 public class PhysicsEngineOld {
 
 	private static final float NORMAL_TH = 0.001f;
 
-	public static final float[] COEFFS_RESTITUTION = {0.75f, 0.85f};
+	public static final float REAL_GRAVITY = 9.813f;
 
 	public static final Vector3f GRAVITY = new Vector3f(0, -230f, 0);
-	public static final float COEFF_GRAVITY = 9.813f;
 	public static final float COEFF_RESTITUTION = 0.75f;
 	public static final float COEFF_FRICTION = 0.15f;
 
@@ -35,21 +36,153 @@ public class PhysicsEngineOld {
 		this.balls.add(ball);
 	}
 
-	public void tick(){
+	public void tick() {
 		for (Ball b : balls){
 			// apply accelerations and stuff like that first, to make sure that a ball can move due to gusts of wind or similar
 			//b.applyAccelerations();
 			b.checkInputs();
 			if (b.isMoving()) {
+				//b.checkMinSpeed();
 				b.move();
-				resolveBallCollision(b);
-				resolveOrdinaryCollision(b);
+				System.out.println("\n---- Collision detection starts ----\n");
+				resolveTerrainCollision(b);
+				//resolveBallCollision(b);
+				//resolveObstacleCollision(b);
+				//resolveOrdinaryCollision(b);
+				System.out.println("\n---- Collision detection ends ----\n");
 			}
 		}
 	}
+	
+	public void resolveTerrainCollision(Ball b) {
+		/* 
+		 * The collision detection and resolution works according to the following steps:
+		 * 1. Collision is detected based on triangle mesh of the terrain (NOT JUST height below ball)
+		 * 2. Ball is pushed upwards until it no longer collides (according to the ball/mesh criteria)
+		 * 3. The then-closest plane/triangle is taken as the point of contact and all further calculations are using that one plane
+		 * 4. The movement of the ball is adjusted based on angle of incidence, velocity, friction/restitution etc. with the selected plane
+		 */
+		
+		// get all faces/triangles of the terrain mesh that the ball collides with
+		//ArrayList<PhysicalFace> collidingFaces = new ArrayList<PhysicalFace>();
+		//collidingFaces.addAll(world.getCollidingFacesTerrains(b));
+		
+		// e.g. if the ball is above the maximum height of the terrain, then there is no need to actually resolve any collision
+		//if (collidingFaces.isEmpty())
+			//return;
+		
+		System.out.println("There are colliding faces");
+		
+		// push the ball out of the terrain so it remains on the surface
+		// since its a terrain (which comes with certain restrictions) the ball is simply pushed upwards to simplify matters
+		//while (b.collidesWith(collidingFaces)) 
+			//b.increasePosition(0, 0.01f, 0);
+		
+		if (world.getHeightOfTerrain(b.getPosition().x, b.getPosition().z) > b.getPosition().y - Ball.RADIUS) {
+			b.setPosition(new Vector3f(b.getPosition().x, world.getHeightOfTerrain(b.getPosition().x, b.getPosition().z) + Ball.RADIUS, b.getPosition().z));
+			//b.setVelocity(b.getVelocity().x, 0, b.getVelocity().z);
+		//}
+		
+		// calculate the closest face/plane after the ball was pushed out, which is then used for collision resolution
+		Terrain t = world.getTerrain(b.getPosition().x, b.getPosition().z);
+		float terrainX = b.getPosition().x - t.getX();
+		float terrainZ = b.getPosition().z - t.getZ();
+		float gridSquareSize = Terrain.getSize() / (float) (t.getHeights().length-1);
+		int gridX = (int) Math.floor(terrainX/ gridSquareSize);
+		int gridZ = (int) Math.floor(terrainZ/ gridSquareSize);
+		float xCoord = (terrainX % gridSquareSize) / gridSquareSize;
+		float zCoord = (terrainZ % gridSquareSize) / gridSquareSize;
+		PhysicalFace forResolution = null;
+		if (xCoord <= (1 - zCoord)) {
+			Vector3f v1 = new Vector3f(), v2 = new Vector3f(), p1 = new Vector3f(), p2 = new Vector3f(), p3 = new Vector3f(), normal = new Vector3f();
+			p1.set(0, t.getHeights()[gridX][gridZ], 0);
+			p2.set(1, t.getHeights()[gridX + 1][gridZ], 0);
+			p3.set(0, t.getHeights()[gridX][gridZ + 1], 1);
+			
+			Vector3f.sub(p2, p1, v1);
+			Vector3f.sub(p3, p1, v2);
+			Vector3f.cross(v1, v2, normal);
+			
+			forResolution = new PhysicalFace(normal, p1, p2, p3);
+		} else {
+			Vector3f v1 = new Vector3f(), v2 = new Vector3f(), p1 = new Vector3f(), p2 = new Vector3f(), p3 = new Vector3f(), normal = new Vector3f();
+			p1.set(1, t.getHeights()[gridX + 1][gridZ], 0);
+			p2.set(1, t.getHeights()[gridX + 1][gridZ + 1], 1);
+			p3.set(0, t.getHeights()[gridX][gridZ + 1], 1);
+			
+			Vector3f.sub(p2, p1, v1);
+			Vector3f.sub(p3, p1, v2);
+			Vector3f.cross(v1, v2, normal);
+			
+			forResolution = new PhysicalFace(normal, p1, p2, p3);
+		}
+		
+		
+		/*PhysicalFace forResolution = collidingFaces.get(0);
+		float minDistanceSq = forResolution.distanceToFaceSq(b);
+		for (PhysicalFace f : collidingFaces) {
+			float curDistanceSq = f.distanceToFaceSq(b);
+			if (curDistanceSq < minDistanceSq) {
+				forResolution = f;
+				minDistanceSq = curDistanceSq;
+			}
+		}*/
+		
+		// calculate the angle between the plane that is used for collision resolution and the velocity vector of the ball
+		// since Vector3f.angle(x, y) can compute angles over 90�, there is an additional check to make sure the angle is below 90� 
+		float temp = Vector3f.angle(forResolution.getNormal(), b.getVelocity());
+		float angle = (float) Math.min(Math.PI - temp, temp);
+		angle = (float) (Math.PI/2 - angle);
+		
+		// some pre-processing whose results will be used in both the bouncing and the rolling case
+		// the normal component of the velocity is the projection of said velocity on the normal vector of the plane
+		// that normal component will then be subtracted from the original velocity to get the new one
+		Vector3f normal = new Vector3f(forResolution.getNormal().x, forResolution.getNormal().y, forResolution.getNormal().z);
+		Vector3f normalComponent = new Vector3f(normal.x, normal.y, normal.z);
+		normalComponent.scale(2 * Vector3f.dot(b.getVelocity(), normal) * (1/normal.lengthSquared()));
+		Vector3f.sub(b.getVelocity(), normalComponent, b.getVelocity());
+		
+		// 15� are used as an estimation of the angle above which the ball would bounce off of the plane/face rather than roll
+		if (angle > Math.toRadians(45)) {
+			// the ball is bouncing and the velocity can simply remain as is, only the coefficient of restitution has to be applied
+			System.out.println("BOUNCING");
+			b.scaleVelocity(COEFF_RESTITUTION);
+			System.out.printf("Velocity of ball: (%f|%f|%f)", b.getVelocity().x, b.getVelocity().y, b.getVelocity().z);
+		} else {
+			// the ball is rolling (or sliding but that is not implemented (yet)), therefore a projection on the plane instead of a reflection is used
+			System.out.println("ROLLING");
+			Vector3f projection = new Vector3f();
+			normalComponent.scale(-0.5f);
+			Vector3f.sub(b.getVelocity(), normalComponent, projection);
+			
+			// friction is applied in the opposite direction as the movement of the ball, the vector can therefore be constructed from the projection
+			Vector3f frictionDir = new Vector3f(projection.x, projection.y, projection.z);
+			frictionDir.normalise();
+			
+			// the angle of inclination of the plane in the direction of movement/friction in respect to the horizontal plane
+			// knowing this angle, the magnitude of the frictional force and acceleration can be computed
+			// since F = m * a <=> F/m = a <=> F/m * t = v the effect on the velocity is computed as done below (Ffriction = coeffFriction * Fnormal)
+			float angleIncl = Vector3f.angle(new Vector3f(frictionDir.x,0,frictionDir.z), frictionDir);
+			angleIncl = (float) Math.min(Math.PI - angleIncl, angleIncl);
+			float frictionVelComponent = PhysicsEngineOld.COEFF_FRICTION * (PhysicsEngineOld.GRAVITY.length() * (float) (Math.cos(angleIncl))) * DisplayManager.getFrameTimeSeconds();
+			frictionDir = (Vector3f) frictionDir.scale(-frictionVelComponent);
+			
+			// finally, the velocity of the ball is set to the projection (since the ball is not supposed to be bouncing)
+			// then friction is applied (if the effect of friction is larger than the actual velocity, the ball just stops)
+			b.setVelocity(projection.x, projection.y, projection.z);
+			if (b.getVelocity().lengthSquared() > frictionDir.lengthSquared())
+				b.increaseVelocity(frictionDir);
+			else
+				b.setVelocity(0, 0, 0);
+		} }
+	}
+	
+	public void resolveObstacleCollision(Ball b) {
+		
+	}
 
 	public void resolveOrdinaryCollision(Ball b) { // might delegate this to own class CollisionSD (Static-Dynamic) and ball-ball collision to CollisionDD
-		while (b.getPosition().y - Ball.RADIUS < world.getHeightOfTerrain(b.getPosition().x, b.getPosition().x))
+		while (b.getPosition().y - Ball.RADIUS < world.getHeightOfTerrain(b.getPosition().x, b.getPosition().z))
 			b.increasePosition(0, 0.001f, 0);
 		
 		//if (b.getPosition().y - Ball.RADIUS < world.getHeightOfTerrain(b.getPosition().x, b.getPosition().z))
@@ -64,7 +197,8 @@ public class PhysicsEngineOld {
 		if (collidingFaces.isEmpty()) {
 			System.out.println();
 			return;
-		}
+		} else if (true)
+			return;
 
 		ArrayList<PhysicalFace> combined = new ArrayList<PhysicalFace>();
 		combined.add(collidingFaces.get(0));

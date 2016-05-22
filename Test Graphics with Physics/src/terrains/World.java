@@ -103,25 +103,25 @@ public class World {
 	}
 	
 	public float getHeightOfTerrain(float x, float z){
-		Terrain t = getTerrain(x,z);
+		Terrain t = getTerrain(x, z);
 		if(t != null)
-			return getHeightTerrain(x,z,t);
+			return getHeightTerrain(x, z, t);
 		return 0;
 	}
 	
-	public static float getHeightTerrain(float worldX, float worldZ, Terrain terrain){
+	public static float getHeightTerrain(float worldX, float worldZ, Terrain terrain) {
 		float terrainX = worldX - terrain.getX();
 		float terrainZ = worldZ - terrain.getZ();
 		float gridSquareSize = Terrain.getSize() / (float) (terrain.getHeights().length-1);
 		int gridX = (int) Math.floor(terrainX/ gridSquareSize);
 		int gridZ = (int) Math.floor(terrainZ/ gridSquareSize);
-		if(gridX >= terrain.getHeights().length -1 || gridZ >= terrain.getHeights().length-1 || gridX<0 || gridZ<0){
+		if(gridX >= terrain.getHeights().length - 1 || gridZ >= terrain.getHeights().length - 1 || gridX < 0 || gridZ < 0){
 			return 0;
 		}
 		float xCoord = (terrainX % gridSquareSize) / gridSquareSize;
 		float zCoord = (terrainZ % gridSquareSize) / gridSquareSize;
 		float answer;
-		if (xCoord <= (1-zCoord)) {
+		if (xCoord <= (1 - zCoord)) {
 			answer = Maths.barryCentric(new Vector3f(0, terrain.getHeights()[gridX][gridZ], 0), new Vector3f(1,
 					terrain.getHeights()[gridX + 1][gridZ], 0), new Vector3f(0,
 							terrain.getHeights()[gridX][gridZ + 1], 1), new Vector2f(xCoord, zCoord));

@@ -17,7 +17,7 @@ public class DisplayManager {
 	private static long lastFrameTime;
 	private static float delta;
 	
-	public static void createDisplay(){
+	public static void createDisplay() {
 		
 		ContextAttribs attribs = new ContextAttribs(3,2)
 		.withForwardCompatible(true)
@@ -36,7 +36,7 @@ public class DisplayManager {
 		lastFrameTime = getCurrentTime();
 	}
 	
-	public static void updateDisplay(){
+	public static void updateDisplay() {
 		
 		Display.sync(FPS_CAP);
 		Display.update();
@@ -45,7 +45,7 @@ public class DisplayManager {
 		lastFrameTime = currentFrameTime;
 	}
 	
-	public static float getFrameTimeSeconds(){
+	public static float getFrameTimeSeconds() {
 		return delta;
 	}
 	
@@ -53,13 +53,11 @@ public class DisplayManager {
 		lastFrameTime = getCurrentTime();
 	}
 	
-	public static void closeDisplay(){
-		
+	public static void closeDisplay() {
 		Display.destroy();
-		
 	}
 	
-	private static long getCurrentTime(){
+	private static long getCurrentTime() {
 		return Sys.getTime()*1000/Sys.getTimerResolution();
 	}
 	

@@ -16,11 +16,11 @@ public class Ball extends Entity{
 	private static final float RUN_SPEED = 2;
 	private static final float TURN_SPEED = 100;
 	private static final float JUMP_POWER = 40;
-	private static final float MIN_XVEL = 0;
-	private static final float MIN_YVEL = 0;
-	private static final float MIN_ZVEL = 0;
+	private static final float MIN_XVEL = 0.001f;
+	private static final float MIN_YVEL = 0.001f;
+	private static final float MIN_ZVEL = 0.001f;
 
-	public static final float RADIUS_IN_M = 0.04267f;
+	public static final float REAL_RADIUS = 0.04267f;
 	public static final float RADIUS = 1f;
 
 	private Vector3f currentVel = new Vector3f();
@@ -36,7 +36,7 @@ public class Ball extends Entity{
 		this.enableControls = enableControls;
 	}
 
-	public void move(){ // world really necessary?
+	public void move() { // world really necessary?
 		super.increaseRotation(0, currentTurnSpeed * DisplayManager.getFrameTimeSeconds(), 0);
 		Vector3f gravity = new Vector3f(0, PhysicsEngineOld.GRAVITY.y, 0);
 		gravity = (Vector3f) gravity.scale(DisplayManager.getFrameTimeSeconds());
@@ -119,14 +119,12 @@ public class Ball extends Entity{
 		return false;
 	}
 
-	public void checkMinSpeed(World world){
+	public void checkMinSpeed(){
 		if (currentVel.x < MIN_XVEL)
 			currentVel.x = 0;
-		if (currentVel.y < MIN_YVEL && getPosition().y < world.getHeightOfTerrain(getPosition().x, getPosition().z)){
+		if (currentVel.y < MIN_YVEL)
 			currentVel.y = 0;
-			getPosition().y = world.getHeightOfTerrain(getPosition().x, getPosition().z);
-		}
-		if(currentVel.z < MIN_ZVEL)
+		if (currentVel.z < MIN_ZVEL)
 			currentVel.z = 0;
 	}
 
@@ -137,6 +135,22 @@ public class Ball extends Entity{
 	public void setVelocity(Vector3f v) {
 		currentVel.set(v.x, v.y, v.z);
 		System.out.printf("Velocity of ball %s set to: (%f|%f|%f)\n", this.toString(), currentVel.x, currentVel.y, currentVel.z);
+	}
+	
+	public void scaleVelocity(float s) {
+		currentVel.scale(s);
+	}
+	
+	public void increaseVelocity(float x, float y, float z) {
+		currentVel.x += x;
+		currentVel.y += y;
+		currentVel.z += z;
+	}
+	
+	public void increaseVelocity(Vector3f v) {
+		currentVel.x += v.x;
+		currentVel.y += v.y;
+		currentVel.z += v.z;
 	}
 
 	public void setVelocity(float x, float y, float z) {
