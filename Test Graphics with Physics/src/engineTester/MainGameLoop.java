@@ -109,18 +109,19 @@ public class MainGameLoop {
 		//lights.add(new Light(new Vector3f(0,7,70),new Vector3f(2,2,0), new Vector3f(1,0.01f,0.002f)));
 
 		Ball player1 = new Ball(ballTModel, new Vector3f(200, 25, 400), 0, 0, 0, 1, true);
+		Ball player2 = new Ball(ballTModel, new Vector3f(201, 1, 400), 0, 0, 0, 1, false);
 		List<Ball> balls = new ArrayList<Ball>();
 		balls.add(player1);
-		//wballs.add(new Ball(ballTModel, new Vector3f(200, 10, 500), 0, 0, 0, 1, false));
+		balls.add(player2);
 
 		Camera camera = new Camera(player1);
 		World world = new World(camera);
-		world.add(new Terrain(0, 0, loader, new ModelTexture(loader.loadTexture("rock1"))/*, "arena"/*, "heightmap"*/));
-		world.add(new Terrain(0, 1, loader, new ModelTexture(loader.loadTexture("rock1"))/*, "arena"*/, "heightmap"));
+		world.add(new Terrain(0, 0, loader, new ModelTexture(loader.loadTexture("metal1"))/*, "arena"/*, "heightmap"*/));
+		world.add(new Terrain(0, 1, loader, new ModelTexture(loader.loadTexture("metal1"))/*, "arena"/, "heightmap_ramp_test"*/));
 		world.getTerrains().get(1).printHeightsToFile("heights");
 		System.out.printf("\nmaxHeight for 2nd terrain: %f, minHeight: %f\n\n", world.getTerrains().get(1).getMaxHeight(), world.getTerrains().get(1).getMinHeight());
-		world.add(new Terrain(0, 2, loader, new ModelTexture(loader.loadTexture("rock1"))/*, "arena"/*, "heightmap"*/));
-		world.add(new Terrain(0, 3, loader, new ModelTexture(loader.loadTexture("rock1"))/*, "arena"/*, "heightmap"*/));
+		world.add(new Terrain(0, 2, loader, new ModelTexture(loader.loadTexture("metal1"))/*, "arena"/*, "heightmap"*/));
+		world.add(new Terrain(0, 3, loader, new ModelTexture(loader.loadTexture("metal1"))/*, "arena"/*, "heightmap"*/));
 
 
 		/*float[][] heights = world.getTerrains().get(0).getHeights();
@@ -227,7 +228,7 @@ public class MainGameLoop {
 			mainEngine.tick();
 
 			Vector3f terrainPoint = picker.getCurrentTerrainPoint();
-			if(terrainPoint != null){
+			if (terrainPoint != null){
 				//nature.get(0).setPosition(terrainPoint);
 			}
 
@@ -250,13 +251,13 @@ public class MainGameLoop {
 
 			fbos.unbindCurrentFrameBuffer();*/
 			renderer.processEntity(player1);
-			//renderer.processEntity(balls.get(1));
+			renderer.processEntity(player2);
 			renderer.processWorld(world, new Vector4f(0, -1, 0, 10000));
 			waterRenderer.render(waters, camera);
 			guiRenderer.render(guis);
 
 			DisplayManager.updateDisplay();
-
+			System.out.printf("CURRENT BALL VELOCITY: (%f|%f|%f)\n", player1.getVelocity().x, player1.getVelocity().y, player1.getVelocity().z);
 			if (player1.getPosition().y < world.getHeightOfTerrain(player1.getPosition().x, player1.getPosition().z)) {
 				System.out.println("\nBALL SINKS INTO GROUND.");
 				break;

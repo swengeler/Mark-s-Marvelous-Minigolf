@@ -17,6 +17,8 @@ import toolbox.Maths;
 public class PhysicsEngineOld {
 
 	private static final float NORMAL_TH = 0.001f;
+	private static final float C = 0.001f;
+	private static final float B = 1f;
 
 	public static final float REAL_GRAVITY = 9.813f;
 
@@ -26,10 +28,16 @@ public class PhysicsEngineOld {
 
 	private List<Ball> balls;
 	private World world;
+	private boolean enabled;
 
-	public PhysicsEngineOld(List<Ball> balls, World world){
+	public PhysicsEngineOld(List<Ball> balls, World world) {
 		this.balls = balls;
 		this.world = world;
+		this.enabled = true;
+	}
+	
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 
 	public void addBall(Ball ball) {
@@ -37,6 +45,8 @@ public class PhysicsEngineOld {
 	}
 
 	public void tick() {
+		if (!enabled)
+			return;
 		for (Ball b : balls){
 			// apply accelerations and stuff like that first, to make sure that a ball can move due to gusts of wind or similar
 			//b.applyAccelerations();
@@ -46,7 +56,7 @@ public class PhysicsEngineOld {
 				b.move();
 				System.out.println("\n---- Collision detection starts ----\n");
 				resolveTerrainCollision(b);
-				//resolveBallCollision(b);
+				resolveBallCollision(b);
 				//resolveObstacleCollision(b);
 				//resolveOrdinaryCollision(b);
 				System.out.println("\n---- Collision detection ends ----\n");
@@ -85,6 +95,10 @@ public class PhysicsEngineOld {
 		
 		// calculate the closest face/plane after the ball was pushed out, which is then used for collision resolution
 		Terrain t = world.getTerrain(b.getPosition().x, b.getPosition().z);
+		if (t == null) {
+			setEnabled(false);
+			return;
+		}
 		float terrainX = b.getPosition().x - t.getX();
 		float terrainZ = b.getPosition().z - t.getZ();
 		float gridSquareSize = Terrain.getSize() / (float) (t.getHeights().length-1);
@@ -142,8 +156,10 @@ public class PhysicsEngineOld {
 		normalComponent.scale(2 * Vector3f.dot(b.getVelocity(), normal) * (1/normal.lengthSquared()));
 		Vector3f.sub(b.getVelocity(), normalComponent, b.getVelocity());
 		
-		// 15ï¿½ are used as an estimation of the angle above which the ball would bounce off of the plane/face rather than roll
-		if (angle > Math.toRadians(45)) {
+		// 45° and 5° are estimated
+		if (angle > Math.toRadians(35))
+			System.out.println("Angle is larger than 45°");
+		if (angle > Math.toRadians(45) || (angle * b.getVelocity().lengthSquared() * C > 1 && angle > Math.toRadians(5))) {
 			// the ball is bouncing and the velocity can simply remain as is, only the coefficient of restitution has to be applied
 			System.out.println("BOUNCING");
 			b.scaleVelocity(COEFF_RESTITUTION);
@@ -172,8 +188,10 @@ public class PhysicsEngineOld {
 			b.setVelocity(projection.x, projection.y, projection.z);
 			if (b.getVelocity().lengthSquared() > frictionDir.lengthSquared())
 				b.increaseVelocity(frictionDir);
-			else
+			else {
 				b.setVelocity(0, 0, 0);
+				//b.setMoving(false);
+			}
 		} }
 	}
 	
@@ -363,15 +381,17 @@ public class PhysicsEngineOld {
 				Vector3f normal = new Vector3f(b2.getPosition().x - b1.getPosition().x, b2.getPosition().y - b1.getPosition().y, b2.getPosition().z - b1.getPosition().z);
 				Vector3f.sub(b1.getPosition(), b2.getPosition(), dist);
 				System.out.println("Distance between balls: " + normal.length());
-				if (normal.length() < (2 * Ball.RADIUS)) {
-					Vector3f revM = new Vector3f(b1.getVelocity().x, b1.getVelocity().y,b1.getVelocity().z);
+				if (normal.lengthSquared() < Math.pow(2 * Ball.RADIUS, 2)) {
+					System.out.println("BALL COLLISION OCCURS");
+					Vector3f revM = new Vector3f(b1.getVelocity().x, b1.getVelocity().y, b1.getVelocity().z);
 					revM.negate();
 					revM.normalise();
 					revM.scale(0.001f);
-					while (normal.lengthSquared() < Math.pow(Ball.RADIUS, 2)) {
+					while (normal.lengthSquared() < Math.pow(2 * Ball.RADIUS, 2)) {
 						b1.increasePosition(revM);
 						normal.set(b2.getPosition().x - b1.getPosition().x, b2.getPosition().y - b1.getPosition().y, b2.getPosition().z - b1.getPosition().z);
 					}
+					System.out.printf("Position b1 after pushing out: (%f|%f|%f)\n", b1.getPosition().x, b1.getPosition().y, b1.getPosition().z);
 					System.out.printf("Movement b1 before: (%f|%f|%f)\n", b1.getVelocity().x, b1.getVelocity().y, b1.getVelocity().z);
 					System.out.printf("Movement b2 before: (%f|%f|%f)\n", b2.getVelocity().x, b2.getVelocity().y, b2.getVelocity().z);
 					//Vector3f normal = new Vector3f(b2.getPosition().x - b1.getPosition().x, b2.getPosition().y - b1.getPosition().y, b2.getPosition().z - b1.getPosition().z);
@@ -382,13 +402,14 @@ public class PhysicsEngineOld {
 					alpha = Math.min(alpha, (float) (Math.PI - alpha));
 					float factorB2 = (float) (Math.cos(alpha) * b1.getVelocity().length());
 					float factorB1 = (float) (Math.sin(alpha) * b1.getVelocity().length());
-					System.out.println("alpha = " + alpha);
+					System.out.println("alpha = " + Math.toDegrees(alpha));
 					System.out.println("factorB1 = " + factorB1);
 					System.out.println("factorB2 = " + factorB2);
 					// set the velocity of the second ball to one along the normal of the collision (its already in the right direction because of the way the normal is created (from b1 to b2)
 					normal.normalise();
 					Vector3f projection = new Vector3f(b1.getVelocity().x, b1.getVelocity().y, b1.getVelocity().z);
-					Vector3f.sub(projection, (Vector3f) b1.getVelocity().scale(Vector3f.dot(normal, projection)), projection);
+					Vector3f.sub(projection, (Vector3f) normal.scale(Vector3f.dot(normal, projection)), projection);
+					normal.normalise();
 					normal.scale(factorB2);
 					System.out.printf("Calculated movement b2: (%f|%f|%f)\n", normal.x, normal.y, normal.z);
 					b2.setVelocity(normal);

@@ -56,6 +56,8 @@ public class Ball extends Entity{
 	public void setMoving(boolean moving) {
 		System.out.println("Moving set to " + moving);
 		this.moving = moving;
+		if (!moving)
+			enableControls = true;
 	}
 
 	public boolean isMoving() {
@@ -79,11 +81,11 @@ public class Ball extends Entity{
 				this.currentVel.z += (float) -(RUN_SPEED * Math.cos(Math.toRadians(super.getRotY())))/FACTOR;
 				setMoving(true);
 			} else if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
-				this.currentVel.x += 5;
+				this.currentVel.z += 70;
 				System.out.println("x-speed increased by pressing up-arrow");
 				setMoving(true);
 			} else if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
-				this.currentVel.x -= 5;
+				this.currentVel.z -= 70;
 				System.out.println("x-speed decreased by pressing down-arrow");
 				setMoving(true);
 			} else if (Keyboard.isKeyDown(Keyboard.KEY_T) && Keyboard.isKeyDown(Keyboard.KEY_1)) {
