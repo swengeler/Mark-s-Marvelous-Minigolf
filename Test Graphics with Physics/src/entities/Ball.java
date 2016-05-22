@@ -9,7 +9,7 @@ import models.TexturedModel;
 import renderEngine.DisplayManager;
 import terrains.World;
 import Physics.PhysicalFace;
-import Physics.PhysicsEngineOld;
+import Physics.PhysicsEngine;
 
 public class Ball extends Entity{
 	private static final float FACTOR = 1;
@@ -38,7 +38,7 @@ public class Ball extends Entity{
 
 	public void move() { // world really necessary?
 		super.increaseRotation(0, currentTurnSpeed * DisplayManager.getFrameTimeSeconds(), 0);
-		Vector3f gravity = new Vector3f(0, PhysicsEngineOld.GRAVITY.y, 0);
+		Vector3f gravity = new Vector3f(0, PhysicsEngine.GRAVITY.y, 0);
 		gravity = (Vector3f) gravity.scale(DisplayManager.getFrameTimeSeconds());
 		System.out.println("DisplayManager.getFrameTimeSeconds(): " + DisplayManager.getFrameTimeSeconds());
 		System.out.printf("Ball's velocity before moving (and modifying): (%f|%f|%f)\n", currentVel.x, currentVel.y, currentVel.z);
@@ -135,20 +135,20 @@ public class Ball extends Entity{
 	}
 
 	public void setVelocity(Vector3f v) {
+        System.out.printf("Velocity of ball %s set to: (%f|%f|%f)\n", this.toString(), v.x, v.y, v.z);
 		currentVel.set(v.x, v.y, v.z);
-		System.out.printf("Velocity of ball %s set to: (%f|%f|%f)\n", this.toString(), currentVel.x, currentVel.y, currentVel.z);
 	}
-	
+
 	public void scaleVelocity(float s) {
 		currentVel.scale(s);
 	}
-	
+
 	public void increaseVelocity(float x, float y, float z) {
 		currentVel.x += x;
 		currentVel.y += y;
 		currentVel.z += z;
 	}
-	
+
 	public void increaseVelocity(Vector3f v) {
 		currentVel.x += v.x;
 		currentVel.y += v.y;
@@ -156,12 +156,12 @@ public class Ball extends Entity{
 	}
 
 	public void setVelocity(float x, float y, float z) {
+		System.out.printf("Velocity of ball %s set to: (%f|%f|%f)\n", this.toString(), x, y, z);
 		currentVel.set(x, y, z);
-		System.out.printf("Velocity of ball %s set to: (%f|%f|%f)\n", this.toString(), currentVel.x, currentVel.y, currentVel.z);
 	}
-	
+
 	public String toString() {
-		return "Ball at (" + getPosition().x + "|" + getPosition().y + "|" + getPosition().z + ") with velocity (" + currentVel.x + "|" + currentVel.y + "|" + currentVel.z + ")" ; 
+		return "Ball at (" + getPosition().x + "|" + getPosition().y + "|" + getPosition().z + ") with velocity (" + currentVel.x + "|" + currentVel.y + "|" + currentVel.z + ")" ;
 	}
 
 }

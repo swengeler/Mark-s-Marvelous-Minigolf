@@ -12,7 +12,7 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import Physics.BoundingBox;
-import Physics.PhysicsEngineOld;
+import Physics.PhysicsEngine;
 import entities.Ball;
 import entities.Camera;
 import entities.Entity;
@@ -116,12 +116,12 @@ public class MainGameLoop {
 
 		Camera camera = new Camera(player1);
 		World world = new World(camera);
-		world.add(new Terrain(0, 0, loader, new ModelTexture(loader.loadTexture("metal1"))/*, "arena"/*, "heightmap"*/));
-		world.add(new Terrain(0, 1, loader, new ModelTexture(loader.loadTexture("metal1"))/*, "arena"/, "heightmap_ramp_test"*/));
+		world.add(new Terrain(0, 0, loader, new ModelTexture(loader.loadTexture("metal2"))/*, "arena"/*, "heightmap"*/));
+		world.add(new Terrain(0, 1, loader, new ModelTexture(loader.loadTexture("metal2"))/*, "arena"/, "heightmap_ramp_test"*/));
 		world.getTerrains().get(1).printHeightsToFile("heights");
 		System.out.printf("\nmaxHeight for 2nd terrain: %f, minHeight: %f\n\n", world.getTerrains().get(1).getMaxHeight(), world.getTerrains().get(1).getMinHeight());
-		world.add(new Terrain(0, 2, loader, new ModelTexture(loader.loadTexture("metal1"))/*, "arena"/*, "heightmap"*/));
-		world.add(new Terrain(0, 3, loader, new ModelTexture(loader.loadTexture("metal1"))/*, "arena"/*, "heightmap"*/));
+		world.add(new Terrain(0, 2, loader, new ModelTexture(loader.loadTexture("metal2"))/*, "arena"/*, "heightmap"*/));
+		world.add(new Terrain(0, 3, loader, new ModelTexture(loader.loadTexture("metal2"))/*, "arena"/*, "heightmap"*/));
 
 
 		/*float[][] heights = world.getTerrains().get(0).getHeights();
@@ -206,7 +206,7 @@ public class MainGameLoop {
 		//world.add(big_Human);
 		world.addLights(lights);
 
-		PhysicsEngineOld mainEngine = new PhysicsEngineOld(balls, world);
+		PhysicsEngine mainEngine = new PhysicsEngine(balls, world);
 
 		MousePicker picker = new MousePicker(camera, renderer.getProjectionMatrix(), world);
 
@@ -260,7 +260,7 @@ public class MainGameLoop {
 			System.out.printf("CURRENT BALL VELOCITY: (%f|%f|%f)\n", player1.getVelocity().x, player1.getVelocity().y, player1.getVelocity().z);
 			if (player1.getPosition().y < world.getHeightOfTerrain(player1.getPosition().x, player1.getPosition().z)) {
 				System.out.println("\nBALL SINKS INTO GROUND.");
-				break;
+				//break;
 			}
 			System.out.println("---- While loop end ----\n");
 		}
