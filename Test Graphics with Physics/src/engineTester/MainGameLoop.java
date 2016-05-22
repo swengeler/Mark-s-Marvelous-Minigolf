@@ -38,6 +38,8 @@ import water.WaterShader;
 import water.WaterTile;
 
 public class MainGameLoop {
+	
+	private static int counter;
 
 	public static void main(String[] args) {
 
@@ -109,7 +111,7 @@ public class MainGameLoop {
 		//lights.add(new Light(new Vector3f(0,7,70),new Vector3f(2,2,0), new Vector3f(1,0.01f,0.002f)));
 
 		Ball player1 = new Ball(ballTModel, new Vector3f(200, 25, 400), 0, 0, 0, 1, true);
-		Ball player2 = new Ball(ballTModel, new Vector3f(201, 1, 400), 0, 0, 0, 1, false);
+		Ball player2 = new Ball(ballTModel, new Vector3f(200.5f, 1, 400), 0, 0, 0, 1, false);
 		List<Ball> balls = new ArrayList<Ball>();
 		balls.add(player1);
 		balls.add(player2);
@@ -117,22 +119,11 @@ public class MainGameLoop {
 		Camera camera = new Camera(player1);
 		World world = new World(camera);
 		world.add(new Terrain(0, 0, loader, new ModelTexture(loader.loadTexture("metal2"))/*, "arena"/*, "heightmap"*/));
-		world.add(new Terrain(0, 1, loader, new ModelTexture(loader.loadTexture("metal2"))/*, "arena"/, "heightmap_ramp_test"*/));
+		world.add(new Terrain(0, 1, loader, new ModelTexture(loader.loadTexture("metal2"))/*, "arena"*/, "heightmap"));
 		world.getTerrains().get(1).printHeightsToFile("heights");
 		System.out.printf("\nmaxHeight for 2nd terrain: %f, minHeight: %f\n\n", world.getTerrains().get(1).getMaxHeight(), world.getTerrains().get(1).getMinHeight());
 		world.add(new Terrain(0, 2, loader, new ModelTexture(loader.loadTexture("metal2"))/*, "arena"/*, "heightmap"*/));
 		world.add(new Terrain(0, 3, loader, new ModelTexture(loader.loadTexture("metal2"))/*, "arena"/*, "heightmap"*/));
-
-
-		/*float[][] heights = world.getTerrains().get(0).getHeights();
-		System.out.println("Heights = " + heights.length + "x" + heights[0].length);
-		System.out.println("Height at 1000|1000: " + heights[1000][1000]);
-		for (int i = 0; i < 10; i++) {
-			for (int j = 0; j < 10; j++) {
-				System.out.print(heights[i][j] + " ");
-			}
-			System.out.println();
-		}*/
 
 		List<Entity> nature = new ArrayList<Entity>();
 		nature.add(new Entity(boxTModel, box, new Vector3f(200, 0, 200), 0, 0, 0, 5, "box"));
@@ -141,59 +132,7 @@ public class MainGameLoop {
 		BoundingBox bbox = nature.get(1).getCollisionData().getBoundingBox();
 		bbox.print();
 
-		/*Random r = new Random();
-		for(int i=0; i<200; i++){
-			if(i<40){
-				float x = r.nextFloat()*Terrain.getSize();
-				float z = r.nextFloat()*Terrain.getSize();
-				nature.add(new Entity(humanTModel, new Vector3f(x, world.getHeightOfTerrain(x, z), z), 0, r.nextFloat()*180, 0, 1));
-			}
-			if(i<5){
-				float x = r.nextFloat()*Terrain.getSize();
-				float z = r.nextFloat()*Terrain.getSize();
-				nature.add(new Entity(ballTModel, new Vector3f(x, world.getHeightOfTerrain(x, z), z), 0, r.nextFloat()*180, 0, 2));
-			}
-			if(i<100){
-				float x = r.nextFloat()*Terrain.getSize();
-				float z = r.nextFloat()*Terrain.getSize();
-				nature.add(new Entity(treeTModel, new Vector3f(x, world.getHeightOfTerrain(x, z), z), 0, r.nextFloat()*180, 0, 7));
-			}
-			if(i<120){
-				float x = r.nextFloat()*Terrain.getSize();
-				float z = r.nextFloat()*Terrain.getSize();
-				nature.add(new Entity(fernTModel, r.nextInt(4),new Vector3f(x, world.getHeightOfTerrain(x, z), z), 0, r.nextFloat()*180, 0, 1));
-			}
-			if(i<120){
-				float x = r.nextFloat()*Terrain.getSize();
-				float z = r.nextFloat()*Terrain.getSize();
-				nature.add(new Entity(grassTModel, new Vector3f(x, world.getHeightOfTerrain(x, z), z), 0, r.nextFloat()*180, 0, 1));
-			}
-			if(i<60){
-				float x = r.nextFloat()*Terrain.getSize();
-				float z = r.nextFloat()*Terrain.getSize();
-				nature.add(new Entity(pineTModel, new Vector3f(x, world.getHeightOfTerrain(x, z), z), 0, r.nextFloat()*180, 0, 1));
-			}
-			if(i<2){
-				float x = r.nextFloat()*Terrain.getSize();
-				float z = r.nextFloat()*Terrain.getSize();
-				nature.add(new Entity(boxTModel, new Vector3f(x, world.getHeightOfTerrain(x, z), z), 0, r.nextFloat()*180, 0, 10));
-			}
-			if(i<200){
-				float x = r.nextFloat()*Terrain.getSize();
-				float z = r.nextFloat()*Terrain.getSize();
-				nature.add(new Entity(flowerTModel, new Vector3f(x, world.getHeightOfTerrain(x, z), z), 0, r.nextFloat()*180, 0, 1));
-			}
-		}
-
-		List<Entity> dragons = new ArrayList<Entity>();
-		for(int i=0; i<10; i++){
-			float x = (float) (Math.random() * 200 - 100);
-			float y = (float) (Math.random() * 200 - 100);
-			float z = (float) (Math.random() * -300);
-			//dragons.add(new Entity(staticModel, new Vector3f(x, y, z), 0f, (float) (Math.random() * 180f), 0f, 1f ));
-		}
-		Entity big_Human = new Entity(humanTModel, new Vector3f(0,0,50), 0f, 0f, 0f, 10);
-		*/
+		
 		MasterRenderer renderer = new MasterRenderer(loader);
 
 		List<GuiTexture> guis = new ArrayList<GuiTexture>();
@@ -203,7 +142,6 @@ public class MainGameLoop {
 		GuiRenderer guiRenderer = new GuiRenderer(loader);
 
 		world.addEntities(nature);
-		//world.add(big_Human);
 		world.addLights(lights);
 
 		PhysicsEngine mainEngine = new PhysicsEngine(balls, world);
@@ -219,13 +157,14 @@ public class MainGameLoop {
 
 		long after = System.currentTimeMillis();
 		System.out.println("\nTIME TO PREPARE MODES ETC.: " + (after - before) + "\n");
-		int i = 0;
 		DisplayManager.resetFrameTime();
 		while(!Display.isCloseRequested()) {
 			world.start();
-			System.out.println("\n---- While loop run " + (i++) + " times ----");
+			System.out.println("\n---- While loop run " + (counter++) + " times ----");
 			picker.update();
-			mainEngine.tick();
+			
+			if (mainEngine.isEnabled())
+				mainEngine.tick();
 
 			Vector3f terrainPoint = picker.getCurrentTerrainPoint();
 			if (terrainPoint != null){
@@ -272,6 +211,10 @@ public class MainGameLoop {
 		loader.cleanUp();
 		DisplayManager.closeDisplay();
 
+	}
+	
+	public static int getCounter() {
+		return counter;
 	}
 
 }

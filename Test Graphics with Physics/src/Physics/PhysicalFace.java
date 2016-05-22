@@ -14,12 +14,6 @@ public class PhysicalFace {
 
 	public PhysicalFace(Vector3f normal, Vector3f point1, Vector3f point2, Vector3f point3) {
 		this.normal = new Vector3f(normal.x, normal.y, normal.z);
-		/*if (Math.abs(normal.x) < 0.0001f)
-			this.normal.setX(0);
-		if (Math.abs(normal.y) < 0.0001f)
-			this.normal.setY(0);
-		if (Math.abs(normal.z) < 0.0001f)
-			this.normal.setZ(0);*/
 		this.normal.normalise();
 		this.point1 = new Vector3f(point1.x, point1.y, point1.z);
 		this.point2 = new Vector3f(point2.x, point2.y, point2.z);
