@@ -7,8 +7,10 @@ import java.util.List;
 import org.lwjgl.util.vector.Vector3f;
 
 import engineTester.MainGameLoop;
+import entities.RealBall;
+import entities.VirtualBall;
 import entities.Ball;
-import renderEngine.DisplayManager;
+import entities.Entity;
 import terrains.Terrain;
 import terrains.World;
 
@@ -24,11 +26,11 @@ public class PhysicsEngine {
 	public static final float COEFF_RESTITUTION = 0.5f;
 	public static final float COEFF_FRICTION = 0.15f;
 
-	private List<Ball> balls;
+	private List<RealBall> balls;
 	private World world;
 	private boolean enabled;
 
-	public PhysicsEngine(List<Ball> balls, World world) {
+	public PhysicsEngine(List<RealBall> balls, World world) {
 		this.balls = balls;
 		this.world = world;
 		this.enabled = true;
@@ -42,12 +44,12 @@ public class PhysicsEngine {
 		this.enabled = enabled;
 	}
 
-	public void addBall(Ball ball) {
+	public void addBall(RealBall ball) {
 		this.balls.add(ball);
 	}
 
 	public void tick() {
-		for (Ball b : balls) {
+		for (RealBall b : balls) {
 			b.checkInputs();
             b.applyAccelerations();
 			if ((b.isMoving() && b.movedLastStep()) || MainGameLoop.getCounter() < 10) {
@@ -161,7 +163,7 @@ public class PhysicsEngine {
 				// since F = m * a <=> F/m = a <=> F/m * t = v the effect on the velocity is computed as done below (Ffriction = coeffFriction * Fnormal)
 				float angleIncl = Vector3f.angle(new Vector3f(frictionDir.x,0,frictionDir.z), frictionDir);
 				angleIncl = (float) Math.min(Math.PI - angleIncl, angleIncl);
-				float frictionVelComponent = PhysicsEngine.COEFF_FRICTION * (PhysicsEngine.GRAVITY.length() * (float) (Math.cos(angleIncl))) * DisplayManager.getFrameTimeSeconds();
+				float frictionVelComponent = PhysicsEngine.COEFF_FRICTION * (PhysicsEngine.GRAVITY.length() * (float) (Math.cos(angleIncl))) * b.getTimeElapsed();
 				frictionDir = (Vector3f) frictionDir.scale(-frictionVelComponent);
 
 				// finally, the velocity of the ball is set to the projection (since the ball is not supposed to be bouncing)
@@ -186,7 +188,7 @@ public class PhysicsEngine {
 			System.out.println();
 			return;
 		}
-		
+
 		System.out.println("OBSTACLE COLLISON DETECTED");
 
 		ArrayList<PhysicalFace> combined = new ArrayList<PhysicalFace>();
@@ -221,7 +223,7 @@ public class PhysicsEngine {
 		}
 	}
 
-	public void resolveOrdinaryCollision(Ball b) { // might delegate this to own class CollisionSD (Static-Dynamic) and ball-ball collision to CollisionDD
+	/*public void resolveOrdinaryCollision(Ball b) { // might delegate this to own class CollisionSD (Static-Dynamic) and ball-ball collision to CollisionDD
 		while (b.getPosition().y - Ball.RADIUS < world.getHeightOfTerrain(b.getPosition().x, b.getPosition().z))
 			b.increasePosition(0, 0.001f, 0);
 
@@ -305,7 +307,7 @@ public class PhysicsEngine {
 
 			long intermediate2 = System.currentTimeMillis();
 			System.out.println("Time to push ball out and get remaining faces: " + (intermediate2 - before) + " (there are " + useForCollision.size() + " faces)");
-			*/ useForCollision = collidingFaces;
+			 useForCollision = collidingFaces;
 			bounceOrdinaryCollision(useForCollision, b);
 		//}
 	}
@@ -377,7 +379,7 @@ public class PhysicsEngine {
 				System.out.println("Friction1: ( " + frictionDir.x + " | " + frictionDir.y + " | " + frictionDir.z + " )");
 				float angleSN = Vector3f.angle(new Vector3f(frictionDir.x,0,frictionDir.z), frictionDir);
 				System.out.println("Gravity scaling: " + Math.cos(angleSN) + " Angle: " + angleSN);
-				float frictionAcc = PhysicsEngine.COEFF_FRICTION * (PhysicsEngine.GRAVITY.length() * DisplayManager.getFrameTimeSeconds() * (float)(Math.cos(angleSN)));
+				float frictionAcc = PhysicsEngine.COEFF_FRICTION * (PhysicsEngine.GRAVITY.length() * b.getTimeElapsed() * (float)(Math.cos(angleSN)));
 				System.out.println("Friction accleration: " + frictionAcc);
 				frictionDir = (Vector3f) frictionDir.scale(frictionAcc); // should now be the correctly scaled vector of the frictional ACCELERATION
 				System.out.println("Friction2: ( " + frictionDir.x + " | " + frictionDir.y + " | " + frictionDir.z + " )");
@@ -394,11 +396,12 @@ public class PhysicsEngine {
 			b.setVelocity(0, 0, 0);
 			b.setMoving(false);
 		}
-	}
+	}*/
 
 	public void resolveBallCollision(Ball b1) {
-		for (Ball b2 : this.balls) {
+		for (RealBall b2 : this.balls) {
 			if (!b1.equals(b2)) {
+				System.out.println("BALLS ARENT EQUAL");
 				// the normal is chose from b1 to b2 so that it will not only be parallel to the new vector of movement of b2 but will also point in the right direction
 				Vector3f normal = new Vector3f(b2.getPosition().x - b1.getPosition().x, b2.getPosition().y - b1.getPosition().y, b2.getPosition().z - b1.getPosition().z);
 				if (normal.lengthSquared() < Math.pow(2 * Ball.RADIUS, 2)) {
@@ -410,7 +413,7 @@ public class PhysicsEngine {
 					revM.normalise();
 					revM.scale(0.001f);
 					while (normal.lengthSquared() < Math.pow(2 * Ball.RADIUS, 2)) {
-						b1.increasePosition(revM);
+						b1.increasePosition(revM.x, revM.y, revM.z);
 						normal.set(b2.getPosition().x - b1.getPosition().x, b2.getPosition().y - b1.getPosition().y, b2.getPosition().z - b1.getPosition().z);
 					}
 
@@ -430,18 +433,46 @@ public class PhysicsEngine {
 					Vector3f.sub(projection, (Vector3f) normal.scale(Vector3f.dot(normal, projection)), projection);
 					normal.normalise();
 					normal.scale(factorB2);
-					b2.setVelocity(normal);
-					b2.setMoving(true);
+                    // check if the ball b1 is real, so that it would actually influence the other ball's movement
+                    if (!(b1 instanceof VirtualBall)) {
+    					b2.setVelocity(normal);
+    					b2.setMoving(true);
+                    }
 
 					// set the velocity of the already previously moving ball to its appropriate magnitude and update b1's velocity
 					if (projection.lengthSquared() > 0) {
-					projection.normalise();
-					projection.scale(factorB1);
+    					projection.normalise();
+    					projection.scale(factorB1);
 					}
 					b1.setVelocity(projection);
 				}
 			}
 		}
+	}
+
+	public ShotData performVirtualShot(RealBall b, Vector3f shotVel) {
+		ArrayList<Entity> obstaclesHit = new ArrayList<Entity>();
+
+		// the position and velocity of the virtual ball which is updated instead of a real ball
+		VirtualBall ball = new VirtualBall(b, shotVel);
+		System.out.printf("Initial position of the virtual ball: (%f|%f|%f)\n", ball.getPosition().x, ball.getPosition().y, ball.getPosition().z);
+		int counter = 0;
+		while (ball.isMoving() || counter < 10) {
+			ball.applyAccelerations();
+			if ((ball.isMoving() && ball.movedLastStep()) || counter < 10) {
+				ball.updateAndMove();
+				resolveTerrainCollision(ball);
+				resolveBallCollision(ball);
+				obstaclesHit.addAll(world.getCollidingEntities(ball));
+				//resolveObstacleCollision(ball);
+			} else {
+				ball.setVelocity(0, 0, 0);
+				ball.setMoving(false);
+			}
+			counter++;
+		}
+		
+		return new ShotData(ball.getPosition(), obstaclesHit);
 	}
 
 }

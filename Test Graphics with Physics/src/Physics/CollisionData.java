@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.lwjgl.util.vector.Vector3f;
 
 import entities.Ball;
+import entities.RealBall;
 
 public class CollisionData {
 
@@ -20,10 +21,10 @@ public class CollisionData {
 	public CollisionData(float[] ver, int[] ind) {
 		faces = new ArrayList<PhysicalFace>(ind.length/3);
 		collisionList = new ArrayList<PhysicalFace>();
-		
+
 		Vector3f p1 = new Vector3f(0,0,0), p2 = new Vector3f(0,0,0), p3 = new Vector3f(0,0,0);
 		Vector3f normal = new Vector3f(0,0,0), v1 = new Vector3f(0,0,0), v2 = new Vector3f(0,0,0);
-		
+
 		float minX = Float.MAX_VALUE;
 		float minY = minX;
 		float minZ = minX;
@@ -44,7 +45,7 @@ public class CollisionData {
 			p2.set(ver[currInd[1]], ver[currInd[1] + 1], ver[currInd[1] + 2]);
 			// third vertex
 			p3.set(ver[currInd[2]], ver[currInd[2] + 1], ver[currInd[2] + 3]);
-			
+
 			// adjusting max/min values
 			minX = Math.min(minX, Math.min(p1.x, Math.min(p2.x, p3.x)));
 			minY = Math.min(minY, Math.min(p1.y, Math.min(p2.y, p3.y)));
@@ -52,7 +53,7 @@ public class CollisionData {
 			maxX = Math.max(maxX, Math.max(p1.x, Math.max(p2.x, p3.x)));
 			maxY = Math.max(maxY, Math.max(p1.y, Math.max(p2.y, p3.y)));
 			maxZ = Math.max(maxZ, Math.max(p1.z, Math.max(p2.z, p3.z)));
-			
+
 			// constructing a face from the three points p1, p2 and p3 and their resulting normal
 			Vector3f.sub(p2, p1, v1);
 			Vector3f.sub(p3, p1, v2);
@@ -62,7 +63,7 @@ public class CollisionData {
 
 			faces.add(face);
 		}
-		
+
 		bbox = new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
 	}
 
@@ -73,7 +74,7 @@ public class CollisionData {
 	public void setBoundingBox(float minX, float minY, float minZ, float maxX, float maxY, float maxZ) {
 		bbox = new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
 	}
-	
+
 	public BoundingBox getBoundingBox() {
 		return bbox;
 	}
@@ -89,6 +90,14 @@ public class CollisionData {
 
 	public boolean inBounds(Ball b) {
 		return bbox.inBoundingBox(b);
+	}
+	
+	public boolean collides(Ball b) {
+		for (PhysicalFace f : faces) {
+			if (f.collidesWithFace(b))
+				return true;
+		}
+		return false;
 	}
 
 }

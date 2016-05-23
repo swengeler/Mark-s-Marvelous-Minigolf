@@ -12,9 +12,9 @@ public class Camera {
 	private float yaw;				//How much left or right the camera is aiming
 	private float roll;				//How much the camera is tilted
 	
-	private Ball ball;
+	private RealBall ball;
 	
-	public Camera(Ball ball){
+	public Camera(RealBall ball){
 		this.ball = ball;
 	}
 

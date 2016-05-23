@@ -13,6 +13,8 @@ import org.lwjgl.util.vector.Vector4f;
 
 import Physics.BoundingBox;
 import Physics.PhysicsEngine;
+import Physics.ShotData;
+import entities.RealBall;
 import entities.Ball;
 import entities.Camera;
 import entities.Entity;
@@ -38,7 +40,7 @@ import water.WaterShader;
 import water.WaterTile;
 
 public class MainGameLoop {
-	
+
 	private static int counter;
 
 	public static void main(String[] args) {
@@ -110,9 +112,9 @@ public class MainGameLoop {
 		//lights.add(new Light(new Vector3f(35,17,35),new Vector3f(0,2,2), new Vector3f(1,0.01f,0.002f)));
 		//lights.add(new Light(new Vector3f(0,7,70),new Vector3f(2,2,0), new Vector3f(1,0.01f,0.002f)));
 
-		Ball player1 = new Ball(ballTModel, new Vector3f(200, 25, 400), 0, 0, 0, 1, true);
-		Ball player2 = new Ball(ballTModel, new Vector3f(200.5f, 1, 400), 0, 0, 0, 1, false);
-		List<Ball> balls = new ArrayList<Ball>();
+		RealBall player1 = new RealBall(ballTModel, new Vector3f(200, 25, 400), 0, 0, 0, 1, true);
+		RealBall player2 = new RealBall(ballTModel, new Vector3f(200.5f, 1, 400), 0, 0, 0, 1, false);
+		List<RealBall> balls = new ArrayList<RealBall>();
 		balls.add(player1);
 		balls.add(player2);
 
@@ -129,10 +131,9 @@ public class MainGameLoop {
 		nature.add(new Entity(boxTModel, box, new Vector3f(200, 0, 200), 0, 0, 0, 5, "box"));
 		nature.add(new Entity(dragonTModel, dragon_low, new Vector3f(400, 0, 200), 0, 0, 0, 5, "dragon"));
 
-		BoundingBox bbox = nature.get(1).getCollisionData().getBoundingBox();
-		bbox.print();
+		//BoundingBox bbox = nature.get(1).getCollisionData().getBoundingBox();
+		//bbox.print();
 
-		
 		MasterRenderer renderer = new MasterRenderer(loader);
 
 		List<GuiTexture> guis = new ArrayList<GuiTexture>();
@@ -154,7 +155,20 @@ public class MainGameLoop {
 		WaterRenderer waterRenderer = new WaterRenderer(loader, waterShader, renderer.getProjectionMatrix(), fbos);
 		List<WaterTile> waters = new ArrayList<WaterTile>();
 		//waters.add(new WaterTile(75, 120, 0));
-
+		
+		
+		
+		long ago = System.currentTimeMillis();
+		
+		ShotData sData = mainEngine.performVirtualShot(player1, new Vector3f(-10, 0, 0));
+		System.out.printf("Shot ends up at: (%f|%f|%f)\n", sData.getEndPosition().x, sData.getEndPosition().y, sData.getEndPosition().z);
+		
+		long notSoLongAgo = System.currentTimeMillis();
+		System.out.println("Time for virtual shot: " + (notSoLongAgo - ago));
+		
+		
+		
+		
 		long after = System.currentTimeMillis();
 		System.out.println("\nTIME TO PREPARE MODES ETC.: " + (after - before) + "\n");
 		DisplayManager.resetFrameTime();
@@ -162,7 +176,7 @@ public class MainGameLoop {
 			world.start();
 			System.out.println("\n---- While loop run " + (counter++) + " times ----");
 			picker.update();
-			
+
 			if (mainEngine.isEnabled())
 				mainEngine.tick();
 
@@ -203,16 +217,16 @@ public class MainGameLoop {
 			}
 			System.out.println("---- While loop end ----\n");
 		}
-
+		
 		fbos.cleanUp();
 		waterShader.cleanUp();
 		guiRenderer.cleanUp();
 		renderer.cleanUp();
 		loader.cleanUp();
 		DisplayManager.closeDisplay();
-
-	}
 	
+	}
+
 	public static int getCounter() {
 		return counter;
 	}

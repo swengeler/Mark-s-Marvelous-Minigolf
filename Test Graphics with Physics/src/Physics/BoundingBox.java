@@ -3,6 +3,7 @@ package Physics;
 import org.lwjgl.util.vector.Vector3f;
 
 import entities.Ball;
+import entities.RealBall;
 
 public class BoundingBox {
 

@@ -130,7 +130,7 @@ public class Entity {
 	public CollisionData getCollisionData() {
 		return cdata;
 	}
-	
+
 	public void printBBox() {
 		cdata.getBoundingBox().print();
 	}
@@ -141,6 +141,10 @@ public class Entity {
 
 	public boolean inBounds(Ball b) {
 		return this.cdata.inBounds(b);
+	}
+	
+	public boolean collides(Ball b) {
+		return this.cdata.collides(b);
 	}
 
 	public float getTextureXOffset(){

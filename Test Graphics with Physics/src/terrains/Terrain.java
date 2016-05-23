@@ -14,6 +14,7 @@ import org.lwjgl.util.vector.Vector4f;
 import Physics.CollisionData;
 import Physics.PhysicalFace;
 import entities.Ball;
+import entities.RealBall;
 import models.RawModel;
 import objConverter.ModelData;
 import renderEngine.Loader;
@@ -213,7 +214,7 @@ public class Terrain {
 	}
 
 	public boolean ballInTerrain(Ball b) {
-		float ballR = Ball.RADIUS;
+		float ballR = RealBall.RADIUS;
 		float ballX = b.getPosition().x;
 		float ballZ = b.getPosition().z;
 		return  (ballX - ballR) < (this.x + Terrain.SIZE) && (ballX + ballR) > this.x &&
@@ -222,7 +223,7 @@ public class Terrain {
 
 	public ArrayList<PhysicalFace> getCollidingFaces(Ball b) {
 		System.out.println("getCollidingFaces in Terrain is called (Terrain at " + this.x + "|" + this.z + ")");
-		float ballR = Ball.RADIUS;
+		float ballR = RealBall.RADIUS;
 		float ballX = b.getPosition().x - this.x;
 		float ballZ = b.getPosition().z - this.z;
 

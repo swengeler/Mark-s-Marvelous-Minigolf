@@ -10,6 +10,7 @@ import Physics.PhysicalFace;
 import entities.Entity;
 import entities.Light;
 import toolbox.Maths;
+import entities.RealBall;
 import entities.Ball;
 import entities.Camera;
 
@@ -70,6 +71,16 @@ public class World {
 	
 	public List<Light> getLights(){
 		return lights;
+	}
+	
+	public ArrayList<Entity> getCollidingEntities(Ball b) {
+		ArrayList<Entity> obstaclesHit = new ArrayList<Entity>();
+		for (Entity e : entities) {
+			if (e.collides(b)) {
+				obstaclesHit.add(e);
+			}
+		}
+		return obstaclesHit;
 	}
 	
 	public ArrayList<PhysicalFace> getCollidingFacesEntities(Ball b) {
