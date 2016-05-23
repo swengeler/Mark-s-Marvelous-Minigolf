@@ -165,24 +165,26 @@ public class MasterRenderer {
 		return projectionMatrix;
 	}
 
-	public void processWorld(World world, Vector4f clipPlane) {
+	public void processWorld(World world, Vector4f clipPlane, boolean normalMap) {
 		for(Terrain t:world.getTerrains())
 			terrains.add(t);
 		for(Entity e:world.getEntities())
 			processEntity(e);
-		for(Entity e:world.getNormalEntities())
-			processNormalMapEntity(e);
+		if(normalMap)
+			for(Entity e:world.getNormalEntities())
+				processNormalMapEntity(e);
 		render(world.getLights(), world.getCamera(), clipPlane);
 		
 	}
 	
-	public void processWorld(World world) {
+	public void processWorld(World world, boolean normalMap) {
 		for(Terrain t:world.getTerrains())
 			terrains.add(t);
 		for(Entity e:world.getEntities())
 			processEntity(e);
-		for(Entity e:world.getNormalEntities())
-			processNormalMapEntity(e);
+		if(normalMap)
+			for(Entity e:world.getNormalEntities())
+				processNormalMapEntity(e);
 		render(world.getLights(), world.getCamera(), new Vector4f(0, -1, 0, 1000));
 		
 	}

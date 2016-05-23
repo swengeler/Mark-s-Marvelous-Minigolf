@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 
 import models.RawModel;
+import programStates.GameState;
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
 import entities.Camera;
@@ -66,7 +67,7 @@ private static final float SIZE = 500f;
 	private int texture;
 	private int nightTexture;
 	private SkyboxShader shader;
-	private float time = 0;
+	private float time = 12;
 	
 	public SkyboxRenderer(Loader loader, Matrix4f projectionMatrix, String skyBox){
 		cube = loader.loadToVAO(VERTICES, 3);
@@ -91,10 +92,8 @@ private static final float SIZE = 500f;
 		GL30.glBindVertexArray(0);
 	}
 	
-	private void bindTextures(){
-		/*
-		time += DisplayManager.getFrameTimeSeconds() * 1000;
-		time %= 24000;
+	private void bindTextures(){/*
+		time = GameState.currTime * 1000;
 		int texture1;
 		int texture2;
 		float blendFactor;		
@@ -114,9 +113,10 @@ private static final float SIZE = 500f;
 			texture1 = texture;
 			texture2 = nightTexture;
 			blendFactor = (time - 21000)/(24000 - 21000);
-		}*/ 
+		}
+		*/
 		float blendFactor = 0.0f;
-
+		
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, texture);
 		GL13.glActiveTexture(GL13.GL_TEXTURE1);

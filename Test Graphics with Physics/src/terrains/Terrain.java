@@ -76,7 +76,7 @@ public class Terrain {
 	private RawModel generateTerrain(Loader loader, boolean rand){
 		if(rand){
 			int VERTEX_COUNT = 256;
-			HeightsGenerator generator = new HeightsGenerator((int)(x/SIZE),(int)(z/SIZE), VERTEX_COUNT, 1);
+			HeightsGenerator generator = new HeightsGenerator((int)(x/SIZE),(int)(z/SIZE), VERTEX_COUNT, (int)(Math.random()*100000));
 			heights = new float[VERTEX_COUNT][VERTEX_COUNT];
 			
 			int count = VERTEX_COUNT * VERTEX_COUNT;

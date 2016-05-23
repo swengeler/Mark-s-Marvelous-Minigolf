@@ -66,6 +66,10 @@ public class World {
 		getNormalEntities().addAll(normEnt);
 	}
 	
+	public void addNE(Entity e){
+		normalEntities.add(e);
+	}
+	
 	public List<Light> getLights(){
 		return lights;
 	}

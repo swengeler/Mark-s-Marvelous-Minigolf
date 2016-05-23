@@ -53,6 +53,10 @@ public class WaterRenderer {
 		unbind();
 	}
 	
+	public WaterShader getShader() {
+		return shader;
+	}
+
 	private void prepareRender(Camera camera){
 		shader.start();
 		shader.loadViewMatrix(camera);

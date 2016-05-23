@@ -14,13 +14,13 @@ import Physics.PhysicsEngine;
 public class Ball extends Entity{
 	public static final float RADIUS = 1.1925f;
 	
-	private static final float RUN_SPEED = 2;
-	private static final float TURN_SPEED = 100;
-	private static final float JUMP_POWER = 40;
+	private static final float RUN_SPEED = 4;
+	private static final float TURN_SPEED = 200;
+	private static final float JUMP_POWER = 80;
 	private static final float MIN_XVEL = 0;
 	private static final float MIN_YVEL = 0;
 	private static final float MIN_ZVEL = 0;
-	private static final float COEFF_RESTITUTION = 0.56f;
+	private static final float COEFF_RESTITUTION = 1f;
 
 	private static final float BR_DECIDER = (float) (Math.PI * 0.1);
 
@@ -35,8 +35,7 @@ public class Ball extends Entity{
 		super(model, position, rotX, rotY, rotZ, scale);
 	}
 
-	public void move(World world){ // world really necessary?
-		checkInputs(world);
+	public void move(World world){ // world really necessary?;
 		super.increaseRotation(0, currentTurnSpeed * DisplayManager.getFrameTimeSeconds(), 0);
 		Vector3f gravity = new Vector3f(PhysicsEngine.GRAVITY.x, PhysicsEngine.GRAVITY.y, PhysicsEngine.GRAVITY.z);
 		gravity = (Vector3f) gravity.scale(DisplayManager.getFrameTimeSeconds());
@@ -66,7 +65,7 @@ public class Ball extends Entity{
 			this.currentVel.y = JUMP_POWER;
 	}
 
-	private void checkInputs(World world){
+	public void checkInputs(World world){
 		if(Keyboard.isKeyDown(Keyboard.KEY_W)){
 			this.currentVel.x += (float) (RUN_SPEED * Math.sin(Math.toRadians(super.getRotY())));
 			this.currentVel.z += (float) (RUN_SPEED * Math.cos(Math.toRadians(super.getRotY())));
