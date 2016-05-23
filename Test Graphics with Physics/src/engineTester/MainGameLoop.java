@@ -160,7 +160,7 @@ public class MainGameLoop {
 		
 		long ago = System.currentTimeMillis();
 		
-		ShotData sData = mainEngine.performVirtualShot(player1, new Vector3f(-10, 0, 0));
+		ShotData sData = mainEngine.performVirtualShot(player1, new Vector3f(0, 0, 300));
 		System.out.printf("Shot ends up at: (%f|%f|%f)\n", sData.getEndPosition().x, sData.getEndPosition().y, sData.getEndPosition().z);
 		
 		long notSoLongAgo = System.currentTimeMillis();

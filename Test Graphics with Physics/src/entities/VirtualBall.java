@@ -31,9 +31,6 @@ public class VirtualBall implements Ball {
 		Vector3f delta = new Vector3f(velocity.x, velocity.y, velocity.z);
 		delta.scale(getTimeElapsed());
 		increasePosition(delta.x, delta.y, delta.z);
-		
-		System.out.printf("Ball's position after moving: (%f|%f|%f)\n", position.x, position.y, position.z);
-		System.out.printf("Ball's velocity after moving (with gravity applied): (%f|%f|%f)\n", velocity.x, velocity.y, velocity.z);
 	}
 	
 	public float getTimeElapsed() {

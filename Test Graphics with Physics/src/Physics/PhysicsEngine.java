@@ -13,10 +13,12 @@ import entities.Ball;
 import entities.Entity;
 import terrains.Terrain;
 import terrains.World;
+import toolbox.Maths;
 
 public class PhysicsEngine {
 
 	private static final float NORMAL_TH = 0.001f;
+	private static final float ANGLE_TH  = 5f;
 	private static final float C = 0.001f;
 	public static final float MIN_MOV_REQ = 0.000f;
 
@@ -128,58 +130,11 @@ public class PhysicsEngine {
 				forResolution = new PhysicalFace(normal, p1, p2, p3);
 			}
 
-			// calculate the angle between the plane that is used for collision resolution and the velocity vector of the ball
-			// since Vector3f.angle(x, y) can compute angles over 90 degrees, there is an additional check to make sure the angle is below 90 degrees
-			float temp = Vector3f.angle(forResolution.getNormal(), b.getVelocity());
-			float angle = (float) Math.min(Math.PI - temp, temp);
-			angle = (float) (Math.PI/2 - angle);
-
-			// some pre-processing whose results will be used in both the bouncing and the rolling case
-			// the normal component of the velocity is the projection of said velocity on the normal vector of the plane
-			// that normal component will then be subtracted from the original velocity to get the new one
-			Vector3f normal = new Vector3f(forResolution.getNormal().x, forResolution.getNormal().y, forResolution.getNormal().z);
-			Vector3f normalComponent = new Vector3f(normal.x, normal.y, normal.z);
-			normalComponent.scale(2 * Vector3f.dot(b.getVelocity(), normal) * (1/normal.lengthSquared()));
-			Vector3f.sub(b.getVelocity(), normalComponent, b.getVelocity());
-
-			// 45 degrees and 5 degrees are estimated
-			if (angle > Math.toRadians(45) || (angle * b.getVelocity().lengthSquared() * C > 1 && angle > Math.toRadians(5))) {
-				// the ball is bouncing and the velocity can simply remain as is, only the coefficient of restitution has to be applied
-				System.out.println("BOUNCING");
-				b.scaleVelocity(COEFF_RESTITUTION);
-			} else {
-				// the ball is rolling (or sliding but that is not implemented (yet)), therefore a projection on the plane instead of a reflection is used
-				System.out.println("ROLLING");
-				Vector3f projection = new Vector3f();
-				normalComponent.scale(-0.5f);
-				Vector3f.sub(b.getVelocity(), normalComponent, projection);
-
-				// friction is applied in the opposite direction as the movement of the ball, the vector can therefore be constructed from the projection
-				Vector3f frictionDir = new Vector3f(projection.x, projection.y, projection.z);
-				frictionDir.normalise();
-
-				// the angle of inclination of the plane in the direction of movement/friction in respect to the horizontal plane
-				// knowing this angle, the magnitude of the frictional force and acceleration can be computed
-				// since F = m * a <=> F/m = a <=> F/m * t = v the effect on the velocity is computed as done below (Ffriction = coeffFriction * Fnormal)
-				float angleIncl = Vector3f.angle(new Vector3f(frictionDir.x,0,frictionDir.z), frictionDir);
-				angleIncl = (float) Math.min(Math.PI - angleIncl, angleIncl);
-				float frictionVelComponent = PhysicsEngine.COEFF_FRICTION * (PhysicsEngine.GRAVITY.length() * (float) (Math.cos(angleIncl))) * b.getTimeElapsed();
-				frictionDir = (Vector3f) frictionDir.scale(-frictionVelComponent);
-
-				// finally, the velocity of the ball is set to the projection (since the ball is not supposed to be bouncing)
-				// then friction is applied (if the effect of friction is larger than the actual velocity, the ball just stops)
-				b.setVelocity(projection.x, projection.y, projection.z);
-				if (b.getVelocity().lengthSquared() > frictionDir.lengthSquared())
-					b.increaseVelocity(frictionDir);
-				else {
-					b.setVelocity(0, 0, 0);
-					//b.setMoving(false);
-				}
-			}
+			resolvePlaneCollision(b, forResolution);
+			
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public void resolveObstacleCollision(Ball b) {
 		ArrayList<PhysicalFace> collidingFaces = new ArrayList<PhysicalFace>();
 		collidingFaces.addAll(world.getCollidingFacesEntities(b));
@@ -209,6 +164,44 @@ public class PhysicsEngine {
 		}
 		System.out.println("Number of planes after reduction: " + combined.size());
 		collidingFaces = (ArrayList<PhysicalFace>) combined.clone();
+		
+		if (collidingFaces.size() == 1) {
+			System.out.println("OBSTACLE COLLISION WITH ONE PLANE");
+			// the simplest case, where the ball collides with one plane/face and the collision resolution is very simple
+			resolvePlaneCollision(b, collidingFaces.get(0));
+		} else if (collidingFaces.size() == 2) {
+			System.out.println("OBSTACLE COLLISION WITH TWO PLANES");
+			//for (PhysicalFace f : combined) {
+			//	float angle = Vector3f.angle(b.getVelocity(), f.getNormal());
+			//	angle = (float) Math.min(angle, Math.PI - angle);
+			//	if (angle < Math.toRadians(ANGLE_TH) /*|| (angle * b.getVelocity().lengthSquared() * C < 1 && angle < Math.toRadians(45))*/) {
+			//		collidingFaces.remove(f);
+			//	}
+			//}
+			
+			System.out.println("Plane 1: " + collidingFaces.get(0));
+			System.out.println("Plane 2: " + collidingFaces.get(1));
+			
+			Vector3f[] pointsOfIntersection = Maths.intersectionPoints(collidingFaces.get(0), collidingFaces.get(1), b);
+			for (int i = 0; i < pointsOfIntersection.length; i++) {
+				System.out.printf("Intersection point %d: (%f|%f|%f)\n", (i + 1), pointsOfIntersection[i].x, pointsOfIntersection[i].y, pointsOfIntersection[i].z); 
+			}
+			
+			if (collidingFaces.size() == 0) {
+				// in that case the ball's movement is almost parallel to both planes, thus it should just move parallel to them
+				
+			} else if (collidingFaces.size() == 1) {
+				// in that case the ball moves parallel to one plane and therefore simply collides with the other one
+				resolvePlaneCollision(b, collidingFaces.get(0));
+			} else {
+				
+			}
+			
+		} else if (collidingFaces.size() == 3) {
+			System.out.println("OBSTACLE COLLISION WITH THREE PLANES");
+		} else {
+			System.out.println("OBSTACLE COLLISION WITH MORE THAN THREE PLANES");
+		}
 
 		if (collidingFaces.size() > 1) {
 			for (PhysicalFace f : combined) {
@@ -401,7 +394,6 @@ public class PhysicsEngine {
 	public void resolveBallCollision(Ball b1) {
 		for (RealBall b2 : this.balls) {
 			if (!b1.equals(b2)) {
-				System.out.println("BALLS ARENT EQUAL");
 				// the normal is chose from b1 to b2 so that it will not only be parallel to the new vector of movement of b2 but will also point in the right direction
 				Vector3f normal = new Vector3f(b2.getPosition().x - b1.getPosition().x, b2.getPosition().y - b1.getPosition().y, b2.getPosition().z - b1.getPosition().z);
 				if (normal.lengthSquared() < Math.pow(2 * Ball.RADIUS, 2)) {
@@ -446,6 +438,57 @@ public class PhysicsEngine {
 					}
 					b1.setVelocity(projection);
 				}
+			}
+		}
+	}
+	
+	private void resolvePlaneCollision(Ball b, PhysicalFace forResolution) {
+		// calculate the angle between the plane that is used for collision resolution and the velocity vector of the ball
+		// since Vector3f.angle(x, y) can compute angles over 90 degrees, there is an additional check to make sure the angle is below 90 degrees
+		float temp = Vector3f.angle(forResolution.getNormal(), b.getVelocity());
+		float angle = (float) Math.min(Math.PI - temp, temp);
+		angle = (float) (Math.PI/2 - angle);
+
+		// some pre-processing whose results will be used in both the bouncing and the rolling case
+		// the normal component of the velocity is the projection of said velocity on the normal vector of the plane
+		// that normal component will then be subtracted from the original velocity to get the new one
+		Vector3f normal = new Vector3f(forResolution.getNormal().x, forResolution.getNormal().y, forResolution.getNormal().z);
+		Vector3f normalComponent = new Vector3f(normal.x, normal.y, normal.z);
+		normalComponent.scale(2 * Vector3f.dot(b.getVelocity(), normal) * (1/normal.lengthSquared()));
+		Vector3f.sub(b.getVelocity(), normalComponent, b.getVelocity());
+
+		// 45 degrees and 5 degrees are estimated
+		if (angle > Math.toRadians(45) || (angle * b.getVelocity().lengthSquared() * C > 1 && angle > Math.toRadians(ANGLE_TH))) {
+			// the ball is bouncing and the velocity can simply remain as is, only the coefficient of restitution has to be applied
+			System.out.println("BOUNCING");
+			b.scaleVelocity(COEFF_RESTITUTION);
+		} else {
+			// the ball is rolling (or sliding but that is not implemented (yet)), therefore a projection on the plane instead of a reflection is used
+			System.out.println("ROLLING");
+			Vector3f projection = new Vector3f();
+			normalComponent.scale(-0.5f);
+			Vector3f.sub(b.getVelocity(), normalComponent, projection);
+
+			// friction is applied in the opposite direction as the movement of the ball, the vector can therefore be constructed from the projection
+			Vector3f frictionDir = new Vector3f(projection.x, projection.y, projection.z);
+			frictionDir.normalise();
+
+			// the angle of inclination of the plane in the direction of movement/friction in respect to the horizontal plane
+			// knowing this angle, the magnitude of the frictional force and acceleration can be computed
+			// since F = m * a <=> F/m = a <=> F/m * t = v the effect on the velocity is computed as done below (Ffriction = coeffFriction * Fnormal)
+			float angleIncl = Vector3f.angle(new Vector3f(frictionDir.x,0,frictionDir.z), frictionDir);
+			angleIncl = (float) Math.min(Math.PI - angleIncl, angleIncl);
+			float frictionVelComponent = PhysicsEngine.COEFF_FRICTION * (PhysicsEngine.GRAVITY.length() * (float) (Math.cos(angleIncl))) * b.getTimeElapsed();
+			frictionDir = (Vector3f) frictionDir.scale(-frictionVelComponent);
+
+			// finally, the velocity of the ball is set to the projection (since the ball is not supposed to be bouncing)
+			// then friction is applied (if the effect of friction is larger than the actual velocity, the ball just stops)
+			b.setVelocity(projection.x, projection.y, projection.z);
+			if (b.getVelocity().lengthSquared() > frictionDir.lengthSquared())
+				b.increaseVelocity(frictionDir);
+			else {
+				b.setVelocity(0, 0, 0);
+				//b.setMoving(false);
 			}
 		}
 	}
