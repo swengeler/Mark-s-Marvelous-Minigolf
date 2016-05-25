@@ -228,7 +228,7 @@ public class MainGameLoop {
 		system.setDirection(new Vector3f(1,0,0), 0.1f);
 		
 		
-		//currState = new MenuState(loader);
+		currState = new MenuState(loader);
 		DisplayManager.reset();
 		
 		while(!Display.isCloseRequested()){
