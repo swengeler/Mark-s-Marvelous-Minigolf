@@ -116,7 +116,11 @@ public class Entity {
 			Vector3f.sub(p2, p1, v1);
 			Vector3f.sub(p3, p1, v2);
 			Vector3f.cross(v1, v2, normal);
-			normal.normalise();
+			if (normal.lengthSquared() == 0) {
+				normal.set(0, 1f, 0);
+			} else {
+				normal.normalise();
+			}
 			face = new PhysicalFace(normal, p1, p2, p3);
 
 			cdata.addFace(face);

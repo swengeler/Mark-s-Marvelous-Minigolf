@@ -57,9 +57,10 @@ public class MainGameLoop {
 		ModelData grass = OBJFileLoader.loadOBJ("grassModel");
 		ModelData pine = OBJFileLoader.loadOBJ("pine");
 		ModelData flower = OBJFileLoader.loadOBJ("grassModel");
-	    ModelData box = OBJFileLoader.loadOBJ("box_big");
+	    ModelData box = OBJFileLoader.loadOBJ("wall2");
 	    ModelData dragon = OBJFileLoader.loadOBJ("dragon");
 	    ModelData dragon_low = OBJFileLoader.loadOBJ("dragon_low_test");
+	    ModelData flag = OBJFileLoader.loadOBJ("flag");
 		box.print(ModelData.PRINT_DATA_FILE);
 
 		RawModel humanModel = loader.loadToVAO(human.getVertices(), human.getTextureCoords(), human.getNormals(), human.getIndices());
@@ -71,6 +72,7 @@ public class MainGameLoop {
 		RawModel boxModel = loader.loadToVAO(box.getVertices(), box.getTextureCoords(), box.getNormals(), box.getIndices());
 		RawModel flowerModel = loader.loadToVAO(flower.getVertices(), flower.getTextureCoords(), flower.getNormals(), flower.getIndices());
 		RawModel dragonModel = loader.loadToVAO(dragon.getVertices(), dragon.getTextureCoords(), dragon.getNormals(), dragon.getIndices());
+		RawModel flagModel = loader.loadToVAO(flag.getVertices(), flag.getTextureCoords(), flag.getNormals(), flag.getIndices());
 
 		TexturedModel humanTModel = new TexturedModel(humanModel,new ModelTexture(loader.loadTexture("playerTexture")));
 		TexturedModel ballTModel = new TexturedModel(ballModel,new ModelTexture(loader.loadTexture("white")));
@@ -78,9 +80,10 @@ public class MainGameLoop {
 		TexturedModel fernTModel = new TexturedModel(fernModel,new ModelTexture(loader.loadTexture("fernAtlas")));
 		TexturedModel grassTModel = new TexturedModel(grassModel,new ModelTexture(loader.loadTexture("grassTexture")));
 		TexturedModel pineTModel = new TexturedModel(pineModel,new ModelTexture(loader.loadTexture("pine")));
-		TexturedModel boxTModel = new TexturedModel(boxModel,new ModelTexture(loader.loadTexture("box")));
+		TexturedModel boxTModel = new TexturedModel(boxModel,new ModelTexture(loader.loadTexture("black_big")));
 		TexturedModel flowerTModel = new TexturedModel(flowerModel,new ModelTexture(loader.loadTexture("flower")));
 		TexturedModel dragonTModel = new TexturedModel(dragonModel,new ModelTexture(loader.loadTexture("white")));
+		TexturedModel flagTModel = new TexturedModel(flagModel,new ModelTexture(loader.loadTexture("white")));
 
 
 		long beforeHumans = System.currentTimeMillis();
@@ -90,6 +93,7 @@ public class MainGameLoop {
 		Entity c = new Entity(fernTModel, fern, new Vector3f(0, 0, 0), 0, 0, 0, 1, "fern");
 		Entity d = new Entity(grassTModel, grass, new Vector3f(0, 0, 0), 0, 0, 0, 1, "grass");
 		Entity e = new Entity(boxTModel, box, new Vector3f(0, 0, 0), 0, 0, 0, 1, "box");
+		Entity f = new Entity(flagTModel, flag, new Vector3f(300, 0, 300), 0, 0, 0, 4, "flag");
 		long afterHumans = System.currentTimeMillis();
 		System.out.println("Time to load entities: " + (afterHumans - beforeHumans));
 
@@ -130,6 +134,7 @@ public class MainGameLoop {
 		nature.add(new Entity(boxTModel, box, new Vector3f(200, 0, 200), 0, 0, 0, 5, "box"));
 		nature.add(new Entity(dragonTModel, dragon_low, new Vector3f(400, 0, 200), 0, 0, 0, 5, "dragon"));
 		nature.add(new Entity(treeTModel, tree, new Vector3f(300, 0, 100), 0, 0, 0, 3, "tree"));
+		nature.add(f);
 
 		//BoundingBox bbox = nature.get(1).getCollisionData().getBoundingBox();
 		//bbox.print();
