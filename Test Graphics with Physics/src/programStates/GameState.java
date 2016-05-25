@@ -79,6 +79,10 @@ public class GameState implements State {
 		mainEngine = new PhysicsEngine(balls, world);
 		loadWater();
 		loadParticleSystem();
+		createBall(new Vector3f(0,0,20));
+		currBall = 1;
+		setCameraToBall(currBall);
+		
 	}
 	
 	@Override
@@ -123,6 +127,12 @@ public class GameState implements State {
 	@Override
 	public void checkInputs() {
 		balls.get(currBall).checkInputs(world);
+	}
+	
+	public void setCameraToBall(int index){
+		camera = new Camera(balls.get(index));
+		renderer.updateCamera(camera);
+		world.setCamera(camera);
 	}
 	
 	@Override
