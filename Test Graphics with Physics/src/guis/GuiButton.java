@@ -13,20 +13,17 @@ import renderEngine.Loader;
 
 public class GuiButton {
 	
-	public static final float SCREEN_WIDTH = 1920f;
-	public static final float SCREEN_HEIGHT = 1080f;
-	
 	private GuiTexture texture;
 	private float width;
 	private float height;
 	private Vector2f position;
 	
-	public GuiButton(String guiTex, Vector2f position, Loader loader){
+	public GuiButton(String guiTex, Vector2f position,Vector2f scale, Loader loader){
 		BufferedImage image = null;
 		try {
 			image = ImageIO.read(new File("res/" + guiTex + ".png"));
-			width = image.getWidth();
-			height = image.getHeight();
+			width = image.getWidth() * scale.x;
+			height = image.getHeight() * scale.y;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
