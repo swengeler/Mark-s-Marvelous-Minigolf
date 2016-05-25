@@ -19,7 +19,6 @@ public class Terrain {
 	private static final float SIZE = 800;
 	private static final int VERTEX_COUNT = 512;
 	private static final float MAX_HEIGHT = 40;
-	private static final float HEIGHT = -30;
 	private static final float RADIUS = 25;
 	private static final float MAX_PIXEL_COLOR = 256 * 256 * 256;
 	
@@ -46,6 +45,11 @@ public class Terrain {
 		this.z = gridZ * getSize();
 		this.model = generateTerrain(loader, heightMap);
 		
+	}
+	
+	public boolean inWorld(float x, float z) {
+		
+		return true;
 	}
 	
 	public float[][] getHeights(){
@@ -77,28 +81,41 @@ public class Terrain {
 	}
 	
 	public void updateTerrain(Loader loader, float x, float z, float change) {
-		System.out.println(change);
 		int count = VERTEX_COUNT * VERTEX_COUNT;
 		float[] vertices = new float[count * 3];
 		float[] normals = new float[count * 3];
 		float[] textureCoords = new float[count*2];
 		int[] indices = new int[6*(VERTEX_COUNT-1)*(VERTEX_COUNT-1)];
 		int vertexPointer = 0;
-		float currentHeight = heights[(int)x][(int)z];
-		float newHeight = currentHeight + change;
+		//float currentHeight = heights[(int)x][(int)z];
+		//float newHeight = currentHeight + change;
 		for(float i = -RADIUS; i <= RADIUS; i++) {
 			for (float k = -RADIUS; k  <= RADIUS; k++) {
+				heights[(int)(x + i)][(int)(z + k)] += change;
+				if (heights[(int)(x + i)][(int)(z + k)] >= MAX_HEIGHT) {
+					heights[(int)(x + i)][(int)(z + k)] =  MAX_HEIGHT;
+				} else if (heights[(int)(x + i)][(int)(z + k)] <= -MAX_HEIGHT) {
+					heights[(int)(x + i)][(int)(z + k)] =  -MAX_HEIGHT;
+				}
+				/*
 				float distance = (float) Math.sqrt((i*i)+(k*k));
 				if (distance <= RADIUS) {
 					float height = (float) ((newHeight/2) * -(Math.cos(Math.PI - (Math.PI * (distance/RADIUS))))+(newHeight/2));
-					if (x + i >= 0 && x + i <= VERTEX_COUNT && z + k >= 0 && z + k <= VERTEX_COUNT) {
-						if (change > 0 && height > heights[(int)(x + i)][(int)(z + k)]) {
-							heights[(int)(x + i)][(int)(z + k)] =  height;		
-						} else if(change < 0 && height < heights[(int)(x + i)][(int)(z + k)]) {
-							heights[(int)(x + i)][(int)(z + k)] =  height;	
+					if (height >= MAX_HEIGHT) {
+						heights[(int)(x + i)][(int)(z + k)] =  MAX_HEIGHT;
+					} else if (height <= -MAX_HEIGHT) {
+						heights[(int)(x + i)][(int)(z + k)] =  -MAX_HEIGHT;
+					} else {
+						if (x + i >= 0 && x + i <= VERTEX_COUNT && z + k >= 0 && z + k <= VERTEX_COUNT) {
+							if (change > 0 && height > heights[(int)(x + i)][(int)(z + k)]) {
+								heights[(int)(x + i)][(int)(z + k)] =  height;		
+							} else if(change < 0 && height < heights[(int)(x + i)][(int)(z + k)]) {
+								heights[(int)(x + i)][(int)(z + k)] =  height;	
+							}
 						}
 					}
 				}
+				*/
 			}
 		}
 		for(int i=0;i<VERTEX_COUNT;i++){
@@ -129,7 +146,7 @@ public class Terrain {
 				indices[pointer++] = bottomRight;
 			}
 		}
-		this.model = loader.loadToVAO(vertices, textureCoords, normals, indices);
+		this.model = loader.loadToVAOTerrain(vertices, textureCoords, normals, indices);
 		//return loader.loadToVAO(vertices, textureCoords, normals, indices);
 	}
 
@@ -265,6 +282,10 @@ public class Terrain {
 
 	public static float getSize() {
 		return SIZE;
+	}
+	
+	public static float getVertexCount() {
+		return VERTEX_COUNT;
 	}
 
 }

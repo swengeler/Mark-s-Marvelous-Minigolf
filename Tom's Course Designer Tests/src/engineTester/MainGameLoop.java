@@ -122,10 +122,9 @@ public class MainGameLoop {
 			world.start();
 			picker.update();
 			mainEngine.tick();
-			float mouseWheel = Mouse.getDWheel() / 120;
-			if (mouseWheel != 0) {
-				System.out.println(Mouse.getDWheel() + " " + mouseWheel);
-				world.getTerrains().get(0).updateTerrain(loader, ((picker.getCurrentTerrainPoint().x / (Terrain.getSize()/2)) * 256), ((picker.getCurrentTerrainPoint().z / (Terrain.getSize()/2)) * 256), mouseWheel );
+			float mouseWheel = Mouse.getDWheel() / 48;
+			if (mouseWheel != 0 && loader.getVBOs() <= 380) {
+				world.getTerrains().get(0).updateTerrain(loader, ((picker.getCurrentTerrainPoint().x / (Terrain.getSize()/2)) * (Terrain.getVertexCount()/2)), ((picker.getCurrentTerrainPoint().z / (Terrain.getSize()/2)) * (Terrain.getVertexCount()/2)), mouseWheel );
 			}
 			
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
