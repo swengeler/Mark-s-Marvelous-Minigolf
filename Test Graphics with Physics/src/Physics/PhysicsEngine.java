@@ -17,7 +17,7 @@ import toolbox.Maths;
 
 public class PhysicsEngine {
 
-	private static final float NORMAL_TH = 0.001f;
+	static final float NORMAL_TH = 0.001f;
 	private static final float ANGLE_TH  = 5f;
 	private static final float C = 0.001f;
 	public static final float MIN_MOV_REQ = 0.000f;
@@ -54,7 +54,7 @@ public class PhysicsEngine {
 		for (RealBall b : balls) {
 			b.checkInputs();
             b.applyAccelerations();
-			if ((b.isMoving() && b.movedLastStep()) || MainGameLoop.getCounter() < 10) {
+			if ((b.isMoving() && (b.movedLastStep() || b.getLastTimeElapsed() == 0)) || MainGameLoop.getCounter() < 10) {
 				b.updateAndMove();
 				System.out.println("\n---- Collision detection starts ----\n");
 				resolveTerrainCollision(b);
@@ -131,21 +131,18 @@ public class PhysicsEngine {
 			}
 
 			resolvePlaneCollision(b, forResolution);
-			
+
 		}
 	}
 
 	public void resolveObstacleCollision(Ball b) {
 		ArrayList<PhysicalFace> collidingFaces = new ArrayList<PhysicalFace>();
 		collidingFaces.addAll(world.getCollidingFacesEntities(b));
-
-		if (collidingFaces.isEmpty()) {
-			System.out.println();
+		
+		if (collidingFaces.size() == 0) 
 			return;
-		}
-
-		System.out.println("OBSTACLE COLLISON DETECTED");
-
+		
+		
 		ArrayList<PhysicalFace> combined = new ArrayList<PhysicalFace>();
 		combined.add(collidingFaces.get(0));
 		System.out.println("Normal added: (" + combined.get(0).getNormal().x + "|" + combined.get(0).getNormal().y + "|" + combined.get(0).getNormal().z + ")");
@@ -162,59 +159,141 @@ public class PhysicsEngine {
 				combined.add(f);
 			}
 		}
-		System.out.println("Number of planes after reduction: " + combined.size());
-		collidingFaces = (ArrayList<PhysicalFace>) combined.clone();
 		
-		if (collidingFaces.size() == 1) {
-			System.out.println("OBSTACLE COLLISION WITH ONE PLANE");
-			// the simplest case, where the ball collides with one plane/face and the collision resolution is very simple
-			resolvePlaneCollision(b, collidingFaces.get(0));
-		} else if (collidingFaces.size() == 2) {
-			System.out.println("OBSTACLE COLLISION WITH TWO PLANES");
-			//for (PhysicalFace f : combined) {
-			//	float angle = Vector3f.angle(b.getVelocity(), f.getNormal());
-			//	angle = (float) Math.min(angle, Math.PI - angle);
-			//	if (angle < Math.toRadians(ANGLE_TH) /*|| (angle * b.getVelocity().lengthSquared() * C < 1 && angle < Math.toRadians(45))*/) {
-			//		collidingFaces.remove(f);
-			//	}
-			//}
-			
-			System.out.println("Plane 1: " + collidingFaces.get(0));
-			System.out.println("Plane 2: " + collidingFaces.get(1));
-			
-			Vector3f[] pointsOfIntersection = Maths.intersectionPoints(collidingFaces.get(0), collidingFaces.get(1), b);
-			for (int i = 0; i < pointsOfIntersection.length; i++) {
-				System.out.printf("Intersection point %d: (%f|%f|%f)\n", (i + 1), pointsOfIntersection[i].x, pointsOfIntersection[i].y, pointsOfIntersection[i].z); 
+		if (combined.size() > 1) {
+			Vector3f revBM = new Vector3f(b.getVelocity().x, b.getVelocity().y, b.getVelocity().z);
+			revBM.normalise();
+			revBM.scale(-0.001f);
+			while (b.collidesWith(collidingFaces)) {
+				b.increasePosition(revBM);
 			}
-			
-			if (collidingFaces.size() == 0) {
-				// in that case the ball's movement is almost parallel to both planes, thus it should just move parallel to them
-				
-			} else if (collidingFaces.size() == 1) {
-				// in that case the ball moves parallel to one plane and therefore simply collides with the other one
-				resolvePlaneCollision(b, collidingFaces.get(0));
-			} else {
-				
+		}
+		
+		PhysicalFace closest = collidingFaces.get(0);
+		float lowestDistSq = closest.distanceToFaceSq(b);
+		for (PhysicalFace f : collidingFaces) {
+			if (f.distanceToFaceSq(b) < lowestDistSq) {
+				closest = f;
+				lowestDistSq = f.distanceToFaceSq(b);
 			}
-			
-		} else if (collidingFaces.size() == 3) {
-			System.out.println("OBSTACLE COLLISION WITH THREE PLANES");
-		} else {
-			System.out.println("OBSTACLE COLLISION WITH MORE THAN THREE PLANES");
+		}
+		
+		System.out.println("Lowest distance to ball: " + Math.sqrt(lowestDistSq));
+		
+		if (combined.size() == 1) {
+			Vector3f normal = new Vector3f(closest.getNormal().x, closest.getNormal().y, closest.getNormal().z);
+			System.out.printf("Normal of closest: (%f|%f|%f)\n", normal.x, normal.x, normal.x);
+			normal.scale(Vector3f.dot(b.getVelocity(), normal)/normal.lengthSquared());
+			normal.scale(-0.001f);
+			while (b.collidesWith(collidingFaces)) {
+				b.increasePosition(normal);
+			}
+		}
+		
+		resolvePlaneCollision(b, closest);
+	}
+
+/*
+	public void resolveObstacleCollision(Ball b) {
+		ArrayList<PhysicalFace> collidingFaces = new ArrayList<PhysicalFace>();
+		collidingFaces.addAll(world.getCollidingFacesEntities(b));
+
+		if (collidingFaces.isEmpty()) {
+			System.out.println();
+			return;
 		}
 
-		if (collidingFaces.size() > 1) {
-			for (PhysicalFace f : combined) {
-				float angle = Vector3f.angle(b.getVelocity(), f.getNormal());
-				angle = (float) Math.min(angle, Math.PI - angle);
-				System.out.println("Angle between vel and normal: " + Math.toDegrees(angle));
-				if (collidingFaces.size() != 1 && Math.abs(Math.PI/2 - angle) < Math.toRadians(15)) {
-					System.out.println("Normal removed: (" + f.getNormal().x + "|" + f.getNormal().y + "|" + f.getNormal().z + ")");
-					collidingFaces.remove(f);
-				}
+		System.out.println("OBSTACLE COLLISON DETECTED");
+
+		ArrayList<FaceComposite> combined = new ArrayList<FaceComposite>();
+		combined.add(new FaceComposite(collidingFaces.get(0)));
+		System.out.println("Normal added: (" + combined.get(0).getNormal().x + "|" + combined.get(0).getNormal().y + "|" + combined.get(0).getNormal().z + ")");
+		for (int i = 1; i < collidingFaces.size(); i++) {
+			boolean found = false;
+			for (int j = 0; !found && j < combined.size(); j++) {
+                if (combined.get(j).canAddFace(collidingFaces.get(i))) {
+                    combined.get(j).add(collidingFaces.get(i));
+                    found = true;
+                }
+			}
+			if (!found) {
+				combined.add(new FaceComposite(collidingFaces.get(i)));
 			}
 		}
+		System.out.println("Number of planes after reduction: " + combined.size());
+
+		if (combined.size() == 1) {
+			System.out.println("OBSTACLE COLLISION WITH ONE PLANE");
+			// the simplest case, where the ball collides with one plane/face and the collision resolution is very simple
+
+            // get a reversed projection on the normal vector of that one plane and push the ball out that way
+            Vector3f projection = new Vector3f(combined.get(0).getNormal().x, combined.get(0).getNormal().y, combined.get(0).getNormal().z);
+            projection.scale(Vector3f.dot(b.getVelocity(), projection)/projection.lengthSquared());
+            projection.normalise();
+            projection.scale(-0.001f);
+            while (combined.get(0).collidesWith(b)) {
+                b.increasePosition(projection);
+            }
+
+            // now resolve collision with that plane
+            resolvePlaneCollision(b, combined.get(0).get(0));
+		} else if (collidingFaces.size() == 2) {
+			System.out.println("OBSTACLE COLLISION WITH TWO PLANES");
+
+            // check in which "quadrant/octant" of the coordinate system the center of the ball lies
+            // this is done by checking whether the projections of the ball's position on the planes lie in the physical face
+            Vector3f proj1 = new Vector3f();
+            Vector3f proj2 = new Vector3f();
+
+
+            Vector3f revBM = new Vector3f(b.getVelocity().x, b.getVelocity().y, b.getVelocity().z);
+            revBM.normalise();
+            revBM.scale(-0.001f);
+            while (combined.get(0).collidesWith(b) || combined.get(1).collidesWith(b)) {
+                b.increasePosition(revBM);
+            }
+
+            if (combined.get(0).pointInComposite(proj1)) {
+                resolvePlaneCollision(b, combined.get(0).get(0));
+            } else if (combined.get(1).pointInComposite(proj2)) {
+                resolvePlaneCollision(b, combined.get(1).get(0));
+            } else {
+                // get the vector which is parallel to the line of intersection of the planes
+                Vector3f crossP = new Vector3f();
+                Vector3f.cross(combined.get(0).getNormal(), combined.get(1).getNormal(), crossP);
+
+                // get the projection of the ball's velocity on that parallel vector
+                Vector3f velProj = new Vector3f(crossP.x, crossP.y, crossP.z);
+                velProj.scale(Vector3f.dot(b.getVelocity(), crossP)/crossP.lengthSquared());
+
+                // reducing the velocity vector by that parallel component, get the normal vecgtor of the plane
+                Vector3f newNormal = new Vector3f();
+                Vector3f.sub(b.getVelocity(), velProj, newNormal);
+
+                PhysicalFace newPlane = new PhysicalFace(newNormal, new Vector3f(), new Vector3f(), new Vector3f());
+                resolvePlaneCollision(b, newPlane);
+            }
+
+		} else {
+            // push the ball out to avoid unnecessary collisions
+            Vector3f revBM = new Vector3f(b.getVelocity().x, b.getVelocity().y, b.getVelocity().z);
+            revBM.normalise();
+            revBM.scale(-0.001f);
+            boolean collides = true;
+            while (collides) {
+                boolean col = false;
+                for (FaceComposite c : combined) {
+                    if (c.collidesWith(b)) {
+                        b.increasePosition(revBM);
+                        col = true;
+                    }
+                }
+                if (col)
+                    collides = false;
+            }
+        }
 	}
+*/	
 
 	/*public void resolveOrdinaryCollision(Ball b) { // might delegate this to own class CollisionSD (Static-Dynamic) and ball-ball collision to CollisionDD
 		while (b.getPosition().y - Ball.RADIUS < world.getHeightOfTerrain(b.getPosition().x, b.getPosition().z))
@@ -441,7 +520,7 @@ public class PhysicsEngine {
 			}
 		}
 	}
-	
+
 	private void resolvePlaneCollision(Ball b, PhysicalFace forResolution) {
 		// calculate the angle between the plane that is used for collision resolution and the velocity vector of the ball
 		// since Vector3f.angle(x, y) can compute angles over 90 degrees, there is an additional check to make sure the angle is below 90 degrees
@@ -514,7 +593,7 @@ public class PhysicsEngine {
 			}
 			counter++;
 		}
-		
+
 		return new ShotData(ball.getPosition(), obstaclesHit);
 	}
 

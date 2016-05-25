@@ -123,6 +123,12 @@ public class VirtualBall implements Ball {
 		position.y += y;
 		position.z += z;
 	}
+	
+	public void increasePosition(Vector3f v) {
+		position.x += v.x;
+		position.y += v.y;
+		position.z += v.z;
+	}
 
 	public void setPosition(Vector3f p) {
 		position.x = p.x;

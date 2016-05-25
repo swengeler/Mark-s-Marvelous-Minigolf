@@ -50,6 +50,12 @@ public class PhysicalFace {
 		Vector3f.sub(b.getPosition(), closest, dist);
 		return dist.lengthSquared();
 	}
+	
+	public float distanceMidToFaceSq(Ball b) {
+		Vector3f closest = Maths.closestPtPointTriangle(b.getPosition(), point1, point2, point3);
+		Vector3f.sub(b.getPosition(), closest, dist);
+		return dist.lengthSquared();
+	}
 
 	public Vector3f getNormal() {
 		return normal;

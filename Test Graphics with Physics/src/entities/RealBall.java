@@ -11,6 +11,7 @@ import Physics.PhysicalFace;
 import Physics.PhysicsEngine;
 
 public class RealBall extends Entity implements Ball {
+	
 	private static final float FACTOR = 1;
 	private static final float RUN_SPEED = 2;
 	private static final float TURN_SPEED = 100;
@@ -26,6 +27,7 @@ public class RealBall extends Entity implements Ball {
 	private ArrayList<Vector3f> accelerations;
 
 	private float currentTurnSpeed;
+	private float lastTimeElapsed;
 
 	private boolean moving;
 	private boolean enableControls;
@@ -44,6 +46,7 @@ public class RealBall extends Entity implements Ball {
 	public void updateAndMove() {
 		super.increaseRotation(0, currentTurnSpeed * getTimeElapsed(), 0);
 		lastPosition.set(super.getPosition().x, super.getPosition().y, super.getPosition().z);
+		lastTimeElapsed = getTimeElapsed();
 
 		// based on the newly updated velocity, move the ball
 		Vector3f delta = new Vector3f(currentVel.x, currentVel.y, currentVel.z);
@@ -180,7 +183,11 @@ public class RealBall extends Entity implements Ball {
 	}
 	
 	public float getTimeElapsed() {
-		return DisplayManager.getFrameTimeSeconds();
+		return /*DisplayManager.getFrameTimeSeconds()*/0.01f;
+	}
+	
+	public float getLastTimeElapsed() {
+		return lastTimeElapsed;
 	}
 
 	public String toString() {

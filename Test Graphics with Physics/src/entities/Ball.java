@@ -18,6 +18,7 @@ public interface Ball {
 	public Vector3f getVelocity();
 	public void setPosition(Vector3f p);
 	public void increasePosition(float x, float y, float z);
+	public void increasePosition(Vector3f v);
 	public void setVelocity(float x, float y, float z);
 	public void setVelocity(Vector3f v);
 	public void increaseVelocity(float x, float y, float z);
@@ -27,6 +28,7 @@ public interface Ball {
 	public void removeAccel(Vector3f accel);
 	public void setMoving(boolean moving);
 	public boolean isMoving();
+	public boolean movedLastStep();
 	public boolean collidesWith(ArrayList<PhysicalFace> faces);
 	
 	
