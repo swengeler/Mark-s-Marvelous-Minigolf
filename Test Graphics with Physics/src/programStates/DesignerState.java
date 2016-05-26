@@ -19,6 +19,8 @@ import entities.CameraDesigner;
 import entities.Empty;
 import entities.Entity;
 import entities.Light;
+import entities.RealBall;
+import entities.VirtualBall;
 import guis.GuiRenderer;
 import guis.GuiTexture;
 import models.RawModel;
@@ -137,18 +139,22 @@ public class DesignerState implements State{
 			fbos.unbindCurrentFrameBuffer();
 		}
 		
-		for(Ball b:balls)
-			renderer.processEntity(b);
-		renderer.processWorld(world, new Vector4f(0, -1, 0, 10000), true);
+		for(Ball b:balls){
+			if(b instanceof RealBall)
+				renderer.processEntity((RealBall)b);
+		}
+		renderer.processWorld(world, new Vector4f(0, -1, 0, 10000), false);
 		if(water)
 			waterRenderer.render(waterTiles, camera);
-		ParticleMaster.renderParticles(camera);
-		ParticleMaster.update(camera);
-		guiRenderer.render(guis);
+		//ParticleMaster.renderParticles(camera);
+		//ParticleMaster.update(camera);
+		//guiRenderer.render(guis);
+		
 	}
 	
 	@Override
 	public void checkInputs() {
+
 		balls.get(currBall).checkInputs(world);
 		picker.update();
 		if (Keyboard.isKeyDown(Keyboard.KEY_Q) && loader.getVBOs() <= 350) {

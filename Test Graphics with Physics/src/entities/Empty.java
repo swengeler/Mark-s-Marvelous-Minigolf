@@ -2,15 +2,18 @@ package entities;
 
 
 
+import java.util.ArrayList;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector3f;
 
+import Physics.PhysicalFace;
 import Physics.PhysicsEngine;
 import models.TexturedModel;
 import renderEngine.DisplayManager;
 import terrains.World;
 
-public class Empty extends Ball{
+public class Empty extends RealBall{
 
 	private static final float RUN_SPEED = 20;
 	private static final float TURN_SPEED = 100;
@@ -73,5 +76,4 @@ public class Empty extends Ball{
 		else
 			this.currentTurnSpeed = 0;
 	}
-
 }

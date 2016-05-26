@@ -9,10 +9,14 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import Physics.PhysicsEngine;
+import engineTester.MainGameLoop;
 import entities.Ball;
 import entities.Camera;
+import entities.Empty;
 import entities.Entity;
 import entities.Light;
+import entities.RealBall;
+import entities.VirtualBall;
 import guis.GuiRenderer;
 import guis.GuiTexture;
 import models.RawModel;
@@ -36,7 +40,10 @@ import water.WaterTile;
 
 public class GameState implements State {
 	
+	private static GameState instance;
+	
 	private Map<String,TexturedModel> tModels = new HashMap<String,TexturedModel>();
+	private Map<String,ModelData> mData = new HashMap<String,ModelData>();
 	private World world;
 	private ArrayList<WaterTile> waterTiles;
 	private ArrayList<GuiTexture> guis;
@@ -61,9 +68,19 @@ public class GameState implements State {
 	private boolean particle = true;
 	private boolean shadow = true;
 	private boolean normalMap = true;
+	private boolean multiplayer=true;
+	
+	private static int score[]={0,0};
+	
 	
 	public GameState(Loader loader){
+		instance = this;
 		init(loader);
+		DisplayManager.reset();
+	}
+	
+	public static GameState getInstance(){
+		return instance;
 	}
 	
 	public GameState(Loader loader, World world) {
@@ -75,7 +92,8 @@ public class GameState implements State {
 		this.loader = loader;
 		loadModels();
 		loadGuis();
-		createBall(new Vector3f(Terrain.getSize()/2f, 30, Terrain.getSize()/2f));
+		//createBall(new Vector3f(Terrain.getSize()/2f, 30, Terrain.getSize()/2f), true);
+		createBall(new Vector3f(100, 20, 100), true);
 		camera = new Camera(balls.get(0));
 		world = new World(camera);
 		loadLights();
@@ -84,7 +102,7 @@ public class GameState implements State {
 		loadWater();
 		loadParticleSystem();
 
-		createTerrain(0, 0, "grass", true);
+		createTerrain(0, 0, "grass", false);
 		createWaterTile(Terrain.getSize()/2f, Terrain.getSize()/2f, -8f);
 		createEntity("dragon", new Vector3f(100, getWorld().getHeightOfTerrain(100, 60), 60), -10f, 170f, 0f, 3 );
 		ParticleSystem system = createParticleSystem("fire", 8, 200, 30, -0.3f, 1.5f, 8.6f, new Vector3f(113,getWorld().getHeightOfTerrain(100, 60) + 21.3f,57));
@@ -94,8 +112,8 @@ public class GameState implements State {
 		system.randomizeRotation();
 		system.setDirection(new Vector3f(1,0,0), 0.1f);
 
-		createBall(new Vector3f(0,0,20));
-		currBall = 1;
+		//createBall(new Vector3f(0,0,20), true);
+		//createBall(new Vector3f(120, 1, 100), true);
 		setCameraToBall(currBall);
 		//createTerrain(0, 0, "grass", true);
 	}
@@ -110,7 +128,7 @@ public class GameState implements State {
 		for(Entity e:world.getEntities()) {
 			System.out.println(e);
 		}
-		createBall(new Vector3f(world.getStart().x, world.getHeightOfTerrain(world.getStart().x, world.getEnd().y), world.getEnd().y));
+		createBall(new Vector3f(world.getStart().x, world.getHeightOfTerrain(world.getStart().x, world.getEnd().y), world.getEnd().y), true);
 		//createBall(new Vector3f(400,0,400));
 		loadLights();
 		renderer = new MasterRenderer(loader, camera);
@@ -121,6 +139,9 @@ public class GameState implements State {
 		currBall = 0;
 		setCameraToBall(currBall);
 		System.out.println("done game with world");
+
+		createTerrain(0, 1, "grass", true);
+
 	}
 	
 	@Override
@@ -135,7 +156,8 @@ public class GameState implements State {
 			camera.getPosition().y -= distance;
 			camera.invertPitch();
 			for(Ball b:balls)
-				renderer.processEntity(b);
+				if(b instanceof RealBall)
+				renderer.processEntity((RealBall)b);
 			renderer.processWorld(world, new Vector4f(0, 1, 0, - waterTiles.get(0).getHeight()), normalMap);
 			if(particle)
 				ParticleMaster.renderParticles(camera);
@@ -145,7 +167,8 @@ public class GameState implements State {
 			//Rendering on refraction buffer
 			fbos.bindRefractionFrameBuffer();
 			for(Ball b:balls)
-				renderer.processEntity(b);
+				if(b instanceof RealBall)
+				renderer.processEntity((RealBall)b);
 			renderer.processWorld(world, new Vector4f(0, -1, 0, waterTiles.get(0).getHeight()), normalMap);
 			if(particle)
 				ParticleMaster.renderParticles(camera);
@@ -153,7 +176,8 @@ public class GameState implements State {
 		}
 		
 		for(Ball b:balls)
-			renderer.processEntity(b);
+			if(b instanceof RealBall)
+			renderer.processEntity((RealBall)b);
 		renderer.processWorld(world, new Vector4f(0, -1, 0, 10000), true);
 		if(water)
 			waterRenderer.render(waterTiles, camera);
@@ -164,7 +188,7 @@ public class GameState implements State {
 	
 	@Override
 	public void checkInputs() {
-		balls.get(currBall).checkInputs(world);
+		balls.get(currBall).checkInputs();
 	}
 	
 	public void setCameraToBall(int index){
@@ -172,6 +196,7 @@ public class GameState implements State {
 		renderer.updateCamera(camera);
 		world.setCamera(camera);
 	}
+	
 	
 	@Override
 	public void update() {
@@ -192,6 +217,8 @@ public class GameState implements State {
 		renderer.cleanUp();
 		loader.cleanUp();
 		ParticleMaster.cleanUp();
+		tModels.clear();
+		mData.clear();
 	}
 	
 	public Terrain createTerrain(int gridX, int gridY, String texName, boolean rand){
@@ -252,6 +279,23 @@ public class GameState implements State {
 		ModelData empty = OBJFileLoader.loadOBJ("empty");
 		ModelData disk = OBJFileLoader.loadOBJ("disk");
 		ModelData flag = OBJFileLoader.loadOBJ("flag_rounded");
+		ModelData wall = OBJFileLoader.loadOBJ("wall3");
+	    ModelData dragon_low = OBJFileLoader.loadOBJ("dragon_low_test");
+	    ModelData hole = OBJFileLoader.loadOBJ("hole");
+		
+	    mData.put("human",human);
+	    mData.put("ball",ball);
+	    mData.put("tree",tree);
+	    mData.put("fern",fern);
+	    mData.put("grass",grass);
+	    mData.put("pine",pine);
+	    mData.put("flower",flower);
+	    mData.put("box",box);
+	    mData.put("dragon",dragon);
+	    mData.put("wall",wall);
+	    mData.put("dragon_low",dragon_low);
+	    mData.put("flag",flag);
+	    mData.put("hole",hole);
 		
 		RawModel humanModel = loader.loadToVAO(human.getVertices(), human.getTextureCoords(), human.getNormals(), human.getIndices());
 		RawModel ballModel = loader.loadToVAO(ball.getVertices(), ball.getTextureCoords(), ball.getNormals(), ball.getIndices());
@@ -265,8 +309,10 @@ public class GameState implements State {
 		RawModel emptyModel = loader.loadToVAO(empty.getVertices(), empty.getTextureCoords(), empty.getNormals(), empty.getIndices());
 		RawModel diskModel = loader.loadToVAO(disk.getVertices(), disk.getTextureCoords(), disk.getNormals(), disk.getIndices());
 		RawModel flagModel = loader.loadToVAO(flag.getVertices(), flag.getTextureCoords(), flag.getNormals(), flag.getIndices());
-	
-	
+		RawModel holeModel = loader.loadToVAO(hole.getVertices(), hole.getTextureCoords(), hole.getNormals(), hole.getIndices());
+		RawModel wallModel = loader.loadToVAO(wall.getVertices(), wall.getTextureCoords(), wall.getNormals(), wall.getIndices());
+		RawModel dragonLowModel = loader.loadToVAO(dragon_low.getVertices(), dragon_low.getTextureCoords(), dragon_low.getNormals(), dragon_low.getIndices());
+		
 		tModels.put("human", new TexturedModel(humanModel,new ModelTexture(loader.loadTexture("playerTexture"))));
 		tModels.put("ball", new TexturedModel(ballModel,new ModelTexture(loader.loadTexture("white"))));
 		tModels.put("tree", new TexturedModel(treeModel,new ModelTexture(loader.loadTexture("tree"))));
@@ -282,8 +328,10 @@ public class GameState implements State {
 		tModels.put("empty", new TexturedModel(emptyModel, new ModelTexture(loader.loadTexture("flower"))));
 		tModels.put("disk", new TexturedModel(diskModel, new ModelTexture(loader.loadTexture("white"))));
 		tModels.put("flag", new TexturedModel(flagModel, new ModelTexture(loader.loadTexture("white"))));
+		tModels.put("wall", new TexturedModel(wallModel, new ModelTexture(loader.loadTexture("white"))));
+		tModels.put("hole", new TexturedModel(holeModel, new ModelTexture(loader.loadTexture("white"))));
+		tModels.put("dragon_low", new TexturedModel(dragonLowModel, new ModelTexture(loader.loadTexture("white"))));
 		
-	
 		tModels.get("barrel").getTexture().setShineDamper(10);
 		tModels.get("barrel").getTexture().setReflectivity(0.3f);
 		tModels.get("barrel").getTexture().setNormalMap(loader.loadTexture("barrelNormal"));
@@ -308,20 +356,20 @@ public class GameState implements State {
 	}
 	
 	public Entity createEntity(String eName, Vector3f position, float rotX, float rotY, float rotZ, float scale){
-		Entity e = new Entity(tModels.get(eName), position, rotX, rotY, rotZ, scale);
+		Entity e = new Entity(tModels.get(eName), 0,mData.get(eName), position, rotX, rotY, rotZ, scale);
 		world.add(e);
 		return e;
 	}
 	
 	public Entity createEntity(String eName, int a,  Vector3f position, float rotX, float rotY, float rotZ, float scale){
-		Entity e = new Entity(tModels.get(eName), a, position, rotX, rotY, rotZ, scale);
+		Entity e = new Entity(tModels.get(eName), a, mData.get(eName), position, rotX, rotY, rotZ, scale);
 		world.add(e);
 		return e;
 	}
 	
 	public Entity createNormalMapEntity(String eName, int a,  Vector3f position, float rotX, float rotY, float rotZ, float scale){
 		if(normalMap){
-			Entity e = new Entity(tModels.get(eName), position, rotX, rotY, rotZ, scale);
+			Entity e = new Entity(tModels.get(eName), a, mData.get(eName), position, rotX, rotY, rotZ, scale);
 			e.getModel().getTexture().setNormalMap(loader.loadTexture(eName + "Normal"));
 			world.addNE(e);
 			return e;
@@ -330,8 +378,15 @@ public class GameState implements State {
 		return null;
 	}
 	
-	public Ball createBall(Vector3f position){
-		Ball b = new Ball(tModels.get("ball"), position, 0f, 0f, 0f, 1f);
+	public Ball createBall(Vector3f position, boolean real){
+		Ball b;
+		if(real){
+			b = new RealBall(tModels.get("ball"), position, 0f, 0f, 0f, 1f);
+			if(mainEngine != null)
+				mainEngine.addBall((RealBall)b);
+		}else {
+			b = new Empty(tModels.get("ball"), position, 0f, 0f, 0f, 1f);
+		}
 		balls.add(b);
 		return b;
 	}
@@ -347,5 +402,24 @@ public class GameState implements State {
 		return world;
 	}
 	
-
+	public void swap() {
+		if(currBall==1) {
+			currBall = 0;
+			score[1]++;
+			System.out.println("score is " + score[1]);
+		} 	
+		else if(currBall==0 && score[0]==0 ){
+			createBall(new Vector3f(100, 20, 100), true);
+			score[0]++;
+			currBall=1;
+			System.out.println(score[0]);
+		}
+		
+		else if(currBall == 0) {
+			currBall=1;
+			score[0]++;
+			System.out.println("score is " + score[0]);
+		}
+		setCameraToBall(currBall);
+	}
 }

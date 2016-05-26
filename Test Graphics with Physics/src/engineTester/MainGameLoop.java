@@ -73,6 +73,7 @@ public class MainGameLoop {
 		
 		update = false;
 	}
+	private static int counter;
 	
 	public static void main(String[] args) {
 	
@@ -80,7 +81,7 @@ public class MainGameLoop {
 		currState = new DesignerState(loader);
 		/*
 		GameState game = (GameState) currState;
-		game.createTerrain(0, 0, "grass", true);
+		//game.createTerrain(0, 0, "grass", true);
 		game.createWaterTile(Terrain.getSize()/2f, Terrain.getSize()/2f, -8f);
 		//GameState game = (GameState) currState;
 		
@@ -296,6 +297,7 @@ public class MainGameLoop {
 			currState.update();
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 			currState.renderScreen();
+			counter++;
 			
 			/*
 			fbos.bindReflectionFrameBuffer();
@@ -348,6 +350,10 @@ public class MainGameLoop {
 	
 	public static void loadDesigner(){
 		currState = new DesignerState(loader);
+	}
+	
+	public static int getCounter() {
+		return counter;
 	}
 
 }
