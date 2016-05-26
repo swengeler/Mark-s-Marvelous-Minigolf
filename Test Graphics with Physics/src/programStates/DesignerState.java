@@ -19,6 +19,7 @@ import entities.CameraDesigner;
 import entities.Empty;
 import entities.Entity;
 import entities.Light;
+import entities.RealBall;
 import guis.GuiRenderer;
 import guis.GuiTexture;
 import models.RawModel;
@@ -43,6 +44,7 @@ import water.WaterTile;
 public class DesignerState implements State{
 	
 	private Map<String,TexturedModel> tModels = new HashMap<String,TexturedModel>();
+	private Map<String,ModelData> mData = new HashMap<String,ModelData>();
 	private World world;
 	private ArrayList<WaterTile> waterTiles;
 	private ArrayList<GuiTexture> guis;
@@ -53,8 +55,6 @@ public class DesignerState implements State{
 	private WaterRenderer waterRenderer;
 	private GuiRenderer guiRenderer;
 	private MousePicker picker;
-	
-	private PhysicsEngine mainEngine;
 	
 	private ArrayList<Ball> balls = new ArrayList<Ball>();
 	private int currBall;
@@ -85,7 +85,6 @@ public class DesignerState implements State{
 		world = new World(camera);
 		loadLights();
 		renderer = new MasterRenderer(loader, camera);
-		mainEngine = new PhysicsEngine(balls, world);
 		loadWater();
 		loadParticleSystem();
 
@@ -120,7 +119,8 @@ public class DesignerState implements State{
 			camera.getPosition().y -= distance;
 			camera.invertPitch();
 			for(Ball b:balls)
-				renderer.processEntity(b);
+				if(b instanceof RealBall)
+				renderer.processEntity((RealBall)b);
 			renderer.processWorld(world, new Vector4f(0, 1, 0, - waterTiles.get(0).getHeight()), normalMap);
 			if(particle)
 				ParticleMaster.renderParticles(camera);
@@ -130,28 +130,32 @@ public class DesignerState implements State{
 			//Rendering on refraction buffer
 			fbos.bindRefractionFrameBuffer();
 			for(Ball b:balls)
-				renderer.processEntity(b);
+				if(b instanceof RealBall)
+				renderer.processEntity((RealBall)b);
 			renderer.processWorld(world, new Vector4f(0, -1, 0, waterTiles.get(0).getHeight()), normalMap);
 			if(particle)
 				ParticleMaster.renderParticles(camera);
 			fbos.unbindCurrentFrameBuffer();
 		}
 		
-		for(Ball b:balls)
-			renderer.processEntity(b);
-		renderer.processWorld(world, new Vector4f(0, -1, 0, 10000), true);
+		for(Ball b:balls){
+			if(b instanceof RealBall)
+				renderer.processEntity((RealBall)b);
+		}
+		renderer.processWorld(world, new Vector4f(0, -1, 0, 10000), false);
 		if(water)
 			waterRenderer.render(waterTiles, camera);
-		ParticleMaster.renderParticles(camera);
-		ParticleMaster.update(camera);
-		guiRenderer.render(guis);
+		//ParticleMaster.renderParticles(camera);
+		//ParticleMaster.update(camera);
+		//guiRenderer.render(guis);
+		
 	}
 	
 	@Override
 	public void checkInputs() {
-		balls.get(currBall).checkInputs(world);
-		picker.update();
-		if (Keyboard.isKeyDown(Keyboard.KEY_Q) && loader.getVBOs() <= 350) {
+
+		balls.get(currBall).checkInputs();
+		if (Keyboard.isKeyDown(Keyboard.KEY_Q) && loader.getVBOs() <= 350 && picker.getCurrentTerrainPoint() != null) {
 			world.getTerrains().get(0).updateTerrain(loader, ((picker.getCurrentTerrainPoint().x / (Terrain.getSize()/2)) * (world.getTerrains().get(0).getVertexCount()/2)), ((picker.getCurrentTerrainPoint().z / (Terrain.getSize()/2)) * (world.getTerrains().get(0).getVertexCount()/2)));
 			for(Entity e:world.getEntities()) {
 				float x = e.getPosition().x;
@@ -161,24 +165,24 @@ public class DesignerState implements State{
 			}
 		
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_R) && !BallPlaced) {
-			createEntity("disk", new Vector3f(picker.getCurrentTerrainPoint().x, getWorld().getHeightOfTerrain(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z), picker.getCurrentTerrainPoint().z), 0f, 0f, 0f, 1);
+		if (Keyboard.isKeyDown(Keyboard.KEY_R) && !BallPlaced && picker.getCurrentTerrainPoint() != null) {
+			createNotCollidingEntity("disk", 0, new Vector3f(picker.getCurrentTerrainPoint().x, getWorld().getHeightOfTerrain(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z), picker.getCurrentTerrainPoint().z), 0f, 0f, 0f, 1);
 			BallPlaced = true;
 			world.setStart(new Vector2f(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z));
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_T) && !HolePlaced) {
-			createEntity("flag", new Vector3f(picker.getCurrentTerrainPoint().x, getWorld().getHeightOfTerrain(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z), picker.getCurrentTerrainPoint().z), 0f, 0f, 0f, 5);
+		if (Keyboard.isKeyDown(Keyboard.KEY_T) && !HolePlaced && picker.getCurrentTerrainPoint() != null) {
+			createNotCollidingEntity("flag", 0, new Vector3f(picker.getCurrentTerrainPoint().x, getWorld().getHeightOfTerrain(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z), picker.getCurrentTerrainPoint().z), 0f, 0f, 0f, 5);
 			HolePlaced = true;
 			world.setEnd(new Vector2f(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z));
 		}
-		if (loader.getVBOs() <= 350 && Keyboard.isKeyDown(Keyboard.KEY_F)) {
+		if (loader.getVBOs() <= 350 && Keyboard.isKeyDown(Keyboard.KEY_F ) && picker.getCurrentTerrainPoint() != null) {
 			createEntity("tree", new Vector3f(picker.getCurrentTerrainPoint().x, getWorld().getHeightOfTerrain(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z), picker.getCurrentTerrainPoint().z), 0f, 0f, 0f, 5);
 		}
-		if (loader.getVBOs() <= 350 && Keyboard.isKeyDown(Keyboard.KEY_G)) {
+		if (loader.getVBOs() <= 350 && Keyboard.isKeyDown(Keyboard.KEY_G) && picker.getCurrentTerrainPoint() != null) {
 			createEntity("box", new Vector3f(picker.getCurrentTerrainPoint().x, getWorld().getHeightOfTerrain(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z), picker.getCurrentTerrainPoint().z), 0f, 0f, 0f, 3);
 		}
 		if (BallPlaced && HolePlaced && Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
-			MainGameLoop.crateNewState("game", world);
+			MainGameLoop.loadGame(world);
 		}
 	}
 	
@@ -190,7 +194,8 @@ public class DesignerState implements State{
 	
 	@Override
 	public void update() {
-		mainEngine.tick();
+		//mainEngine.tick();
+		picker.update();
 		camera.move();
 		for(ParticleSystem system:particles)
 			system.generateParticles();
@@ -257,6 +262,23 @@ public class DesignerState implements State{
 		ModelData empty = OBJFileLoader.loadOBJ("empty");
 		ModelData disk = OBJFileLoader.loadOBJ("disk");
 		ModelData flag = OBJFileLoader.loadOBJ("flag_rounded");
+		ModelData wall = OBJFileLoader.loadOBJ("wall3");
+	    ModelData dragon_low = OBJFileLoader.loadOBJ("dragon_low_test");
+	    ModelData hole = OBJFileLoader.loadOBJ("hole");
+		
+		mData.put("human",human);
+	    mData.put("ball",ball);
+	    mData.put("tree",tree);
+	    mData.put("fern",fern);
+	    mData.put("grass",grass);
+	    mData.put("pine",pine);
+	    mData.put("flower",flower);
+	    mData.put("box",box);
+	    mData.put("dragon",dragon);
+	    mData.put("wall",wall);
+	    mData.put("dragon_low",dragon_low);
+	    mData.put("flag",flag);
+	    mData.put("hole",hole);
 		
 		RawModel humanModel = loader.loadToVAO(human.getVertices(), human.getTextureCoords(), human.getNormals(), human.getIndices());
 		RawModel ballModel = loader.loadToVAO(ball.getVertices(), ball.getTextureCoords(), ball.getNormals(), ball.getIndices());
@@ -270,7 +292,11 @@ public class DesignerState implements State{
 		RawModel emptyModel = loader.loadToVAO(empty.getVertices(), empty.getTextureCoords(), empty.getNormals(), empty.getIndices());
 		RawModel diskModel = loader.loadToVAO(disk.getVertices(), disk.getTextureCoords(), disk.getNormals(), disk.getIndices());
 		RawModel flagModel = loader.loadToVAO(flag.getVertices(), flag.getTextureCoords(), flag.getNormals(), flag.getIndices());
-	
+		RawModel holeModel = loader.loadToVAO(hole.getVertices(), hole.getTextureCoords(), hole.getNormals(), hole.getIndices());
+		RawModel wallModel = loader.loadToVAO(wall.getVertices(), wall.getTextureCoords(), wall.getNormals(), wall.getIndices());
+		RawModel dragonLowModel = loader.loadToVAO(dragon_low.getVertices(), dragon_low.getTextureCoords(), dragon_low.getNormals(), dragon_low.getIndices());
+		
+		
 		tModels.put("human", new TexturedModel(humanModel,new ModelTexture(loader.loadTexture("playerTexture"))));
 		tModels.put("ball", new TexturedModel(ballModel,new ModelTexture(loader.loadTexture("white"))));
 		tModels.put("tree", new TexturedModel(treeModel,new ModelTexture(loader.loadTexture("tree"))));
@@ -279,13 +305,17 @@ public class DesignerState implements State{
 		tModels.put("pine", new TexturedModel(pineModel,new ModelTexture(loader.loadTexture("pine"))));
 		tModels.put("box", new TexturedModel(boxModel,new ModelTexture(loader.loadTexture("box"))));
 		tModels.put("flower", new TexturedModel(flowerModel,new ModelTexture(loader.loadTexture("flower"))));
-		tModels.put( "barrel", new TexturedModel(NormalMappedObjLoader.loadOBJ("barrel", loader), new ModelTexture(loader.loadTexture("barrel"))));
+		tModels.put("barrel", new TexturedModel(NormalMappedObjLoader.loadOBJ("barrel", loader), new ModelTexture(loader.loadTexture("barrel"))));
 		tModels.put("crate", new TexturedModel(NormalMappedObjLoader.loadOBJ("crate", loader), new ModelTexture(loader.loadTexture("crate"))));
 		tModels.put("boulder", new TexturedModel(NormalMappedObjLoader.loadOBJ("boulder", loader), new ModelTexture(loader.loadTexture("boulder"))));
 		tModels.put("dragon", new TexturedModel(dragonModel,new ModelTexture(loader.loadTexture("white"))));
 		tModels.put("empty", new TexturedModel(emptyModel, new ModelTexture(loader.loadTexture("flower"))));
 		tModels.put("disk", new TexturedModel(diskModel, new ModelTexture(loader.loadTexture("white"))));
 		tModels.put("flag", new TexturedModel(flagModel, new ModelTexture(loader.loadTexture("white"))));
+		tModels.put("wall", new TexturedModel(wallModel, new ModelTexture(loader.loadTexture("white"))));
+		tModels.put("hole", new TexturedModel(holeModel, new ModelTexture(loader.loadTexture("white"))));
+		tModels.put("dragon_low", new TexturedModel(dragonLowModel, new ModelTexture(loader.loadTexture("white"))));
+
 		
 		tModels.get("barrel").getTexture().setShineDamper(10);
 		tModels.get("barrel").getTexture().setReflectivity(0.3f);
@@ -311,20 +341,26 @@ public class DesignerState implements State{
 	}
 	
 	public Entity createEntity(String eName, Vector3f position, float rotX, float rotY, float rotZ, float scale){
-		Entity e = new Entity(tModels.get(eName), position, rotX, rotY, rotZ, scale);
+		Entity e = new Entity(tModels.get(eName), 0, mData.get(eName), position, rotX, rotY, rotZ, scale);
 		world.add(e);
 		return e;
 	}
 	
 	public Entity createEntity(String eName, int a,  Vector3f position, float rotX, float rotY, float rotZ, float scale){
-		Entity e = new Entity(tModels.get(eName), a, position, rotX, rotY, rotZ, scale);
+		Entity e = new Entity(tModels.get(eName), a, mData.get(eName), position, rotX, rotY, rotZ, scale);
+		world.add(e);
+		return e;
+	}
+	
+	public Entity createNotCollidingEntity(String eName, int a,  Vector3f position, float rotX, float rotY, float rotZ, float scale){
+		Entity e = new Entity(tModels.get(eName), a, position, rotX, rotY, rotZ, scale, false);
 		world.add(e);
 		return e;
 	}
 	
 	public Entity createNormalMapEntity(String eName, int a,  Vector3f position, float rotX, float rotY, float rotZ, float scale){
 		if(normalMap){
-			Entity e = new Entity(tModels.get(eName), position, rotX, rotY, rotZ, scale);
+			Entity e = new Entity(tModels.get(eName), 0, mData.get(eName),position, rotX, rotY, rotZ, scale);
 			e.getModel().getTexture().setNormalMap(loader.loadTexture(eName + "Normal"));
 			world.addNE(e);
 			return e;

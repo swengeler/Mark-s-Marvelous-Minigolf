@@ -4,6 +4,8 @@ import org.lwjgl.util.vector.Vector3f;
 
 public class Camera {
 
+	private static Camera instance;
+	
 	private float distanceFromBall = 100;
 	private float angleAroundBall = 0;
 	
@@ -20,6 +22,15 @@ public class Camera {
 			distanceFromBall = 0;
 			((Empty) ball).setCamera(this);
 		}
+		instance = this;
+	}
+	
+	public static Camera getInstance(){
+		return instance;
+	}
+	
+	public Ball getBall() {
+		return ball;
 	}
 
 	public void move(){
@@ -29,7 +40,7 @@ public class Camera {
 		float horizontalDistance = calculateHorizontalDistance();
 		float verticalDistance = calculateVerticalDistance();
 		calculateCameraPosition(horizontalDistance, verticalDistance);
-		this.yaw = 180 - (ball.getRotY() + angleAroundBall);
+		this.yaw = 180 - (((RealBall)ball).getRotY() + angleAroundBall);
 	}
 	
 	public Vector3f getPosition() {
@@ -46,6 +57,10 @@ public class Camera {
 
 	public float getRoll() {
 		return roll;
+	}
+	
+	public float getAngleAroundBall(){
+		return angleAroundBall;
 	}
 	
 	private void calculateCameraPosition (float horizDistance, float verticDistance){
