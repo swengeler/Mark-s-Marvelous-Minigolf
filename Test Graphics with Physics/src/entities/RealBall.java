@@ -107,11 +107,11 @@ public class RealBall extends Entity implements Ball {
 				this.currentVel.z += (float) -(RUN_SPEED * Math.cos(Math.toRadians(super.getRotY())))/FACTOR;
 				setMoving(true);
 			} else if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
-				this.currentVel.z += 40;
+				this.currentVel.z += 10;
 				System.out.println("x-speed increased by pressing up-arrow");
 				setMoving(true);
 			} else if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
-				this.currentVel.z -= 40;
+				this.currentVel.z -= 10;
 				System.out.println("x-speed decreased by pressing down-arrow");
 				setMoving(true);
 			}

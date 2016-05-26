@@ -24,7 +24,7 @@ public class PhysicsEngine {
 	public static final float REAL_GRAVITY = 9.813f;
 
 	public static final Vector3f GRAVITY = new Vector3f(0, -230f, 0);
-	public static final float COEFF_RESTITUTION = 0.5f;
+	public static final float COEFF_RESTITUTION = 0.7f;
 	public static final float COEFF_FRICTION = 0.15f;
 
 	private List<RealBall> balls;

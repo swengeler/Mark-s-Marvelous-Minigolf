@@ -57,10 +57,13 @@ public class MainGameLoop {
 		ModelData grass = OBJFileLoader.loadOBJ("grassModel");
 		ModelData pine = OBJFileLoader.loadOBJ("pine");
 		ModelData flower = OBJFileLoader.loadOBJ("grassModel");
-	    ModelData box = OBJFileLoader.loadOBJ("wall3");
+	    ModelData box = OBJFileLoader.loadOBJ("cube_rounded");
 	    ModelData dragon = OBJFileLoader.loadOBJ("dragon");
 	    ModelData dragon_low = OBJFileLoader.loadOBJ("dragon_low_test");
 	    ModelData flag = OBJFileLoader.loadOBJ("hole");
+	    ModelData cone = OBJFileLoader.loadOBJ("cone");
+	    ModelData pyramid = OBJFileLoader.loadOBJ("ramp");
+	    ModelData wall = OBJFileLoader.loadOBJ("wall_segment");
 		box.print(ModelData.PRINT_DATA_FILE);
 
 		RawModel humanModel = loader.loadToVAO(human.getVertices(), human.getTextureCoords(), human.getNormals(), human.getIndices());
@@ -73,6 +76,9 @@ public class MainGameLoop {
 		RawModel flowerModel = loader.loadToVAO(flower.getVertices(), flower.getTextureCoords(), flower.getNormals(), flower.getIndices());
 		RawModel dragonModel = loader.loadToVAO(dragon.getVertices(), dragon.getTextureCoords(), dragon.getNormals(), dragon.getIndices());
 		RawModel flagModel = loader.loadToVAO(flag.getVertices(), flag.getTextureCoords(), flag.getNormals(), flag.getIndices());
+		RawModel coneModel = loader.loadToVAO(cone.getVertices(), cone.getTextureCoords(), cone.getNormals(), cone.getIndices());
+		RawModel pyramidModel = loader.loadToVAO(pyramid.getVertices(), pyramid.getTextureCoords(), pyramid.getNormals(), pyramid.getIndices());
+		RawModel wallModel = loader.loadToVAO(wall.getVertices(), wall.getTextureCoords(), wall.getNormals(), wall.getIndices());
 
 		TexturedModel humanTModel = new TexturedModel(humanModel,new ModelTexture(loader.loadTexture("playerTexture")));
 		TexturedModel ballTModel = new TexturedModel(ballModel,new ModelTexture(loader.loadTexture("white")));
@@ -80,20 +86,26 @@ public class MainGameLoop {
 		TexturedModel fernTModel = new TexturedModel(fernModel,new ModelTexture(loader.loadTexture("fernAtlas")));
 		TexturedModel grassTModel = new TexturedModel(grassModel,new ModelTexture(loader.loadTexture("grassTexture")));
 		TexturedModel pineTModel = new TexturedModel(pineModel,new ModelTexture(loader.loadTexture("pine")));
-		TexturedModel boxTModel = new TexturedModel(boxModel,new ModelTexture(loader.loadTexture("white")));
+		TexturedModel boxTModel = new TexturedModel(boxModel,new ModelTexture(loader.loadTexture("brick_wall")));
 		TexturedModel flowerTModel = new TexturedModel(flowerModel,new ModelTexture(loader.loadTexture("flower")));
 		TexturedModel dragonTModel = new TexturedModel(dragonModel,new ModelTexture(loader.loadTexture("white")));
-		TexturedModel flagTModel = new TexturedModel(flagModel,new ModelTexture(loader.loadTexture("white")));
+		TexturedModel flagTModel = new TexturedModel(flagModel,new ModelTexture(loader.loadTexture("metal2")));
+		TexturedModel coneTModel = new TexturedModel(coneModel,new ModelTexture(loader.loadTexture("blue")));
+		TexturedModel pyramidTModel = new TexturedModel(pyramidModel,new ModelTexture(loader.loadTexture("skull_texture")));
+		TexturedModel wallTModel = new TexturedModel(wallModel,new ModelTexture(loader.loadTexture("white")));
 
 
 		long beforeHumans = System.currentTimeMillis();
-		Entity h = new Entity(humanTModel, human, new Vector3f(0, 0, 0), 0, 0, 0, 1, "human");
+		//Entity h = new Entity(humanTModel, human, new Vector3f(0, 0, 0), 0, 0, 0, 1, "human");
 		Entity a = new Entity(ballTModel, ball, new Vector3f(0, 0, 0), 0, 0, 0, 1);
 		Entity b = new Entity(treeTModel, tree, new Vector3f(0, 0, 0), 0, 0, 0, 1, "tree");
 		Entity c = new Entity(fernTModel, fern, new Vector3f(0, 0, 0), 0, 0, 0, 1, "fern");
 		Entity d = new Entity(grassTModel, grass, new Vector3f(0, 0, 0), 0, 0, 0, 1, "grass");
 		Entity e = new Entity(boxTModel, box, new Vector3f(0, 0, 0), 0, 0, 0, 1, "box");
-		Entity f = new Entity(flagTModel, flag, new Vector3f(300, 4f, 300), 0, 0, 0, 1, "flag");
+		Entity f = new Entity(flagTModel, flag, new Vector3f(300, 0f, 300), 0, 0, 0, 1, "flag");
+		Entity g = new Entity(coneTModel, cone, new Vector3f(100, 0, 300), 0, 0, 0, 5, "cone");
+		Entity h = new Entity(pyramidTModel, pyramid, new Vector3f(400, -0.1f, 400), 0, 0, 0, 10, "pyramid");
+		Entity i = new Entity(wallTModel, wall, new Vector3f(100, 0f, 100), 0, 0, 0, 1, "wall");
 		long afterHumans = System.currentTimeMillis();
 		System.out.println("Time to load entities: " + (afterHumans - beforeHumans));
 
@@ -131,10 +143,13 @@ public class MainGameLoop {
 		world.add(new Terrain(0, 3, loader, new ModelTexture(loader.loadTexture("metal2"))/*, "arena"/*, "heightmap"*/));
 
 		List<Entity> nature = new ArrayList<Entity>();
-		nature.add(new Entity(boxTModel, box, new Vector3f(200, 0, 200), 0, 0, 0, 1, "box"));
+		nature.add(new Entity(boxTModel, box, new Vector3f(200, 0, 500), 0, 0, 0, 5, "box"));
 		nature.add(new Entity(dragonTModel, dragon_low, new Vector3f(400, 0, 200), 0, 0, 0, 5, "dragon"));
 		nature.add(new Entity(treeTModel, tree, new Vector3f(300, 0, 100), 0, 0, 0, 3, "tree"));
 		nature.add(f);
+		nature.add(g);
+		nature.add(h);
+		nature.add(i);
 
 		//BoundingBox bbox = nature.get(1).getCollisionData().getBoundingBox();
 		//bbox.print();
@@ -160,20 +175,20 @@ public class MainGameLoop {
 		WaterRenderer waterRenderer = new WaterRenderer(loader, waterShader, renderer.getProjectionMatrix(), fbos);
 		List<WaterTile> waters = new ArrayList<WaterTile>();
 		//waters.add(new WaterTile(75, 120, 0));
-		
-		
-		
+
+
+
 		long ago = System.currentTimeMillis();
-		
-		ShotData sData = mainEngine.performVirtualShot(player1, new Vector3f(0, 0, 300));
-		System.out.printf("Shot ends up at: (%f|%f|%f)\n", sData.getEndPosition().x, sData.getEndPosition().y, sData.getEndPosition().z);
-		
+
+		//ShotData sData = mainEngine.performVirtualShot(player1, new Vector3f(0, 0, 300));
+		//System.out.printf("Shot ends up at: (%f|%f|%f)\n", sData.getEndPosition().x, sData.getEndPosition().y, sData.getEndPosition().z);
+
 		long notSoLongAgo = System.currentTimeMillis();
 		System.out.println("Time for virtual shot: " + (notSoLongAgo - ago));
-		
-		
-		
-		
+
+
+
+
 		long after = System.currentTimeMillis();
 		System.out.println("\nTIME TO PREPARE MODES ETC.: " + (after - before) + "\n");
 		DisplayManager.resetFrameTime();
@@ -222,14 +237,14 @@ public class MainGameLoop {
 			}
 			System.out.println("---- While loop end ----\n");
 		}
-		
+
 		fbos.cleanUp();
 		waterShader.cleanUp();
 		guiRenderer.cleanUp();
 		renderer.cleanUp();
 		loader.cleanUp();
 		DisplayManager.closeDisplay();
-	
+
 	}
 
 	public static int getCounter() {
