@@ -350,6 +350,7 @@ public class GameState implements State {
 	}
 	
 	private void loadLights(){
+		world.getLights().clear();
 		List<Light> lights = new ArrayList<Light>();
 		lights.add(new Light(new Vector3f(1000000,1500000,-1000000),new Vector3f(1f,1f,1f)));
 		world.addLights(lights);

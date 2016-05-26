@@ -57,8 +57,6 @@ public class DesignerState implements State{
 	private GuiRenderer guiRenderer;
 	private MousePicker picker;
 	
-	private PhysicsEngine mainEngine;
-	
 	private ArrayList<Ball> balls = new ArrayList<Ball>();
 	private int currBall;
 	
@@ -88,7 +86,6 @@ public class DesignerState implements State{
 		world = new World(camera);
 		loadLights();
 		renderer = new MasterRenderer(loader, camera);
-		mainEngine = new PhysicsEngine(balls, world);
 		loadWater();
 		loadParticleSystem();
 
@@ -159,8 +156,7 @@ public class DesignerState implements State{
 	public void checkInputs() {
 
 		balls.get(currBall).checkInputs();
-		picker.update();
-		if (Keyboard.isKeyDown(Keyboard.KEY_Q) && loader.getVBOs() <= 350) {
+		if (Keyboard.isKeyDown(Keyboard.KEY_Q) && loader.getVBOs() <= 350 && picker.getCurrentTerrainPoint() != null) {
 			world.getTerrains().get(0).updateTerrain(loader, ((picker.getCurrentTerrainPoint().x / (Terrain.getSize()/2)) * (world.getTerrains().get(0).getVertexCount()/2)), ((picker.getCurrentTerrainPoint().z / (Terrain.getSize()/2)) * (world.getTerrains().get(0).getVertexCount()/2)));
 			for(Entity e:world.getEntities()) {
 				float x = e.getPosition().x;
@@ -170,24 +166,24 @@ public class DesignerState implements State{
 			}
 		
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_R) && !BallPlaced) {
-			createEntity("disk", new Vector3f(picker.getCurrentTerrainPoint().x, getWorld().getHeightOfTerrain(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z), picker.getCurrentTerrainPoint().z), 0f, 0f, 0f, 1);
+		if (Keyboard.isKeyDown(Keyboard.KEY_R) && !BallPlaced && picker.getCurrentTerrainPoint() != null) {
+			createNotCollidingEntity("disk", 0, new Vector3f(picker.getCurrentTerrainPoint().x, getWorld().getHeightOfTerrain(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z), picker.getCurrentTerrainPoint().z), 0f, 0f, 0f, 1);
 			BallPlaced = true;
 			world.setStart(new Vector2f(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z));
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_T) && !HolePlaced) {
-			createEntity("flag", new Vector3f(picker.getCurrentTerrainPoint().x, getWorld().getHeightOfTerrain(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z), picker.getCurrentTerrainPoint().z), 0f, 0f, 0f, 5);
+		if (Keyboard.isKeyDown(Keyboard.KEY_T) && !HolePlaced && picker.getCurrentTerrainPoint() != null) {
+			createNotCollidingEntity("flag", 0, new Vector3f(picker.getCurrentTerrainPoint().x, getWorld().getHeightOfTerrain(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z), picker.getCurrentTerrainPoint().z), 0f, 0f, 0f, 5);
 			HolePlaced = true;
 			world.setEnd(new Vector2f(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z));
 		}
-		if (loader.getVBOs() <= 350 && Keyboard.isKeyDown(Keyboard.KEY_F)) {
+		if (loader.getVBOs() <= 350 && Keyboard.isKeyDown(Keyboard.KEY_F ) && picker.getCurrentTerrainPoint() != null) {
 			createEntity("tree", new Vector3f(picker.getCurrentTerrainPoint().x, getWorld().getHeightOfTerrain(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z), picker.getCurrentTerrainPoint().z), 0f, 0f, 0f, 5);
 		}
-		if (loader.getVBOs() <= 350 && Keyboard.isKeyDown(Keyboard.KEY_G)) {
+		if (loader.getVBOs() <= 350 && Keyboard.isKeyDown(Keyboard.KEY_G) && picker.getCurrentTerrainPoint() != null) {
 			createEntity("box", new Vector3f(picker.getCurrentTerrainPoint().x, getWorld().getHeightOfTerrain(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z), picker.getCurrentTerrainPoint().z), 0f, 0f, 0f, 3);
 		}
 		if (BallPlaced && HolePlaced && Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
-			MainGameLoop.crateNewState("game", world);
+			MainGameLoop.loadGame(world);
 		}
 	}
 	
@@ -199,7 +195,8 @@ public class DesignerState implements State{
 	
 	@Override
 	public void update() {
-		mainEngine.tick();
+		//mainEngine.tick();
+		picker.update();
 		camera.move();
 		for(ParticleSystem system:particles)
 			system.generateParticles();
@@ -309,7 +306,7 @@ public class DesignerState implements State{
 		tModels.put("pine", new TexturedModel(pineModel,new ModelTexture(loader.loadTexture("pine"))));
 		tModels.put("box", new TexturedModel(boxModel,new ModelTexture(loader.loadTexture("box"))));
 		tModels.put("flower", new TexturedModel(flowerModel,new ModelTexture(loader.loadTexture("flower"))));
-		tModels.put( "barrel", new TexturedModel(NormalMappedObjLoader.loadOBJ("barrel", loader), new ModelTexture(loader.loadTexture("barrel"))));
+		tModels.put("barrel", new TexturedModel(NormalMappedObjLoader.loadOBJ("barrel", loader), new ModelTexture(loader.loadTexture("barrel"))));
 		tModels.put("crate", new TexturedModel(NormalMappedObjLoader.loadOBJ("crate", loader), new ModelTexture(loader.loadTexture("crate"))));
 		tModels.put("boulder", new TexturedModel(NormalMappedObjLoader.loadOBJ("boulder", loader), new ModelTexture(loader.loadTexture("boulder"))));
 		tModels.put("dragon", new TexturedModel(dragonModel,new ModelTexture(loader.loadTexture("white"))));
@@ -352,6 +349,12 @@ public class DesignerState implements State{
 	
 	public Entity createEntity(String eName, int a,  Vector3f position, float rotX, float rotY, float rotZ, float scale){
 		Entity e = new Entity(tModels.get(eName), a, mData.get(eName), position, rotX, rotY, rotZ, scale);
+		world.add(e);
+		return e;
+	}
+	
+	public Entity createNotCollidingEntity(String eName, int a,  Vector3f position, float rotX, float rotY, float rotZ, float scale){
+		Entity e = new Entity(tModels.get(eName), a, position, rotX, rotY, rotZ, scale, false);
 		world.add(e);
 		return e;
 	}

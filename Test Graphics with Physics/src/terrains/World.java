@@ -95,7 +95,7 @@ public class World {
 	public ArrayList<PhysicalFace> getCollidingFacesEntities(Ball b) {
 		ArrayList<PhysicalFace> collidingFaces = new ArrayList<PhysicalFace>();
 		for (Entity e : entities) {
-			if (e.inBounds(b)) {
+			if (e.isCollidable() && e.inBounds(b)) {
 				collidingFaces.addAll(e.getCollidingFaces(b));
 				System.out.println("Ball may collide with " + e + ".");
 			}

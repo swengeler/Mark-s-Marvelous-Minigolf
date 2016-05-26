@@ -22,6 +22,7 @@ public class Entity {
 	private String type;
 
 	private int textureIndex = 0;
+	private boolean collidable = true;
 
 	public Entity(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale, String type) {
 		this.model = model;
@@ -43,6 +44,29 @@ public class Entity {
         this.rotVel.z = rotZ;
         this.scale = scale;
         this.type = type;
+    }
+	
+	public Entity(TexturedModel model, int index, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
+        this.textureIndex = index;
+        this.model = model;
+        this.position = position;
+        this.rotVel.x = rotX;
+        this.rotVel.y = rotY;
+        this.rotVel.z = rotZ;
+        this.scale = scale;
+        this.type = "Undefined";
+    }
+	
+	public Entity(TexturedModel model, int index, Vector3f position, float rotX, float rotY, float rotZ, float scale, boolean collidable) {
+        this.textureIndex = index;
+        this.model = model;
+        this.position = position;
+        this.rotVel.x = rotX;
+        this.rotVel.y = rotY;
+        this.rotVel.z = rotZ;
+        this.scale = scale;
+        this.collidable = collidable;
+        this.type = "Undefined";
     }
 
     public Entity(TexturedModel model, int index, ModelData data, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
@@ -69,6 +93,10 @@ public class Entity {
 		createCollisionData(data);
 	}
 
+	public boolean isCollidable(){
+		return collidable;
+	}
+	
 	private void createCollisionData(ModelData data) {
 		long before = System.currentTimeMillis();
 		cdata = new CollisionData();
