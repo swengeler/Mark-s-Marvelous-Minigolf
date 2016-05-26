@@ -166,8 +166,11 @@ public class MasterRenderer {
 	}
 
 	public void processWorld(World world, Vector4f clipPlane, boolean normalMap) {
-		for(Terrain t:world.getTerrains())
+		for(Terrain t:world.getTerrains()) {
 			terrains.add(t);
+			//System.out.println(t);
+		}
+			
 		for(Entity e:world.getEntities())
 			processEntity(e);
 		if(normalMap)

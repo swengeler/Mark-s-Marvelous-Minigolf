@@ -18,6 +18,7 @@ public class Entity {
 		this.position = position;
 		this.rotVel.x = rotX;
 		this.rotVel.y = rotY;
+		System.out.println(rotY);
 		this.rotVel.z = rotZ;
 		this.scale = scale;
 	}
@@ -88,6 +89,7 @@ public class Entity {
 	}
 
 	public float getRotY() {
+		System.out.println("Get rotY: " + rotVel.y);
 		return rotVel.y;
 	}
 

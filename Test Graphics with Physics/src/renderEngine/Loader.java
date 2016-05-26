@@ -53,6 +53,17 @@ public class Loader {
 		return new RawModel(vaoID,indices.length);
 	}
 	
+	public RawModel loadToVAOTerrain(float[] positions, float[] textureCoords, float[] normals, int[] indices) {
+		int vaoID = createVAOWithTerrain();
+		bindIndicesBuffer(indices);
+		storeDataInAttributeList(0,3,positions);
+		storeDataInAttributeList(1,2,textureCoords);
+		storeDataInAttributeList(2,3,normals);
+		unbindVAO();
+		System.out.println("Terrain " + vaos.size() + " " + vbos.size());
+		return new RawModel(vaoID,indices.length);
+	}
+	
 	public RawModel loadToVAO(float[] positions, int dimensions){
 		int vaoID = createVAO();
 		this.storeDataInAttributeList(0, dimensions, positions);
@@ -168,6 +179,14 @@ public class Loader {
 		return vaoID;
 	}
 	
+	private int createVAOWithTerrain() {
+		GL30.glBindVertexArray(0);
+		vaos.remove(0);
+		vaos.add(0, 1);
+		GL30.glBindVertexArray(1);
+		return 1;
+	}
+	
 	private void bindIndicesBuffer(int[] indices){
 		int vboID = GL15.glGenBuffers();
 		vbos.add(vboID);
@@ -202,5 +221,9 @@ public class Loader {
 		buffer.put(data);
 		buffer.flip();
 		return buffer;
+	}
+	
+	public int getVBOs() {
+		return vbos.size();
 	}
 }

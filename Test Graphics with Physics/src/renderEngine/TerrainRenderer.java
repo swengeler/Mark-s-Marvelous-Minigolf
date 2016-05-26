@@ -36,6 +36,7 @@ public class TerrainRenderer {
 	public void render(List<Terrain> terrains, Matrix4f toShadowSpace){
 		shader.loadToShadowSpaceMatrix(toShadowSpace);
 		for(Terrain terrain:terrains){
+			System.out.println(terrain);
 			prepareTerrain(terrain);
 			loadModelMatrix(terrain);
 			shader.loadSkyColor(RED, GREEN, BLUE);

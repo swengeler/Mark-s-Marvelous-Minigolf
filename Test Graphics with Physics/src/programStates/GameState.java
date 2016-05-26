@@ -93,7 +93,7 @@ public class GameState implements State {
 		createBall(new Vector3f(0,0,20));
 		currBall = 1;
 		setCameraToBall(currBall);
-		createTerrain(0, 0, "grass", true);
+		//createTerrain(0, 0, "grass", true);
 		
 
 	}
