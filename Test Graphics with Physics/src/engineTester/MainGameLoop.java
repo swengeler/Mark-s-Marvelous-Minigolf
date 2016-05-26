@@ -57,7 +57,7 @@ public class MainGameLoop {
 		ModelData grass = OBJFileLoader.loadOBJ("grassModel");
 		ModelData pine = OBJFileLoader.loadOBJ("pine");
 		ModelData flower = OBJFileLoader.loadOBJ("grassModel");
-	    ModelData box = OBJFileLoader.loadOBJ("wall2");
+	    ModelData box = OBJFileLoader.loadOBJ("wall3");
 	    ModelData dragon = OBJFileLoader.loadOBJ("dragon");
 	    ModelData dragon_low = OBJFileLoader.loadOBJ("dragon_low_test");
 	    ModelData flag = OBJFileLoader.loadOBJ("hole");
@@ -80,7 +80,7 @@ public class MainGameLoop {
 		TexturedModel fernTModel = new TexturedModel(fernModel,new ModelTexture(loader.loadTexture("fernAtlas")));
 		TexturedModel grassTModel = new TexturedModel(grassModel,new ModelTexture(loader.loadTexture("grassTexture")));
 		TexturedModel pineTModel = new TexturedModel(pineModel,new ModelTexture(loader.loadTexture("pine")));
-		TexturedModel boxTModel = new TexturedModel(boxModel,new ModelTexture(loader.loadTexture("black_big")));
+		TexturedModel boxTModel = new TexturedModel(boxModel,new ModelTexture(loader.loadTexture("white")));
 		TexturedModel flowerTModel = new TexturedModel(flowerModel,new ModelTexture(loader.loadTexture("flower")));
 		TexturedModel dragonTModel = new TexturedModel(dragonModel,new ModelTexture(loader.loadTexture("white")));
 		TexturedModel flagTModel = new TexturedModel(flagModel,new ModelTexture(loader.loadTexture("white")));
@@ -93,7 +93,7 @@ public class MainGameLoop {
 		Entity c = new Entity(fernTModel, fern, new Vector3f(0, 0, 0), 0, 0, 0, 1, "fern");
 		Entity d = new Entity(grassTModel, grass, new Vector3f(0, 0, 0), 0, 0, 0, 1, "grass");
 		Entity e = new Entity(boxTModel, box, new Vector3f(0, 0, 0), 0, 0, 0, 1, "box");
-		Entity f = new Entity(flagTModel, flag, new Vector3f(300, 0, 300), 0, 0, 0, 4, "flag");
+		Entity f = new Entity(flagTModel, flag, new Vector3f(300, 4f, 300), 0, 0, 0, 1, "flag");
 		long afterHumans = System.currentTimeMillis();
 		System.out.println("Time to load entities: " + (afterHumans - beforeHumans));
 
@@ -131,7 +131,7 @@ public class MainGameLoop {
 		world.add(new Terrain(0, 3, loader, new ModelTexture(loader.loadTexture("metal2"))/*, "arena"/*, "heightmap"*/));
 
 		List<Entity> nature = new ArrayList<Entity>();
-		nature.add(new Entity(boxTModel, box, new Vector3f(200, 0, 200), 0, 0, 0, 5, "box"));
+		nature.add(new Entity(boxTModel, box, new Vector3f(200, 0, 200), 0, 0, 0, 1, "box"));
 		nature.add(new Entity(dragonTModel, dragon_low, new Vector3f(400, 0, 200), 0, 0, 0, 5, "dragon"));
 		nature.add(new Entity(treeTModel, tree, new Vector3f(300, 0, 100), 0, 0, 0, 3, "tree"));
 		nature.add(f);

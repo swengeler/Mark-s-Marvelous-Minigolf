@@ -183,7 +183,7 @@ public class RealBall extends Entity implements Ball {
 	}
 	
 	public float getTimeElapsed() {
-		return /*DisplayManager.getFrameTimeSeconds()*/0.01f;
+		return DisplayManager.getFrameTimeSeconds();
 	}
 	
 	public float getLastTimeElapsed() {
