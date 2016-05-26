@@ -167,6 +167,7 @@ public class World {
 	}
 	
 	public void setEnd(Vector2f position) {
+		System.out.println("New hole at x: " + position.x + " z: " + position.y);
 		this.End =  position;
 	}
 	

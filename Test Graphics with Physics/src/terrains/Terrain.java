@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import models.RawModel;
@@ -46,13 +47,13 @@ public class Terrain {
 		
 	}
 	
-	public Terrain(int gridX, int gridZ, Loader loader, ModelTexture texture, float[][] heights){
+	public Terrain(int gridX, int gridZ, Loader loader, ModelTexture texture, float[][] heights, Vector2f hole){
 		
 		this.texture = texture;
 		this.x = gridX * getSize();
 		this.z = gridZ * getSize();
 		this.heights = heights;
-		this.model = generateTerrain(loader);
+		this.model = generateTerrain(loader, hole);
 		
 	}
 	
@@ -223,10 +224,28 @@ public class Terrain {
 		return loader.loadToVAO(vertices, textureCoords, normals, indices);
 	}
 	
-	private RawModel generateTerrain(Loader loader){
+	private RawModel generateTerrain(Loader loader, Vector2f hole){
 		
 		
 		VERTEX_COUNT = heights.length;
+		System.out.println(VERTEX_COUNT);
+		float newHeight = -4;
+		int holeRad = 4;
+		float x = (hole.getX() / (SIZE/2)) * (VERTEX_COUNT/2);
+		float z = (hole.getY() / (SIZE/2)) * (VERTEX_COUNT/2);
+		System.out.println("Hole at x: " + x + " z: " + z);
+		for(float i = -holeRad; i <= holeRad; i++) {
+			for (float k = -holeRad; k  <= holeRad; k++) {
+				if (x + i >= 0 && x + i < VERTEX_COUNT && z + k >= 0 && z + k < VERTEX_COUNT) {
+					float distance = (float) Math.sqrt((i*i)+(k*k));
+					if (distance <= holeRad) {
+						float height = (float) ((newHeight/2) * -(Math.cos(Math.PI - (Math.PI * (distance/holeRad))))+(newHeight/2));
+						heights[(int)(x + i)][(int)(z + k)] =  height;		
+					}
+				}
+			}	
+		}
+		
 		
 		int count = VERTEX_COUNT * VERTEX_COUNT;
 		float[] vertices = new float[count * 3];

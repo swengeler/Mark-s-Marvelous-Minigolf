@@ -110,7 +110,7 @@ public class GameState implements State {
 		for(Entity e:world.getEntities()) {
 			System.out.println(e);
 		}
-		createBall(new Vector3f(world.getStart().x, world.getHeightOfTerrain(world.getStart().x, world.getEnd().y), world.getEnd().y));
+		createBall(new Vector3f(world.getStart().x, world.getHeightOfTerrain(world.getStart().x, world.getStart().y), world.getStart().y));
 		//createBall(new Vector3f(400,0,400));
 		loadLights();
 		renderer = new MasterRenderer(loader, camera);
@@ -207,7 +207,7 @@ public class GameState implements State {
 	}
 	
 	public Terrain createTerrain(int gridX, int gridY, String texName, float[][] height){
-		Terrain t = new Terrain(gridX, gridY, loader, new ModelTexture(loader.loadTexture(texName)), height);
+		Terrain t = new Terrain(gridX, gridY, loader, new ModelTexture(loader.loadTexture(texName)), height, world.getEnd());
 		world.removeTerrain();
 		world.add(t);
 		return t;
