@@ -139,7 +139,6 @@ public class GameState implements State {
 		currBall = 0;
 		setCameraToBall(currBall);
 		System.out.println("done game with world");
-
 		createTerrain(0, 1, "grass", true);
 
 	}
@@ -296,6 +295,7 @@ public class GameState implements State {
 	    mData.put("dragon_low",dragon_low);
 	    mData.put("flag",flag);
 	    mData.put("hole",hole);
+
 		
 		RawModel humanModel = loader.loadToVAO(human.getVertices(), human.getTextureCoords(), human.getNormals(), human.getIndices());
 		RawModel ballModel = loader.loadToVAO(ball.getVertices(), ball.getTextureCoords(), ball.getNormals(), ball.getIndices());
@@ -331,7 +331,7 @@ public class GameState implements State {
 		tModels.put("wall", new TexturedModel(wallModel, new ModelTexture(loader.loadTexture("white"))));
 		tModels.put("hole", new TexturedModel(holeModel, new ModelTexture(loader.loadTexture("white"))));
 		tModels.put("dragon_low", new TexturedModel(dragonLowModel, new ModelTexture(loader.loadTexture("white"))));
-		
+
 		tModels.get("barrel").getTexture().setShineDamper(10);
 		tModels.get("barrel").getTexture().setReflectivity(0.3f);
 		tModels.get("barrel").getTexture().setNormalMap(loader.loadTexture("barrelNormal"));
