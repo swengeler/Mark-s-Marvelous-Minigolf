@@ -57,7 +57,7 @@ public class GameState implements State {
 	private WaterFrameBuffers fbos;
 	
 	
-	private boolean water = true;
+	private boolean water = false;
 	private boolean particle = true;
 	private boolean shadow = true;
 	private boolean normalMap = true;
@@ -93,6 +93,7 @@ public class GameState implements State {
 		createBall(new Vector3f(0,0,20));
 		currBall = 1;
 		setCameraToBall(currBall);
+		createTerrain(0, 0, "grass", true);
 		
 
 	}

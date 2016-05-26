@@ -79,24 +79,27 @@ public class MenuState implements State {
 		
 	}
 	
-	public void loadMainMenu(){
-		guis.clear();
-		GuiButton title = new GuiButton("title", new Vector2f(disW/2f,disH*8/10 + 55), new Vector2f(0.8f,0.8f), loader);
-		GuiButton play = new GuiButton("play_button", new Vector2f(disW/2f + 30,disH*6/10 - 20), new Vector2f(1f,0.66f), loader);
-		GuiButton designer = new GuiButton("designer_button", new Vector2f(disW/2f + 210,disH*5/10 - 100), new Vector2f(1f,0.66f), loader);
-		GuiButton options = new GuiButton("options_button", new Vector2f(disW/2f + 90,disH*3/10 - 80), new Vector2f(1f,0.66f), loader);
-		
-		guis.add(title);
-		guis.add(play);
-		guis.add(designer);
-		guis.add(options);
+	public GuiButton createButton(String guiTex, Vector2f position,Vector2f scale, String type){
+		GuiButton button = new GuiButton(guiTex, position, scale, loader, type, this);
+		guis.add(button);
+		return button;
 	}
 	
-	public void loadGameMenu(){
+	public void loadMainMenu(){
+		guis.clear();
+		createButton("title", new Vector2f(disW/2f,disH*8/10 + 55), new Vector2f(0.8f,0.8f), "static");
+		createButton("play_button", new Vector2f(disW/2f + 30,disH*6/10 - 20), new Vector2f(1f,0.66f), "play");
+		createButton("designer_button", new Vector2f(disW/2f + 210,disH*5/10 - 100), new Vector2f(1f,0.66f), "designer");
+		createButton("options_button", new Vector2f(disW/2f + 90,disH*3/10 - 80), new Vector2f(1f,0.66f), "main_options");
 		
 	}
 	
 	public void loadOptions(){
+		guis.clear();
+		createButton("title", new Vector2f(disW/2f,disH*8/10 + 55), new Vector2f(0.8f,0.8f), "static");
+		//createButton("play_button", new Vector2f(disW/2f + 30,disH*6/10 - 20), new Vector2f(1f,0.66f), "play");
+		//createButton("designer_button", new Vector2f(disW/2f + 210,disH*5/10 - 100), new Vector2f(1f,0.66f), "designer");
+		//createButton("options_button", new Vector2f(disW/2f + 90,disH*3/10 - 80), new Vector2f(1f,0.66f), "main_options");
 		
 	}
 

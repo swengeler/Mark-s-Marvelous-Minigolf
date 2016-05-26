@@ -28,6 +28,7 @@ import particles.ParticleMaster;
 import particles.ParticleSystem;
 import particles.ParticleTexture;
 import programStates.State;
+import programStates.DesignerState;
 import programStates.GameState;
 import programStates.MenuState;
 import renderEngine.DisplayManager;
@@ -46,12 +47,13 @@ import water.WaterTile;
 
 public class MainGameLoop {
 	
+	private static State currState;
+	private static Loader loader = new Loader();
 	
 	public static void main(String[] args) {
 	
 		DisplayManager.createDisplay();
-		Loader loader = new Loader();
-		State currState = new GameState(loader);
+		currState = new GameState(loader);
 		GameState game = (GameState) currState;
 		game.createTerrain(0, 0, "grass", true);
 		game.createWaterTile(Terrain.getSize()/2f, Terrain.getSize()/2f, -8f);
@@ -239,7 +241,7 @@ public class MainGameLoop {
 		system.randomizeRotation();
 		system.setDirection(new Vector3f(1,0,0), 0.1f);
 		
-		//currState = new MenuState(loader);
+		currState = new MenuState(loader);
 		DisplayManager.reset();
 		
 		while(!Display.isCloseRequested()){
@@ -305,6 +307,18 @@ public class MainGameLoop {
 		currState.cleanUp();
 		DisplayManager.closeDisplay();
 		
+	}
+	
+	public static void loadGame(){
+		currState = new GameState(loader);
+	}
+	
+	public static void loadMenu(){
+		currState = new MenuState(loader);
+	}
+	
+	public static void loadDesigner(){
+		currState = new DesignerState(loader);
 	}
 
 }

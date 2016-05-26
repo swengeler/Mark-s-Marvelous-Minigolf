@@ -8,17 +8,24 @@ import javax.imageio.ImageIO;
 
 import org.lwjgl.util.vector.Vector2f;
 
+import engineTester.MainGameLoop;
+import programStates.MenuState;
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
 
 public class GuiButton {
 	
+	
 	private GuiTexture texture;
 	private float width;
 	private float height;
 	private Vector2f position;
+	private String type;
+	private MenuState menu;
 	
-	public GuiButton(String guiTex, Vector2f position,Vector2f scale, Loader loader){
+	public GuiButton(String guiTex, Vector2f position,Vector2f scale, Loader loader, String type, MenuState menu){
+		this.type = type;
+		this.menu = menu;
 		BufferedImage image = null;
 		try {
 			image = ImageIO.read(new File("res/" + guiTex + ".png"));
@@ -51,6 +58,15 @@ public class GuiButton {
 
 	public void click() {
 		System.out.println("My size is: width=" + width +", height=" + height);
+		if(type.equals("main_menu")){
+			
+		} else if(type.equals("play")){
+			MainGameLoop.loadGame();
+		} else if(type.equals("designer")){
+			MainGameLoop.loadDesigner();
+		} else if(type.equals("main_options")){
+			menu.loadOptions();
+		}
 	}
 	
 }
