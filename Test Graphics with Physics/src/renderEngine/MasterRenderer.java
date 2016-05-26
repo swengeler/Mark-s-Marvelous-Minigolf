@@ -188,5 +188,9 @@ public class MasterRenderer {
 		render(world.getLights(), world.getCamera(), new Vector4f(0, -1, 0, 1000));
 		
 	}
+
+	public void updateCamera(Camera camera) {
+		shadowMapRenderer = new ShadowMapMasterRenderer(camera);
+	}
 	
 }

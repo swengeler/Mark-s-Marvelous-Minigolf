@@ -79,6 +79,7 @@ public class GameState implements State {
 		mainEngine = new PhysicsEngine(balls, world);
 		loadWater();
 		loadParticleSystem();
+
 		createTerrain(0, 0, "grass", true);
 		createWaterTile(Terrain.getSize()/2f, Terrain.getSize()/2f, -8f);
 		createEntity("dragon", new Vector3f(100, getWorld().getHeightOfTerrain(100, 60), 60), -10f, 170f, 0f, 3 );
@@ -88,6 +89,12 @@ public class GameState implements State {
 		system.setSpeedError(0.25f);
 		system.randomizeRotation();
 		system.setDirection(new Vector3f(1,0,0), 0.1f);
+
+		createBall(new Vector3f(0,0,20));
+		currBall = 1;
+		setCameraToBall(currBall);
+		
+
 	}
 	
 	@Override
@@ -132,6 +139,12 @@ public class GameState implements State {
 	@Override
 	public void checkInputs() {
 		balls.get(currBall).checkInputs(world);
+	}
+	
+	public void setCameraToBall(int index){
+		camera = new Camera(balls.get(index));
+		renderer.updateCamera(camera);
+		world.setCamera(camera);
 	}
 	
 	@Override

@@ -15,7 +15,7 @@ public class Ball {
 	private double radius;
 	public static final double ST_RADIUS = 4.5;
 
-	public static final double BALL_MASS 1;
+	public static final double BALL_MASS = 1;
 	private Vector velocity = new Vector();
 
 	public Ball() {
