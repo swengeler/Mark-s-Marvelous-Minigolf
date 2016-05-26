@@ -57,7 +57,7 @@ public class DesignerState implements State{
 		loadLights();
 		renderer = new MasterRenderer(loader, camera);
 		mainEngine = new PhysicsEngine(balls, world);
-		createTerrain(0, 0, "grass", true);
+		createTerrain(0, 0, "grass", false);
 	}
 
 	@Override
@@ -103,12 +103,15 @@ public class DesignerState implements State{
 		
 		ModelData tree = OBJFileLoader.loadOBJ("tree");
 		ModelData empty = OBJFileLoader.loadOBJ("empty");
+		ModelData grass = OBJFileLoader.loadOBJ("grassModel");
 		
 		RawModel treeModel = loader.loadToVAO(tree.getVertices(), tree.getTextureCoords(), tree.getNormals(), tree.getIndices());
 		RawModel emptyModel = loader.loadToVAO(empty.getVertices(), empty.getTextureCoords(), empty.getNormals(), empty.getIndices());
+		RawModel grassModel = loader.loadToVAO(grass.getVertices(), grass.getTextureCoords(), grass.getNormals(), grass.getIndices());
 		
 		tModels.put("tree", new TexturedModel(treeModel,new ModelTexture(loader.loadTexture("tree"))));
 		tModels.put("empty", new TexturedModel(emptyModel, new ModelTexture(loader.loadTexture("tree"))));
+		tModels.put("grass", new TexturedModel(grassModel,new ModelTexture(loader.loadTexture("grassTexture"))));
 	}
 	
 	public Ball createBall(Vector3f position){
