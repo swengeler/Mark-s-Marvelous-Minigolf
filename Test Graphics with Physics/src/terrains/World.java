@@ -6,9 +6,11 @@ import java.util.List;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
+import Physics.PhysicalFace;
 import entities.Entity;
 import entities.Light;
 import toolbox.Maths;
+import entities.Ball;
 import entities.Camera;
 
 public class World {
@@ -74,6 +76,27 @@ public class World {
 		return lights;
 	}
 	
+	public ArrayList<Entity> getCollidingEntities(Ball b) {
+		ArrayList<Entity> obstaclesHit = new ArrayList<Entity>();
+		for (Entity e : entities) {
+			if (e.collides(b)) {
+				obstaclesHit.add(e);
+			}
+		}
+		return obstaclesHit;
+	}
+	
+	public ArrayList<PhysicalFace> getCollidingFacesEntities(Ball b) {
+		ArrayList<PhysicalFace> collidingFaces = new ArrayList<PhysicalFace>();
+		for (Entity e : entities) {
+			if (e.inBounds(b)) {
+				collidingFaces.addAll(e.getCollidingFaces(b));
+				System.out.println("Ball may collide with " + e + ".");
+			}
+		}
+		return collidingFaces;
+	}
+	
 	public Terrain getTerrain(float x, float z){
 		float gX = (float) Math.floor(x/Terrain.getSize());
 		float gZ = (float) Math.floor(z/Terrain.getSize());
@@ -81,6 +104,16 @@ public class World {
 			if(gX == t.getGridX() && gZ == t.getGridZ())
 				return t;
 		return null;
+	}
+	
+	public ArrayList<PhysicalFace> getCollidingFacesTerrains(Ball b) {
+		System.out.println("getCollidingFaces in World is called (there are " + terrains.size() + " terrains)");
+		ArrayList<PhysicalFace> collidingFaces = new ArrayList<PhysicalFace>();
+		for (Terrain t : terrains) {
+			if (t.ballInTerrain(b))
+				collidingFaces.addAll(t.getCollidingFaces(b));
+		}
+		return collidingFaces;
 	}
 	
 	public float getHeightOfTerrain(float x, float z){

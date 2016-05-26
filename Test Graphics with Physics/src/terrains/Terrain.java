@@ -3,11 +3,16 @@ package terrains;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import Physics.CollisionData;
+import Physics.PhysicalFace;
+import entities.Ball;
+import entities.RealBall;
 import models.RawModel;
 import renderEngine.Loader;
 import textures.ModelTexture;
@@ -21,8 +26,11 @@ public class Terrain {
 	
 	private float x;
 	private float z;
+	private float maxHeight;
+	private float minHeight;
 	private RawModel model;
 	private ModelTexture texture;
+	private CollisionData cdata;
 	
 	private float[][] heights;
 	
@@ -33,6 +41,8 @@ public class Terrain {
 		this.texture = texture;
 		this.x = gridX * getSize();
 		this.z = gridZ * getSize();
+		this.maxHeight = Float.MIN_VALUE;
+		this.minHeight = Float.MAX_VALUE;
 		this.model = generateTerrain(loader, rand);
 		
 	}
@@ -42,6 +52,8 @@ public class Terrain {
 		this.texture = texture;
 		this.x = gridX * getSize();
 		this.z = gridZ * getSize();
+		this.maxHeight = Float.MIN_VALUE;
+		this.minHeight = Float.MAX_VALUE;
 		this.model = generateTerrain(loader, heightMap);
 		
 	}
@@ -92,6 +104,12 @@ public class Terrain {
 				for(int j=0;j<VERTEX_COUNT;j++){
 					vertices[vertexPointer*3] = (float)j/((float)VERTEX_COUNT - 1) * getSize();
 					heights[j][i] = getHeight(j, i, generator);
+					if (heights[j][i] > maxHeight) {
+						maxHeight = heights[j][i];
+					}
+					if (heights[j][i] < minHeight) {
+						minHeight = heights[j][i];
+					}
 					vertices[vertexPointer*3+1] = heights[j][i];
 					vertices[vertexPointer*3+2] = (float)i/((float)VERTEX_COUNT - 1) * getSize();
 					Vector3f normal = calculateNormal(j, i, generator);
@@ -158,6 +176,8 @@ public class Terrain {
 					indices[pointer++] = bottomRight;
 				}
 			}
+			maxHeight = 0;
+			minHeight = 0;
 			return loader.loadToVAO(vertices, textureCoords, normals, indices);
 		}
 	}
@@ -184,6 +204,12 @@ public class Terrain {
 			for(int j=0;j<VERTEX_COUNT;j++){
 				vertices[vertexPointer*3] = (float)j/((float)VERTEX_COUNT - 1) * getSize();
 				heights[j][i] = getHeight(j,i,image);
+				if (heights[j][i] > maxHeight) {
+					maxHeight = heights[j][i];
+				}
+				if (heights[j][i] < minHeight) {
+					minHeight = heights[j][i];
+				}
 				vertices[vertexPointer*3+1] = heights[j][i];
 				vertices[vertexPointer*3+2] = (float)i/((float)VERTEX_COUNT - 1) * getSize();
 				Vector3f normal = calculateNormal(j, i, image);
@@ -298,6 +324,105 @@ public class Terrain {
 	private float getHeight(int x, int z, HeightsGenerator generator){
 		return generator.generateHeight(x, z);
 			
+	}
+	
+	public float getMaxHeight() {
+		return maxHeight;
+	}
+
+	public float getMinHeight() {
+		return minHeight;
+	}
+	
+	public boolean ballInTerrain(Ball b) {
+		float ballR = RealBall.RADIUS;
+		float ballX = b.getPosition().x;
+		float ballZ = b.getPosition().z;
+		return  (ballX - ballR) < (this.x + Terrain.SIZE) && (ballX + ballR) > this.x &&
+				(ballZ - ballR) < (this.z + Terrain.SIZE) && (ballZ + ballR) > this.z; // other size? e.g. heights.length?
+	}
+
+	public ArrayList<PhysicalFace> getCollidingFaces(Ball b) {
+		System.out.println("getCollidingFaces in Terrain is called (Terrain at " + this.x + "|" + this.z + ")");
+		float ballR = Ball.RADIUS;
+		float ballX = b.getPosition().x - this.x;
+		float ballZ = b.getPosition().z - this.z;
+
+		if ((b.getPosition().y - ballR) > this.maxHeight)
+			return new ArrayList<PhysicalFace>(0);
+
+		int leftX = (int) Math.floor(ballX - ballR);
+		int rightX = (int) Math.ceil(ballX + ballR);
+		if (leftX > rightX) {
+			int temp = leftX;
+			leftX = rightX;
+			rightX = temp;
+		}
+		if (leftX < 0)
+			leftX = 0;
+		else if (leftX >= heights[0].length)
+			leftX = heights[0].length - 1;
+		if (rightX >= heights[0].length)
+			rightX = heights[0].length - 1;
+		else if (rightX < 0)
+			rightX = 0;
+
+		int upperZ = (int) Math.floor(ballZ - ballR);
+		int lowerZ = (int) Math.ceil(ballZ + ballR);
+		if (upperZ > lowerZ) {
+			int temp = upperZ;
+			upperZ = lowerZ;
+			lowerZ = temp;
+		}
+		if (upperZ < 0)
+			upperZ = 0;
+		else if (upperZ >= heights.length)
+			upperZ = heights.length - 1;
+		if (lowerZ >= heights.length)
+			lowerZ = heights.length - 1;
+		else if (lowerZ < 0)
+			lowerZ = 0;
+
+		System.out.println("leftX = " + leftX + ", rightX = " + rightX + ", upperZ = " + upperZ + ", lowerZ = " + lowerZ);
+
+		Vector3f p1 = new Vector3f(0,0,0), p2 = new Vector3f(0,0,0), p3 = new Vector3f(0,0,0), normal = new Vector3f(0,0,0), v1 = new Vector3f(0,0,0), v2 = new Vector3f(0,0,0);
+
+		ArrayList<PhysicalFace> collidingFaces = new ArrayList<PhysicalFace>();
+		for (int i = leftX; i <= rightX && i < heights.length - 1; i++) {
+			for (int j = upperZ; j <= lowerZ && j < heights[0].length - 1; j++) {
+				//System.out.println("2 faces added at (" + i + "|" + j + ")");
+
+				// upper left corner
+				p1.set(i + this.x, this.heights[i][j], j + this.z);
+				// lower left corner
+				p2.set(i + this.x + 1, this.heights[i + 1][j], j + this.z);
+				// upper right corner
+				p3.set(i + this.x, this.heights[i][j + 1], j + this.z + 1);
+
+				Vector3f.sub(p2, p1, v1);
+				Vector3f.sub(p3, p1, v2);
+				Vector3f.cross(v1, v2, normal);
+				normal.normalise();
+				collidingFaces.add(new PhysicalFace(normal, p1, p2, p3));
+				//System.out.println("Face added: " + collidingFaces.get(collidingFaces.size() - 1) + ".");
+
+				// upper right corner
+				p1.set(i + this.x, this.heights[i][j + 1], j + this.z + 1);
+				// lower left corner
+				p2.set(i + this.x + 1, this.heights[i + 1][j], j + this.z);
+				// lower right corner
+				p3.set(i + this.x + 1, this.heights[i + 1][j + 1], j  + this.z + 1);
+
+				Vector3f.sub(p2, p1, v1);
+				Vector3f.sub(p3, p1, v2);
+				Vector3f.cross(v1, v2, normal);
+				normal.normalise();
+				collidingFaces.add(new PhysicalFace(normal, p1, p2, p3));
+				//System.out.println("Face added: " + collidingFaces.get(collidingFaces.size() - 1) + ".");
+			}
+		}
+		System.out.println("Number of colliding faces (in Terrain): " + collidingFaces.size());
+		return collidingFaces;
 	}
 	
 	private Vector3f calculateNormal(int x, int z, BufferedImage image){
