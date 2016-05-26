@@ -61,7 +61,7 @@ public class GuiButton {
 		if(type.equals("main_menu")){
 			
 		} else if(type.equals("play")){
-			MainGameLoop.loadGame();
+			MainGameLoop.loadGame(2);
 		} else if(type.equals("designer")){
 			MainGameLoop.loadDesigner();
 		} else if(type.equals("main_options")){

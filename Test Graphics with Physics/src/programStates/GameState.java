@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
@@ -68,14 +69,17 @@ public class GameState implements State {
 	private boolean particle = true;
 	private boolean shadow = true;
 	private boolean normalMap = true;
-	private boolean multiplayer=true;
+	private boolean multiplayer;
+	private int numberOfPlayers;
 	
-	private static int score[]={0,0};
 	private boolean gameover=true;
+
+	private float timeBallStill;
 	
 	
-	public GameState(Loader loader){
+	public GameState(Loader loader, int numberOfPlayers){
 		instance = this;
+		this.numberOfPlayers = numberOfPlayers;
 		init(loader);
 		DisplayManager.reset();
 	}
@@ -84,8 +88,11 @@ public class GameState implements State {
 		return instance;
 	}
 	
-	public GameState(Loader loader, World world) {
+	public GameState(Loader loader, World world, int numberOfPlayers) {
+		instance = this;
+		this.numberOfPlayers = numberOfPlayers;
 		buildWithWorld(loader, world); 
+		DisplayManager.reset();
 	}
 	
 	@Override
@@ -93,10 +100,10 @@ public class GameState implements State {
 		this.loader = loader;
 		loadModels();
 		loadGuis();
-		//createBall(new Vector3f(Terrain.getSize()/2f, 30, Terrain.getSize()/2f), true);
 		createBall(new Vector3f(100, 20, 100), true);
 		camera = new Camera(balls.get(0));
 		world = new World(camera);
+		balls.get(0).setPosition(world.getStart());
 		loadLights();
 		renderer = new MasterRenderer(loader, camera);
 		mainEngine = new PhysicsEngine(balls, world);
@@ -113,10 +120,6 @@ public class GameState implements State {
 		system.randomizeRotation();
 		system.setDirection(new Vector3f(1,0,0), 0.1f);
 
-		//createBall(new Vector3f(0,0,20), true);
-		//createBall(new Vector3f(120, 1, 100), true);
-		setCameraToBall(currBall);
-		//createTerrain(0, 0, "grass", true);
 		DisplayManager.reset();
 	}
 	
@@ -130,19 +133,16 @@ public class GameState implements State {
 		for(Entity e:world.getEntities()) {
 			System.out.println(e);
 		}
-		createBall(new Vector3f(world.getStart().x, world.getHeightOfTerrain(world.getStart().x, world.getStart().y), world.getStart().y), true);
-		createBall(new Vector3f(world.getStart().x, world.getHeightOfTerrain(world.getStart().x, world.getStart().y), world.getStart().y), true);
-		//createBall(new Vector3f(400,0,400));
+		createBall(new Vector3f(world.getStart().x, world.getStart().y, world.getStart().z), true);
 		loadLights();
 		renderer = new MasterRenderer(loader, camera);
 		System.out.println("newEngine");
 		mainEngine = new PhysicsEngine(balls, world);
 		loadWater();
 		loadParticleSystem();
-		currBall = 0;
 		setCameraToBall(currBall);
 		System.out.println("done game with world");
-		createTerrain(0, 1, "grass", true);
+		createTerrain(0, 1, "grass", false);
 		DisplayManager.reset();
 
 	}
@@ -210,8 +210,40 @@ public class GameState implements State {
 		camera.move();
 		for(ParticleSystem system:particles)
 			system.generateParticles();
+		if(!balls.get(currBall).isMoving() && ((RealBall)balls.get(currBall)).isPlayed()){
+			timeBallStill += DisplayManager.getFrameTimeSeconds();
+			if(timeBallStill >= 1){
+				printScore();
+				int bio = checkBallsInHole();
+				if(bio >= 0){
+					System.out.print("Ball " + bio + " in hole!");
+					if(numberOfPlayers == 1)
+						MainGameLoop.gameOver();
+					balls.remove(bio);
+					numberOfPlayers--;
+					if(currBall >= bio)
+						currBall--;
+				}
+				swap();
+				timeBallStill = 0;
+			}
+			
+		}
 	}
 	
+	private int checkBallsInHole() {
+		float hx = world.getEnd().x;
+		float hz = world.getEnd().z;
+		for(Ball b:balls){
+			float bx = b.getPosition().x;
+			float bz = b.getPosition().z;
+			if(Math.abs(bx-hx) < 4 && Math.abs(bz-hz) < 4){
+				return balls.indexOf(b);
+			}
+		}
+		return -1;
+	}
+
 	@Override
 	public void cleanUp() {
 		fbos.cleanUp();
@@ -237,7 +269,7 @@ public class GameState implements State {
 	}
 	
 	public Terrain createTerrain(int gridX, int gridY, String texName, float[][] height){
-		Terrain t = new Terrain(gridX, gridY, loader, new ModelTexture(loader.loadTexture(texName)), height, world.getEnd());
+		Terrain t = new Terrain(gridX, gridY, loader, new ModelTexture(loader.loadTexture(texName)), height, new Vector2f(world.getEnd().x, world.getEnd().z));
 		world.removeTerrain();
 		world.add(t);
 		return t;
@@ -408,41 +440,23 @@ public class GameState implements State {
 	}
 	
 	public void swap() {
-		  if(balls.get(currBall).getPosition().x>world.getEnd().x-4 && balls.get(currBall).getPosition().x<world.getEnd().x+4 && balls.get(currBall).getPosition().z<world.getEnd().y+4&& balls.get(currBall).getPosition().z>world.getEnd().y-4 ){
-              if(gameover==false && !multiplayer) System.out.println("game is over");
-               else if(gameover==false){
-               	gameover=true;
-               	GameState.getInstance().removeBall();
-               }
-               else {
-            	   System.out.println("game is over");
-            	   System.out.println("player 1 score= "+ score[0]);
-             	   System.out.println("player 2 score= "+ score[1]);
-               }
-               }
-		if(currBall==1) {
-			currBall = 0;
-			score[1]++;
-			System.out.println("score is " + score[1]);
-		} 	
-		else if(currBall==0 && score[0]==0 ){
-			createBall(new Vector3f(100, 20, 100), true);
-			score[0]++;
-			currBall=1;
-			System.out.println(score[0]);
+		if(balls.size() < numberOfPlayers){
+			currBall++;
+			createBall(world.getStart(), true);
+			
+		} else {
+			currBall = (currBall + 1) % numberOfPlayers;
 		}
-		
-		else if(currBall == 0) {
-			currBall=1;
-			score[0]++;
-			System.out.println("score is " + score[0]);
-		}
+		((RealBall) balls.get(currBall)).setPlayed(false);
 		setCameraToBall(currBall);
 	}
 	
+	public void printScore(){
+		((RealBall) balls.get(currBall)).addScore();
+		System.out.println("Score for player " + currBall + " is: " + ((RealBall) balls.get(currBall)).getScore());
+	}
 
 	public void removeBall() {
-		balls.get(currBall).setPosition(new Vector3f(0,0,0));
-		
+		balls.remove(currBall);
 	}
 }

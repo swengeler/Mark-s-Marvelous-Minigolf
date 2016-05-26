@@ -78,18 +78,18 @@ public class MainGameLoop {
 		
 	}
 	
-	public static void loadGame(){
+	public static void loadGame(int numberOfPlayers){
 		currState.cleanUp();
 		DisplayManager.closeDisplay();
 		DisplayManager.createDisplay();
-		currState = new GameState(loader);
+		currState = new GameState(loader, numberOfPlayers);
 	}
 	
-	public static void loadGame(World world){
+	public static void loadGame(World world, int numberOfPlayers){
 		currState.cleanUp();
 		DisplayManager.closeDisplay();
 		DisplayManager.createDisplay();
-		currState = new GameState(loader, world);
+		currState = new GameState(loader, world, numberOfPlayers);
 	}
 	
 	public static void loadMenu(){
@@ -109,6 +109,14 @@ public class MainGameLoop {
 	
 	public static int getCounter() {
 		return counter;
+	}
+
+	public static void gameOver() {
+		currState.cleanUp();
+		DisplayManager.closeDisplay();
+		DisplayManager.createDisplay();
+		currState = new MenuState(loader);
+		
 	}
 
 }

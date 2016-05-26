@@ -182,7 +182,7 @@ public class DesignerState implements State{
 			createEntity("box", new Vector3f(picker.getCurrentTerrainPoint().x, getWorld().getHeightOfTerrain(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z), picker.getCurrentTerrainPoint().z), 0f, 0f, 0f, 3);
 		}
 		if (BallPlaced && HolePlaced && Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
-			MainGameLoop.loadGame(world);
+			MainGameLoop.loadGame(world, 3);
 		}
 	}
 	

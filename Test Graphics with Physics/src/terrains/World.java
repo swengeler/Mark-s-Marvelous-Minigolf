@@ -19,7 +19,8 @@ public class World {
 	private List<Entity> normalEntities = new ArrayList<Entity>();
 	private List<Light> lights = new ArrayList<Light>();
 	private Camera camera;
-	private Vector2f Start, End;
+	private Vector2f Start = new Vector2f(Terrain.getSize()/2f, Terrain.getSize()/2f);
+	private Vector2f End = new Vector2f(Terrain.getSize()/4f, Terrain.getSize()/4f);
 	
 	
 	public World(Camera camera){
@@ -204,12 +205,12 @@ public class World {
 		this.End =  position;
 	}
 	
-	public Vector2f getStart() {
-		return Start;
+	public Vector3f getStart() {
+		return new Vector3f(Start.x, getHeightOfTerrain(Start.x, Start.y), Start.y);
 	}
 	
-	public Vector2f getEnd() {
-		return End;
+	public Vector3f getEnd() {
+		return new Vector3f(End.x, getHeightOfTerrain(End.x, End.y), End.y);
 	}
 	
 }

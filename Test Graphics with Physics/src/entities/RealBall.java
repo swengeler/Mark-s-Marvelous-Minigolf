@@ -21,6 +21,10 @@ public class RealBall extends Entity implements Ball {
 	public static final float REAL_RADIUS = 0.04267f;
 	public static final float REAL_MASS = 0.04593f;
 	public static final float RADIUS = 1f;
+	
+	private static final float MAX_CHARGING_TIME = 3;
+	private static final float POWER_SCALE = 100;
+	private static final float MIN_VEL = 7;
 
 	private Vector3f currentVel;
 	private Vector3f currentAcc;
@@ -29,12 +33,13 @@ public class RealBall extends Entity implements Ball {
 	private boolean gameover=false;
 	private float currentTurnSpeed;
 	private float lastTimeElapsed;
+	
+	private int score;
 
 	private boolean moving;
 	
-	private float initspeed=0;
-	private boolean goingup=true;
-	private double a;
+	private float initspeed = 0;
+	private boolean charging;
 	private boolean played;
 
 
@@ -60,6 +65,9 @@ public class RealBall extends Entity implements Ball {
 
 		System.out.printf("Ball's position after moving: (%f|%f|%f)\n", getPosition().x, getPosition().y, getPosition().z);
 		System.out.printf("Ball's velocity after moving (with gravity applied): (%f|%f|%f)\n", currentVel.x, currentVel.y, currentVel.z);
+		if(getVelocity().length() < MIN_VEL && Math.abs(getPosition().y - GameState.getInstance().getWorld().getHeightOfTerrain(getPosition().x, getPosition().z)) < 3){
+			setMoving(false);
+		}
 	}
 
 	public void addAccel(Vector3f accel) {
@@ -109,46 +117,22 @@ public class RealBall extends Entity implements Ball {
 		}
 		
 		if(Keyboard.isKeyDown(Keyboard.KEY_F)){
-			played=true;
-			if (initspeed == 0){
-				goingup=true;
-				a=System.currentTimeMillis();
+			if(!played){
+				charging = true;
+				initspeed += DisplayManager.getFrameTimeSeconds();
+				if(initspeed > MAX_CHARGING_TIME)
+					initspeed = MAX_CHARGING_TIME;
 			}	
-
-			if (initspeed < 250 && goingup)
-					initspeed += 2.5;
-			if( initspeed > 0 && !goingup){
-			initspeed -= 2.5;
-			}
-			if(initspeed == 250){
-					double b = System.currentTimeMillis();
-					goingup = false;
-					System.out.println("time to full charge= " + (b-a) );
-			}
-				
-				
-		}
-		
-		if(!Keyboard.isKeyDown(Keyboard.KEY_F) && played){
+		} else if(!Keyboard.isKeyDown(Keyboard.KEY_F) && charging){
+			charging = false;
 			setMoving(true);
 
 			System.out.println(initspeed + "hell is here");
-			this.currentVel.x += (float) (initspeed * Math.sin(Math.toRadians(super.getRotY()+Camera.getInstance().getAngleAroundBall())));
-			this.currentVel.z += (float) (initspeed * Math.cos(Math.toRadians(super.getRotY()+Camera.getInstance().getAngleAroundBall())));
-			initspeed=0;
-			//System.out.println(this.currentVel.x+"help me pls");
-			//System.out.println(this.currentVel.z+"help me pls");
+			this.currentVel.x = (float) (initspeed * Math.sin(Math.toRadians(super.getRotY()+Camera.getInstance().getAngleAroundBall()))) * POWER_SCALE;
+			this.currentVel.z = (float) (initspeed * Math.cos(Math.toRadians(super.getRotY()+Camera.getInstance().getAngleAroundBall()))) * POWER_SCALE;
 			
-			if(this.getVelocity().x==0 && this.getVelocity().y==0 && this.getVelocity().z==0){
-				played=false;
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				GameState.getInstance().swap();
-			}
+			initspeed=0;
+			played = true;
 		}
 		
 		if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
@@ -252,6 +236,22 @@ public class RealBall extends Entity implements Ball {
 	
 	public boolean equals(Object o) {
 		return super.equals(o);
+	}
+	
+	public void addScore(){
+		score++;
+	}
+	
+	public int getScore(){
+		return score;
+	}
+	
+	public boolean isPlayed(){
+		return played;
+	}
+	
+	public void setPlayed(boolean p){
+		played = p;
 	}
 
 }
