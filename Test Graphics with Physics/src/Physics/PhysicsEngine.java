@@ -320,7 +320,7 @@ public class PhysicsEngine {
 			counter++;
 		}
 
-		return new ShotData(ball.getPosition(), obstaclesHit);
+		return new ShotData(shotVel, ball.getPosition(), obstaclesHit);
 	}
 
 }
