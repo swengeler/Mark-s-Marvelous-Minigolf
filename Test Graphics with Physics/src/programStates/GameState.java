@@ -71,6 +71,7 @@ public class GameState implements State {
 	private boolean multiplayer=true;
 	
 	private static int score[]={0,0};
+	private boolean gameover=true;
 	
 	
 	public GameState(Loader loader){
@@ -407,6 +408,18 @@ public class GameState implements State {
 	}
 	
 	public void swap() {
+		  if(balls.get(currBall).getPosition().x>world.getEnd().x-4 && balls.get(currBall).getPosition().x<world.getEnd().x+4 && balls.get(currBall).getPosition().z<world.getEnd().y+4&& balls.get(currBall).getPosition().z>world.getEnd().y-4 ){
+              if(gameover==false && !multiplayer) System.out.println("game is over");
+               else if(gameover==false){
+               	gameover=true;
+               	GameState.getInstance().removeBall();
+               }
+               else {
+            	   System.out.println("game is over");
+            	   System.out.println("player 1 score= "+ score[0]);
+             	   System.out.println("player 2 score= "+ score[1]);
+               }
+               }
 		if(currBall==1) {
 			currBall = 0;
 			score[1]++;
@@ -425,5 +438,11 @@ public class GameState implements State {
 			System.out.println("score is " + score[0]);
 		}
 		setCameraToBall(currBall);
+	}
+	
+
+	public void removeBall() {
+		balls.get(currBall).setPosition(new Vector3f(0,0,0));
+		
 	}
 }

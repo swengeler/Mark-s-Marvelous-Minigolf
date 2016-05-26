@@ -26,7 +26,7 @@ public class RealBall extends Entity implements Ball {
 	private Vector3f currentAcc;
     private Vector3f lastPosition;
 	private ArrayList<Vector3f> accelerations;
-
+	private boolean gameover=false;
 	private float currentTurnSpeed;
 	private float lastTimeElapsed;
 
@@ -36,6 +36,7 @@ public class RealBall extends Entity implements Ball {
 	private boolean goingup=true;
 	private double a;
 	private boolean played;
+
 
 	public RealBall(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
 		super(model, position, rotX, rotY, rotZ, scale, "ball");
@@ -135,8 +136,8 @@ public class RealBall extends Entity implements Ball {
 			this.currentVel.x += (float) (initspeed * Math.sin(Math.toRadians(super.getRotY()+Camera.getInstance().getAngleAroundBall())));
 			this.currentVel.z += (float) (initspeed * Math.cos(Math.toRadians(super.getRotY()+Camera.getInstance().getAngleAroundBall())));
 			initspeed=0;
-			System.out.println(this.currentVel.x+"help me pls");
-			System.out.println(this.currentVel.z+"help me pls");
+			//System.out.println(this.currentVel.x+"help me pls");
+			//System.out.println(this.currentVel.z+"help me pls");
 			
 			if(this.getVelocity().x==0 && this.getVelocity().y==0 && this.getVelocity().z==0){
 				played=false;
