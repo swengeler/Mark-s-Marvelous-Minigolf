@@ -66,6 +66,10 @@ public class GameState implements State {
 		init(loader);
 	}
 	
+	public GameState(Loader loader, World world) {
+		buildWithWorld(loader, world); 
+	}
+	
 	@Override
 	public void init(Loader loader) {
 		this.loader = loader;
@@ -94,8 +98,29 @@ public class GameState implements State {
 		currBall = 1;
 		setCameraToBall(currBall);
 		//createTerrain(0, 0, "grass", true);
-		
-
+	}
+	
+	public void buildWithWorld(Loader loader, World world) {
+		System.out.println("new game with world");
+		this.loader = loader;
+		loadModels();
+		loadGuis();
+		this.world = world;
+		createTerrain(0, 0, "grass", world.getTerrains().get(0).getHeights());
+		for(Entity e:world.getEntities()) {
+			System.out.println(e);
+		}
+		createBall(new Vector3f(world.getStart().x, world.getHeightOfTerrain(world.getStart().x, world.getEnd().y), world.getEnd().y));
+		//createBall(new Vector3f(400,0,400));
+		loadLights();
+		renderer = new MasterRenderer(loader, camera);
+		System.out.println("newEngine");
+		mainEngine = new PhysicsEngine(balls, world);
+		loadWater();
+		loadParticleSystem();
+		currBall = 0;
+		setCameraToBall(currBall);
+		System.out.println("done game with world");
 	}
 	
 	@Override
@@ -150,6 +175,9 @@ public class GameState implements State {
 	
 	@Override
 	public void update() {
+		if (mainEngine == null) {
+			System.out.println("no physics");
+		}
 		mainEngine.tick();
 		camera.move();
 		for(ParticleSystem system:particles)
@@ -174,6 +202,13 @@ public class GameState implements State {
 	
 	public Terrain createTerrain(int gridX, int gridY, String texName, String heightMap){
 		Terrain t = new Terrain(gridX, gridY, loader, new ModelTexture(loader.loadTexture(texName)), heightMap);
+		world.add(t);
+		return t;
+	}
+	
+	public Terrain createTerrain(int gridX, int gridY, String texName, float[][] height){
+		Terrain t = new Terrain(gridX, gridY, loader, new ModelTexture(loader.loadTexture(texName)), height);
+		world.removeTerrain();
 		world.add(t);
 		return t;
 	}
@@ -214,6 +249,9 @@ public class GameState implements State {
 		ModelData flower = OBJFileLoader.loadOBJ("grassModel");
 		ModelData box = OBJFileLoader.loadOBJ("box");
 		ModelData dragon = OBJFileLoader.loadOBJ("dragon");
+		ModelData empty = OBJFileLoader.loadOBJ("empty");
+		ModelData disk = OBJFileLoader.loadOBJ("disk");
+		ModelData flag = OBJFileLoader.loadOBJ("flag_rounded");
 		
 		RawModel humanModel = loader.loadToVAO(human.getVertices(), human.getTextureCoords(), human.getNormals(), human.getIndices());
 		RawModel ballModel = loader.loadToVAO(ball.getVertices(), ball.getTextureCoords(), ball.getNormals(), ball.getIndices());
@@ -224,6 +262,10 @@ public class GameState implements State {
 		RawModel boxModel = loader.loadToVAO(box.getVertices(), box.getTextureCoords(), box.getNormals(), box.getIndices());
 		RawModel flowerModel = loader.loadToVAO(flower.getVertices(), flower.getTextureCoords(), flower.getNormals(), flower.getIndices());
 		RawModel dragonModel = loader.loadToVAO(dragon.getVertices(), dragon.getTextureCoords(), dragon.getNormals(), dragon.getIndices());
+		RawModel emptyModel = loader.loadToVAO(empty.getVertices(), empty.getTextureCoords(), empty.getNormals(), empty.getIndices());
+		RawModel diskModel = loader.loadToVAO(disk.getVertices(), disk.getTextureCoords(), disk.getNormals(), disk.getIndices());
+		RawModel flagModel = loader.loadToVAO(flag.getVertices(), flag.getTextureCoords(), flag.getNormals(), flag.getIndices());
+	
 	
 		tModels.put("human", new TexturedModel(humanModel,new ModelTexture(loader.loadTexture("playerTexture"))));
 		tModels.put("ball", new TexturedModel(ballModel,new ModelTexture(loader.loadTexture("white"))));
@@ -233,18 +275,22 @@ public class GameState implements State {
 		tModels.put("pine", new TexturedModel(pineModel,new ModelTexture(loader.loadTexture("pine"))));
 		tModels.put("box", new TexturedModel(boxModel,new ModelTexture(loader.loadTexture("box"))));
 		tModels.put("flower", new TexturedModel(flowerModel,new ModelTexture(loader.loadTexture("flower"))));
-		tModels.put( "barrel", new TexturedModel(NormalMappedObjLoader.loadOBJ("barrel", loader), new ModelTexture(loader.loadTexture("barrel"))));
+		tModels.put("barrel", new TexturedModel(NormalMappedObjLoader.loadOBJ("barrel", loader), new ModelTexture(loader.loadTexture("barrel"))));
 		tModels.put("crate", new TexturedModel(NormalMappedObjLoader.loadOBJ("crate", loader), new ModelTexture(loader.loadTexture("crate"))));
 		tModels.put("boulder", new TexturedModel(NormalMappedObjLoader.loadOBJ("boulder", loader), new ModelTexture(loader.loadTexture("boulder"))));
 		tModels.put("dragon", new TexturedModel(dragonModel,new ModelTexture(loader.loadTexture("white"))));
+		tModels.put("empty", new TexturedModel(emptyModel, new ModelTexture(loader.loadTexture("flower"))));
+		tModels.put("disk", new TexturedModel(diskModel, new ModelTexture(loader.loadTexture("white"))));
+		tModels.put("flag", new TexturedModel(flagModel, new ModelTexture(loader.loadTexture("white"))));
+		
 	
 		tModels.get("barrel").getTexture().setShineDamper(10);
 		tModels.get("barrel").getTexture().setReflectivity(0.3f);
 		tModels.get("barrel").getTexture().setNormalMap(loader.loadTexture("barrelNormal"));
 		
-		tModels.get("barrel").getTexture().setShineDamper(10);
-		tModels.get("barrel").getTexture().setReflectivity(0.3f);
-		tModels.get("barrel").getTexture().setNormalMap(loader.loadTexture("crateNormal"));
+		tModels.get("crate").getTexture().setShineDamper(10);
+		tModels.get("crate").getTexture().setReflectivity(0.3f);
+		tModels.get("crate").getTexture().setNormalMap(loader.loadTexture("crateNormal"));
 		
 		tModels.get("boulder").getTexture().setShineDamper(10);
 		tModels.get("boulder").getTexture().setReflectivity(0.3f);

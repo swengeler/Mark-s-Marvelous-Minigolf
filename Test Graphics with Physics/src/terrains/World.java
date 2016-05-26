@@ -17,6 +17,8 @@ public class World {
 	private List<Entity> normalEntities = new ArrayList<Entity>();
 	private List<Light> lights = new ArrayList<Light>();
 	private Camera camera;
+	private Vector2f Start, End;
+	
 	
 	public World(Camera camera){
 		this.camera = camera;
@@ -40,6 +42,10 @@ public class World {
 	
 	public void add(Entity entity){
 		entities.add(entity);
+	}
+	
+	public void removeTerrain() {
+		terrains.clear();
 	}
 	
 	public void add(Light light){
@@ -154,6 +160,22 @@ public class World {
 
 	public void setNormalEntities(List<Entity> normalEntities) {
 		this.normalEntities = normalEntities;
+	}
+	
+	public void setStart(Vector2f position) {
+		this.Start = position;
+	}
+	
+	public void setEnd(Vector2f position) {
+		this.End =  position;
+	}
+	
+	public Vector2f getStart() {
+		return Start;
+	}
+	
+	public Vector2f getEnd() {
+		return End;
 	}
 	
 }

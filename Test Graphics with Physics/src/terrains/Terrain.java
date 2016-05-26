@@ -16,7 +16,7 @@ public class Terrain {
 
 	private static final float SIZE = 800;
 	private static final float MAX_HEIGHT = 40;
-	private static final float RADIUS = 25;
+	private static final float RADIUS = 15;
 	private static final float MAX_PIXEL_COLOR = 256 * 256 * 256;
 	
 	private float x;
@@ -43,6 +43,16 @@ public class Terrain {
 		this.x = gridX * getSize();
 		this.z = gridZ * getSize();
 		this.model = generateTerrain(loader, heightMap);
+		
+	}
+	
+	public Terrain(int gridX, int gridZ, Loader loader, ModelTexture texture, float[][] heights){
+		
+		this.texture = texture;
+		this.x = gridX * getSize();
+		this.z = gridZ * getSize();
+		this.heights = heights;
+		this.model = generateTerrain(loader);
 		
 	}
 	
@@ -213,42 +223,78 @@ public class Terrain {
 		return loader.loadToVAO(vertices, textureCoords, normals, indices);
 	}
 	
-	public void updateTerrain(Loader loader, float x, float z, float change) {
+	private RawModel generateTerrain(Loader loader){
+		
+		
+		VERTEX_COUNT = heights.length;
+		
 		int count = VERTEX_COUNT * VERTEX_COUNT;
 		float[] vertices = new float[count * 3];
 		float[] normals = new float[count * 3];
 		float[] textureCoords = new float[count*2];
 		int[] indices = new int[6*(VERTEX_COUNT-1)*(VERTEX_COUNT-1)];
 		int vertexPointer = 0;
-		//float currentHeight = heights[(int)x][(int)z];
-		//float newHeight = currentHeight + change;
+		for(int i=0;i<VERTEX_COUNT;i++){
+			for(int j=0;j<VERTEX_COUNT;j++){
+				vertices[vertexPointer*3] = (float)j/((float)VERTEX_COUNT - 1) * getSize();
+				
+				vertices[vertexPointer*3+1] = heights[j][i];
+				vertices[vertexPointer*3+2] = (float)i/((float)VERTEX_COUNT - 1) * getSize();
+				Vector3f normal = calculateNormal(j, i, heights);
+				normals[vertexPointer*3] = normal.x;
+				normals[vertexPointer*3+1] = normal.y;
+				normals[vertexPointer*3+2] = normal.z;
+				textureCoords[vertexPointer*2] = (float)j/((float)VERTEX_COUNT - 1);
+				textureCoords[vertexPointer*2+1] = (float)i/((float)VERTEX_COUNT - 1);
+				vertexPointer++;
+			}
+		}
+		int pointer = 0;
+		for(int gz=0;gz<VERTEX_COUNT-1;gz++){
+			for(int gx=0;gx<VERTEX_COUNT-1;gx++){
+				int topLeft = (gz*VERTEX_COUNT)+gx;
+				int topRight = topLeft + 1;
+				int bottomLeft = ((gz+1)*VERTEX_COUNT)+gx;
+				int bottomRight = bottomLeft + 1;
+				indices[pointer++] = topLeft;
+				indices[pointer++] = bottomLeft;
+				indices[pointer++] = topRight;
+				indices[pointer++] = topRight;
+				indices[pointer++] = bottomLeft;
+				indices[pointer++] = bottomRight;
+			}
+		}
+		return loader.loadToVAO(vertices, textureCoords, normals, indices);
+	}
+	
+	public void updateTerrain(Loader loader, float x, float z) {
+		int count = VERTEX_COUNT * VERTEX_COUNT;
+		float[] vertices = new float[count * 3];
+		float[] normals = new float[count * 3];
+		float[] textureCoords = new float[count*2];
+		int[] indices = new int[6*(VERTEX_COUNT-1)*(VERTEX_COUNT-1)];
+		int vertexPointer = 0;
+		float newHeight = 10;
 		for(float i = -RADIUS; i <= RADIUS; i++) {
 			for (float k = -RADIUS; k  <= RADIUS; k++) {
-				heights[(int)(x + i)][(int)(z + k)] += change;
-				if (heights[(int)(x + i)][(int)(z + k)] >= MAX_HEIGHT) {
-					heights[(int)(x + i)][(int)(z + k)] =  MAX_HEIGHT;
-				} else if (heights[(int)(x + i)][(int)(z + k)] <= -MAX_HEIGHT) {
-					heights[(int)(x + i)][(int)(z + k)] =  -MAX_HEIGHT;
-				}
-				/*
-				float distance = (float) Math.sqrt((i*i)+(k*k));
-				if (distance <= RADIUS) {
-					float height = (float) ((newHeight/2) * -(Math.cos(Math.PI - (Math.PI * (distance/RADIUS))))+(newHeight/2));
-					if (height >= MAX_HEIGHT) {
-						heights[(int)(x + i)][(int)(z + k)] =  MAX_HEIGHT;
-					} else if (height <= -MAX_HEIGHT) {
-						heights[(int)(x + i)][(int)(z + k)] =  -MAX_HEIGHT;
-					} else {
-						if (x + i >= 0 && x + i <= VERTEX_COUNT && z + k >= 0 && z + k <= VERTEX_COUNT) {
-							if (change > 0 && height > heights[(int)(x + i)][(int)(z + k)]) {
-								heights[(int)(x + i)][(int)(z + k)] =  height;		
-							} else if(change < 0 && height < heights[(int)(x + i)][(int)(z + k)]) {
-								heights[(int)(x + i)][(int)(z + k)] =  height;	
+				if (x + i >= 0 && x + i < VERTEX_COUNT && z + k >= 0 && z + k < VERTEX_COUNT) {
+					float distance = (float) Math.sqrt((i*i)+(k*k));
+					if (distance <= RADIUS) {
+						float height = (float) ((newHeight/2) * -(Math.cos(Math.PI - (Math.PI * (distance/RADIUS))))+(newHeight/2));
+						if (height >= MAX_HEIGHT) {
+							heights[(int)(x + i)][(int)(z + k)] =  MAX_HEIGHT;
+						} else if (height <= -MAX_HEIGHT) {
+							heights[(int)(x + i)][(int)(z + k)] =  -MAX_HEIGHT;
+						} else {
+							if (x + i >= 0 && x + i <= VERTEX_COUNT && z + k >= 0 && z + k <= VERTEX_COUNT) {
+								if (height > heights[(int)(x + i)][(int)(z + k)]) {
+									heights[(int)(x + i)][(int)(z + k)] =  height;		
+								}
 							}
 						}
 					}
 				}
-				*/
+				
 			}
 		}
 		for(int i=0;i<VERTEX_COUNT;i++){
@@ -314,6 +360,16 @@ public class Terrain {
 		float heightR = getHeight(x+1, z, generator);
 		float heightD = getHeight(x, z-1, generator);
 		float heightU = getHeight(x, z+1, generator);
+		Vector3f normal = new Vector3f(heightL-heightR, 2f, heightD-heightU);
+		normal.normalise();
+		return normal;
+	}
+	private Vector3f calculateNormal(int x, int z, float[][] heights){
+		if (x < 1 || x + 1 >= heights.length || z < 1 || z + 1 >= heights[0].length) return new Vector3f(0,0,0);
+		float heightL = heights[x-1][z];
+		float heightR = heights[x+1][z];
+		float heightD = heights[x][z-1];
+		float heightU = heights[x][z+1];
 		Vector3f normal = new Vector3f(heightL-heightR, 2f, heightD-heightU);
 		normal.normalise();
 		return normal;

@@ -5,11 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import Physics.PhysicsEngine;
+import engineTester.MainGameLoop;
 import entities.Ball;
 import entities.Camera;
 import entities.CameraDesigner;
@@ -60,6 +63,8 @@ public class DesignerState implements State{
 	
 	private WaterFrameBuffers fbos;
 	
+	boolean HolePlaced = false;
+	boolean BallPlaced = false;
 	
 	private boolean water = false;
 	private boolean particle = true;
@@ -146,9 +151,34 @@ public class DesignerState implements State{
 	public void checkInputs() {
 		balls.get(currBall).checkInputs(world);
 		picker.update();
-		float mouseWheel = Mouse.getDWheel() / 48;
-		if (mouseWheel != 0 && loader.getVBOs() <= 380) {
-			world.getTerrains().get(0).updateTerrain(loader, ((picker.getCurrentTerrainPoint().x / (Terrain.getSize()/2)) * (world.getTerrains().get(0).getVertexCount()/2)), ((picker.getCurrentTerrainPoint().z / (Terrain.getSize()/2)) * (world.getTerrains().get(0).getVertexCount()/2)), mouseWheel );
+		if (Keyboard.isKeyDown(Keyboard.KEY_Q) && loader.getVBOs() <= 350) {
+			world.getTerrains().get(0).updateTerrain(loader, ((picker.getCurrentTerrainPoint().x / (Terrain.getSize()/2)) * (world.getTerrains().get(0).getVertexCount()/2)), ((picker.getCurrentTerrainPoint().z / (Terrain.getSize()/2)) * (world.getTerrains().get(0).getVertexCount()/2)));
+			for(Entity e:world.getEntities()) {
+				float x = e.getPosition().x;
+				float z = e.getPosition().z;
+				float y = getWorld().getHeightOfTerrain(x, z);
+				e.setPosition(new Vector3f(x,y,z));
+			}
+		
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_R) && !BallPlaced) {
+			createEntity("disk", new Vector3f(picker.getCurrentTerrainPoint().x, getWorld().getHeightOfTerrain(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z), picker.getCurrentTerrainPoint().z), 0f, 0f, 0f, 1);
+			BallPlaced = true;
+			world.setStart(new Vector2f(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z));
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_T) && !HolePlaced) {
+			createEntity("flag", new Vector3f(picker.getCurrentTerrainPoint().x, getWorld().getHeightOfTerrain(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z), picker.getCurrentTerrainPoint().z), 0f, 0f, 0f, 5);
+			HolePlaced = true;
+			world.setEnd(new Vector2f(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z));
+		}
+		if (loader.getVBOs() <= 350 && Keyboard.isKeyDown(Keyboard.KEY_F)) {
+			createEntity("tree", new Vector3f(picker.getCurrentTerrainPoint().x, getWorld().getHeightOfTerrain(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z), picker.getCurrentTerrainPoint().z), 0f, 0f, 0f, 5);
+		}
+		if (loader.getVBOs() <= 350 && Keyboard.isKeyDown(Keyboard.KEY_G)) {
+			createEntity("box", new Vector3f(picker.getCurrentTerrainPoint().x, getWorld().getHeightOfTerrain(picker.getCurrentTerrainPoint().x, picker.getCurrentTerrainPoint().z), picker.getCurrentTerrainPoint().z), 0f, 0f, 0f, 3);
+		}
+		if (BallPlaced && HolePlaced && Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
+			MainGameLoop.crateNewState("game", world);
 		}
 	}
 	
@@ -225,6 +255,8 @@ public class DesignerState implements State{
 		ModelData box = OBJFileLoader.loadOBJ("box");
 		ModelData dragon = OBJFileLoader.loadOBJ("dragon");
 		ModelData empty = OBJFileLoader.loadOBJ("empty");
+		ModelData disk = OBJFileLoader.loadOBJ("disk");
+		ModelData flag = OBJFileLoader.loadOBJ("flag_rounded");
 		
 		RawModel humanModel = loader.loadToVAO(human.getVertices(), human.getTextureCoords(), human.getNormals(), human.getIndices());
 		RawModel ballModel = loader.loadToVAO(ball.getVertices(), ball.getTextureCoords(), ball.getNormals(), ball.getIndices());
@@ -236,6 +268,8 @@ public class DesignerState implements State{
 		RawModel flowerModel = loader.loadToVAO(flower.getVertices(), flower.getTextureCoords(), flower.getNormals(), flower.getIndices());
 		RawModel dragonModel = loader.loadToVAO(dragon.getVertices(), dragon.getTextureCoords(), dragon.getNormals(), dragon.getIndices());
 		RawModel emptyModel = loader.loadToVAO(empty.getVertices(), empty.getTextureCoords(), empty.getNormals(), empty.getIndices());
+		RawModel diskModel = loader.loadToVAO(disk.getVertices(), disk.getTextureCoords(), disk.getNormals(), disk.getIndices());
+		RawModel flagModel = loader.loadToVAO(flag.getVertices(), flag.getTextureCoords(), flag.getNormals(), flag.getIndices());
 	
 		tModels.put("human", new TexturedModel(humanModel,new ModelTexture(loader.loadTexture("playerTexture"))));
 		tModels.put("ball", new TexturedModel(ballModel,new ModelTexture(loader.loadTexture("white"))));
@@ -250,6 +284,8 @@ public class DesignerState implements State{
 		tModels.put("boulder", new TexturedModel(NormalMappedObjLoader.loadOBJ("boulder", loader), new ModelTexture(loader.loadTexture("boulder"))));
 		tModels.put("dragon", new TexturedModel(dragonModel,new ModelTexture(loader.loadTexture("white"))));
 		tModels.put("empty", new TexturedModel(emptyModel, new ModelTexture(loader.loadTexture("flower"))));
+		tModels.put("disk", new TexturedModel(diskModel, new ModelTexture(loader.loadTexture("white"))));
+		tModels.put("flag", new TexturedModel(flagModel, new ModelTexture(loader.loadTexture("white"))));
 		
 		tModels.get("barrel").getTexture().setShineDamper(10);
 		tModels.get("barrel").getTexture().setReflectivity(0.3f);

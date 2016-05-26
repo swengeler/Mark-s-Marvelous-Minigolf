@@ -49,6 +49,30 @@ public class MainGameLoop {
 	
 	private static State currState;
 	private static Loader loader = new Loader();
+	private static boolean update = false;
+	
+	public static void crateNewState(String key, World world) {
+		System.out.println(key);
+		update = true;
+		currState.cleanUp();
+		DisplayManager.closeDisplay();
+		System.out.println("updating");
+		DisplayManager.createDisplay();
+		if(key.equals("menu")) {
+			currState = new MenuState(loader);
+		} else if (key.equals("designer")) {
+			currState = new DesignerState(loader);
+		} else if (key.equals("game")) {
+			if (world != null) {
+				System.out.println("new game");
+				currState = new GameState(loader, world);
+			} else {
+				currState = new GameState(loader);
+			}
+		}
+		
+		update = false;
+	}
 	
 	public static void main(String[] args) {
 	
@@ -247,6 +271,8 @@ public class MainGameLoop {
 		DisplayManager.reset();
 		
 		while(!Display.isCloseRequested()){
+			if(!update) {
+
 			/*
 			player1.checkInputs(world);
 			mainEngine.tick();
@@ -297,6 +323,7 @@ public class MainGameLoop {
 			*/
 			
 			DisplayManager.updateDisplay();
+			}
 		}
 		/*
 		fbos.cleanUp();

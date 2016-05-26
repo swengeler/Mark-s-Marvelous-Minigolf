@@ -89,7 +89,6 @@ public class Entity {
 	}
 
 	public float getRotY() {
-		System.out.println("Get rotY: " + rotVel.y);
 		return rotVel.y;
 	}
 
