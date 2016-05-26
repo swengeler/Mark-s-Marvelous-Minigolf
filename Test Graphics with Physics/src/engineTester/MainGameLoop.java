@@ -60,7 +60,7 @@ public class MainGameLoop {
 	    ModelData box = OBJFileLoader.loadOBJ("wall2");
 	    ModelData dragon = OBJFileLoader.loadOBJ("dragon");
 	    ModelData dragon_low = OBJFileLoader.loadOBJ("dragon_low_test");
-	    ModelData flag = OBJFileLoader.loadOBJ("flag");
+	    ModelData flag = OBJFileLoader.loadOBJ("hole");
 		box.print(ModelData.PRINT_DATA_FILE);
 
 		RawModel humanModel = loader.loadToVAO(human.getVertices(), human.getTextureCoords(), human.getNormals(), human.getIndices());
