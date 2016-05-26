@@ -113,12 +113,12 @@ public class RealBall extends Entity implements Ball {
 				goingup=true;
 				a=System.currentTimeMillis();
 			}	
-			if (initspeed < 500 && goingup)
-					initspeed += 10;
+			if (initspeed < 250 && goingup)
+					initspeed += 2.5;
 			if( initspeed > 0 && !goingup){
-			//	initspeed -= 2.5;
+			initspeed -= 2.5;
 			}
-			if(initspeed == 500){
+			if(initspeed == 250){
 					double b = System.currentTimeMillis();
 					goingup = false;
 					System.out.println("time to full charge= " + (b-a) );
@@ -128,6 +128,7 @@ public class RealBall extends Entity implements Ball {
 		}
 		
 		if(!Keyboard.isKeyDown(Keyboard.KEY_F) && played){
+			setMoving(true);
 			System.out.println(initspeed + "hell is here");
 			this.currentVel.x += (float) (initspeed * Math.sin(Math.toRadians(super.getRotY()+Camera.getInstance().getAngleAroundBall())));
 			this.currentVel.z += (float) (initspeed * Math.cos(Math.toRadians(super.getRotY()+Camera.getInstance().getAngleAroundBall())));
