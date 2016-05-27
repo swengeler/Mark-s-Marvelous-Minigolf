@@ -52,7 +52,7 @@ public class MainGameLoop {
 
 		ModelData human = OBJFileLoader.loadOBJ("person");
 		ModelData ball = OBJFileLoader.loadOBJ("ball_centred_hight_scaled2");
-		ModelData tree = OBJFileLoader.loadOBJ("tree");
+		ModelData tree = OBJFileLoader.loadOBJ("why_tree_why");
 		ModelData fern = OBJFileLoader.loadOBJ("fern");
 		ModelData grass = OBJFileLoader.loadOBJ("grassModel");
 		ModelData pine = OBJFileLoader.loadOBJ("pine");
@@ -61,7 +61,7 @@ public class MainGameLoop {
 	    ModelData dragon = OBJFileLoader.loadOBJ("dragon");
 	    ModelData dragon_low = OBJFileLoader.loadOBJ("dragon_low_test");
 	    ModelData flag = OBJFileLoader.loadOBJ("hole");
-	    ModelData cone = OBJFileLoader.loadOBJ("cone");
+	    ModelData cone = OBJFileLoader.loadOBJ("ring");
 	    ModelData pyramid = OBJFileLoader.loadOBJ("ramp");
 	    ModelData wall = OBJFileLoader.loadOBJ("wall_segment");
 		box.print(ModelData.PRINT_DATA_FILE);
@@ -82,7 +82,7 @@ public class MainGameLoop {
 
 		TexturedModel humanTModel = new TexturedModel(humanModel,new ModelTexture(loader.loadTexture("playerTexture")));
 		TexturedModel ballTModel = new TexturedModel(ballModel,new ModelTexture(loader.loadTexture("white")));
-		TexturedModel treeTModel = new TexturedModel(treeModel,new ModelTexture(loader.loadTexture("tree")));
+		TexturedModel treeTModel = new TexturedModel(treeModel,new ModelTexture(loader.loadTexture("lowPolyTree")));
 		TexturedModel fernTModel = new TexturedModel(fernModel,new ModelTexture(loader.loadTexture("fernAtlas")));
 		TexturedModel grassTModel = new TexturedModel(grassModel,new ModelTexture(loader.loadTexture("grassTexture")));
 		TexturedModel pineTModel = new TexturedModel(pineModel,new ModelTexture(loader.loadTexture("pine")));
@@ -90,7 +90,7 @@ public class MainGameLoop {
 		TexturedModel flowerTModel = new TexturedModel(flowerModel,new ModelTexture(loader.loadTexture("flower")));
 		TexturedModel dragonTModel = new TexturedModel(dragonModel,new ModelTexture(loader.loadTexture("white")));
 		TexturedModel flagTModel = new TexturedModel(flagModel,new ModelTexture(loader.loadTexture("metal2")));
-		TexturedModel coneTModel = new TexturedModel(coneModel,new ModelTexture(loader.loadTexture("blue")));
+		TexturedModel coneTModel = new TexturedModel(coneModel,new ModelTexture(loader.loadTexture("color_wheel")));
 		TexturedModel pyramidTModel = new TexturedModel(pyramidModel,new ModelTexture(loader.loadTexture("skull_texture")));
 		TexturedModel wallTModel = new TexturedModel(wallModel,new ModelTexture(loader.loadTexture("white")));
 
@@ -101,9 +101,9 @@ public class MainGameLoop {
 		Entity b = new Entity(treeTModel, tree, new Vector3f(0, 0, 0), 0, 0, 0, 1, "tree");
 		Entity c = new Entity(fernTModel, fern, new Vector3f(0, 0, 0), 0, 0, 0, 1, "fern");
 		Entity d = new Entity(grassTModel, grass, new Vector3f(0, 0, 0), 0, 0, 0, 1, "grass");
-		Entity e = new Entity(boxTModel, box, new Vector3f(0, 0, 0), 0, 0, 0, 1, "box");
+		Entity e = new Entity(boxTModel, box, new Vector3f(200, 0, 500), 0, 0, 0, 5, "box");
 		Entity f = new Entity(flagTModel, flag, new Vector3f(300, 0f, 300), 0, 0, 0, 1, "flag");
-		Entity g = new Entity(coneTModel, cone, new Vector3f(100, 0, 300), 0, 0, 0, 5, "cone");
+		Entity g = new Entity(coneTModel, cone, new Vector3f(100, 0, 300), 0, 0, 0, 1, "cone");
 		Entity h = new Entity(pyramidTModel, pyramid, new Vector3f(400, -0.1f, 400), 0, 0, 0, 10, "pyramid");
 		Entity i = new Entity(wallTModel, wall, new Vector3f(100, 0f, 100), 0, 0, 0, 1, "wall");
 		long afterHumans = System.currentTimeMillis();
@@ -143,9 +143,9 @@ public class MainGameLoop {
 		world.add(new Terrain(0, 3, loader, new ModelTexture(loader.loadTexture("metal2"))/*, "arena"/*, "heightmap"*/));
 
 		List<Entity> nature = new ArrayList<Entity>();
-		nature.add(new Entity(boxTModel, box, new Vector3f(200, 0, 500), 0, 0, 0, 5, "box"));
+		nature.add(e);
 		nature.add(new Entity(dragonTModel, dragon_low, new Vector3f(400, 0, 200), 0, 0, 0, 5, "dragon"));
-		nature.add(new Entity(treeTModel, tree, new Vector3f(300, 0, 100), 0, 0, 0, 3, "tree"));
+		nature.add(new Entity(treeTModel, tree, new Vector3f(100, 0, 400), 0, 0, 0, 10, "tree"));
 		nature.add(f);
 		nature.add(g);
 		nature.add(h);
@@ -193,6 +193,7 @@ public class MainGameLoop {
 		System.out.println("\nTIME TO PREPARE MODES ETC.: " + (after - before) + "\n");
 		DisplayManager.resetFrameTime();
 		while(!Display.isCloseRequested()) {
+			e.increaseRotation(0, 0.1f, 0);
 			world.start();
 			System.out.println("\n---- While loop run " + (counter++) + " times ----");
 			picker.update();
